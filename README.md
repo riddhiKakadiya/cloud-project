@@ -4,10 +4,11 @@
 
 | Name | NEU ID | Email Address |
 | --- | --- | --- |
-| | | |
-| | | |
-| | | |
-| | | |
+| Jai Soni| | |
+| Krapali Rai| | |
+| Riddhi Kakadiya| | |
+| Sreerag Mandakathil Sreenath| 001838559| mandakathil.s@husky.neu.edu|
+
 
 ## Technology Stack
 
