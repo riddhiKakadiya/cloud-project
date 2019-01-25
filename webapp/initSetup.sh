@@ -2,38 +2,52 @@
 #Run with sudo permisions
 echo Setingup Dev environment
 
-while getopts u:p:d: option
+while getopts k:u:p:d: option
 do
 case "${option}"
 in
-u) USERNAME=${OPTARG};;
-p) PASSWORD=${OPTARG};;
-d) DATABASENAME=${OPTARG};;
+k) test=${OPTARG};;
+u) user=${OPTARG};;
+p) password=${OPTARG};;
+d) databasename=${OPTARG};;
 esac
 done
+
+echo $user
+echo $password
+echo $databasename
 
 cat > WebProject/WebProject/config/my.cnf << EOF
 # my.cnf
 [client]
-database = $DATABASENAME
-user = $USERNAME
-password = $PASSWORD
+database = $databasename
+user = $user
+password = $password
 default-character-set = utf8
 EOF
 
 sudo rm -rf djangoEnv
 sudo apt-get update
-sudo apt-get install python3 virtualenv python3-pip mysql-server -y
+sudo apt-get install python3 virtualenv python3-pip mysql-server python3-dev libmysqlclient-dev -y
 virtualenv -p python3 djangoEnv
 
-mysql --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '$PASSWORD';" 
-mysql --user="$USERNAME" --password="$PASSWORD" --execute="FLUSH PRIVILEGES;"
+sudo mysql <<EOF
+SELECT user,authentication_string,plugin,host FROM mysql.user;
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '$password';
+FLUSH PRIVILEGES;
+CREATE USER '$user'@'localhost' IDENTIFIED BY '$password';
+GRANT ALL PRIVILEGES ON *.* TO '$user'@'localhost' WITH GRANT OPTION;
+SELECT user,authentication_string,plugin,host FROM mysql.user;
+CREATE DATABASE $databasename;
+EOF
 
-mysql --user="$USERNAME" --password="$PASSWORD" --execute="CREATE USER '$USERNAME'@'localhost' IDENTIFIED BY '$PASSWORD';"
-mysql --user="$USERNAME" --password="$PASSWORD" --execute="GRANT ALL PRIVILEGES ON *.* TO '$USERNAME'@'localhost' WITH GRANT OPTION;"
-mysql --user="$USERNAME" --password="$PASSWORD" --execute="CREATE DATABASE $DATABASENAME;"
 
+sudo rm -rf djangoEnv
+virtualenv -p python3 djangoEnv
 source djangoEnv/bin/activate
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 cd WebProject
 python3 manage.py runserver
+
+exit
+
