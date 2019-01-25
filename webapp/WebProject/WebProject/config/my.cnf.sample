@@ -1,7 +1,6 @@
 # my.cnf
 [client]
 database = WebProject
-user = webapp
-password = JKRSCsye2019@
-port = 3306
+user = USER
+password = PASSWORD
 default-character-set = utf8
