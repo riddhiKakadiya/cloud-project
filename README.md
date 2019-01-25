@@ -25,7 +25,7 @@ Install the following system requirements:
 3. Edit the database connection details there
 
 **Optional**
-You may use the devSetup.sh to install all the required libraries and to start
+You may use the devSetup.sh to install all the required libraries and to start server
 
 ```bash
 source /webapp/devSetup.sh
@@ -35,6 +35,7 @@ source /webapp/devSetup.sh
 To run django server
 1. Start the virtualenv
 2. Execute run server command
+
 ```bash
 cd /webapp
 source djangoEnv/bin/activate
