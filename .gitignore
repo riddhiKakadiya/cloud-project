@@ -109,5 +109,6 @@ venv.bak/
 
 # Django environment
 /webapp/djangoEnv/
+*.sample
 
 *.pyc
