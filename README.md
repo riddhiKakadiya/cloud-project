@@ -25,10 +25,10 @@ Install the following system requirements:
 3. Edit the database connection details there
 
 **Optional**
-You may use the devSetup.sh to install all the required libraries and to start server
+You may use the initSetup.sh to install all the required libraries and to start server
 
 ```bash
-source /webapp/devSetup.sh
+source /webapp/initSetup.sh -u YOURUSERNAME -p YOURPASSWORD -d YOURDBNAME
 ```
 
 ### Dev Setup
