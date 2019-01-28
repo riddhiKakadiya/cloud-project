@@ -28,7 +28,8 @@ Install the following system requirements:
 You may use the initSetup.sh to install all the required libraries and to start server
 
 ```bash
-source /webapp/initSetup.sh -u YOURUSERNAME -p YOURPASSWORD -d YOURDBNAME
+cd webapp
+source initSetup.sh -u YOURUSERNAME -p YOURPASSWORD -d YOURDBNAME
 ```
 
 ### Dev Setup
