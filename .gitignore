@@ -111,3 +111,4 @@ venv.bak/
 /webapp/djangoEnv/
 
 *.pyc
+config/
