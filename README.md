@@ -5,7 +5,7 @@
 | Name | NEU ID | Email Address |
 | --- | --- | --- |
 | Jai Soni| 001822913|soni.j@husky.neu.edu |
-| Krapali Rai| | |
+| Krapali Rai| 001813750 | rai.k@husky.neu.edu |
 | Riddhi Kakadiya| | |
 | Sreerag Mandakathil Sreenath| 001838559| mandakathil.s@husky.neu.edu|
 
