@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Jai Soni| 001822913|soni.j@husky.neu.edu |
 | Krapali Rai| | |
-| Riddhi Kakadiya| | |
+| Riddhi Kakadiya| 001811354 | kamlesh.r@husky.neu.edu |
 | Sreerag Mandakathil Sreenath| 001838559| mandakathil.s@husky.neu.edu|
 
 
@@ -34,8 +34,9 @@ source initSetup.sh -u YOURUSERNAME -p YOURPASSWORD -d YOURDBNAME
 
 ### Dev Setup
 To run django server
-1. Start the virtualenv
-2. Execute run server command
+1.Start the server
+2.Go to webapp folder “csye6225-spring2019/webapp”
+3.Activate python environment “source djangoEnv/bin/activate”
 
 ```bash
 cd /webapp
