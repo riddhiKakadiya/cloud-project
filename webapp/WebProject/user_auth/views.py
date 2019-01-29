@@ -12,10 +12,14 @@ def password_check(given_password):
 		return "Not working"
 	return given_password
 
+# def createUser():
+# 	return 	
+
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index." + password_check("testa"))
 
-
+# def registerPage(request):
+#     return HttpResponse("register"+ createUser())
 
 def testpage(request):
     return HttpResponse("testpage" + password_check("testa"))
