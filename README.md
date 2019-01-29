@@ -45,7 +45,6 @@ cd /WebProject
 python3 manage.py runserver
 ```
 
-
 ## Build Instructions
 
 
