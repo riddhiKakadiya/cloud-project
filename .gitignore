@@ -110,5 +110,4 @@ venv.bak/
 # Django environment
 /webapp/djangoEnv/
 *.cnf
-
 *.pyc
