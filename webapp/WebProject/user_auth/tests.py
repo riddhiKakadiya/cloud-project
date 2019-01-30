@@ -29,3 +29,11 @@ class BasicAuthTest(TestCase):
 						
 	def TestUserNameFalse(self):
 		self.assertEqual(validateUserName('riddhikakadiya29'), '* please enter valid email ID *')
+
+
+	#passwordValidation
+	def TestPasswordTrue(self):
+		self.assertEqual(validatePassword('Krapali@123'),True)
+
+	def TestPasswordFalse(self):
+		self.assertEqual(validatePassword('krere'), 'The password must be between 8 and 16 characters. : ')
