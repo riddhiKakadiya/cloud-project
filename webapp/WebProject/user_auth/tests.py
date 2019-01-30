@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test import Client
 import base64
-from .views import validateUserName 
+from .views import validateUserName , validatePassword
 
 class BasicAuthTest(TestCase):
 	#creating user
@@ -27,14 +27,14 @@ class BasicAuthTest(TestCase):
 	def testUserNameTrue(self):
 		self.assertEqual(validateUserName('riddhikakadiya29@gmail.com'), True)
 						
-	def TestUserNameFalse(self):
+	def testUserNameFalse(self):
 		self.assertEqual(validateUserName('riddhikakadiya29'), '* please enter valid email ID *')
 
 
 	#passwordValidation
-	def TestPasswordTrue(self):
+	def testPasswordTrue(self):
 		self.assertEqual(validatePassword('Krapali@123'),True)
 
-	def TestPasswordFalse(self):
-		self.assertEqual(validatePassword('krere'), 'The password must be between 8 and 16 characters. : ')
+	def testPasswordFalse(self):
+		self.assertEqual(validatePassword('K1e$e'), 'The password must be between 8 and 16 characters. : ')
 
