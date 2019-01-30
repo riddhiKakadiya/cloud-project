@@ -96,7 +96,6 @@ def signin(request):
 				user = authenticate(username=username, password=password)
 				if user is not None:
 					current_time = time.ctime()
-					print(current_time)
 					return JsonResponse({"current time": current_time})
 	# otherwise ask for authentification
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
