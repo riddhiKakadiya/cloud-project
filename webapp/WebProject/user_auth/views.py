@@ -35,7 +35,7 @@ def validatePassword(password):
 		message+= "Password must contain one special character : "
 	
 	if (len(message)>0):
-		return JsonResponse({'message':message})
+		return message
 	else:
 		return True
 
@@ -44,21 +44,19 @@ def validateUserName(username):
 	valid = re.search(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$',username)
 	if valid:
 		return True
-	return JsonResponse({'message': '"* please enter valid email ID *"'})
+	return "* please enter valid email ID *"
 
 
 #--------------------------------------------------------------------------------
 # Views definitions
 #--------------------------------------------------------------------------------	
-@csrf_exempt
-def index(request):
-	return HttpResponse("Hello")
+
+
 
 @csrf_exempt
 def registerPage(request):
 	if request.method == 'POST':
 		received_json_data = json.loads(request.body.decode("utf-8"))
-		print(received_json_data)
 		username = received_json_data['username']
 		password = received_json_data['password']
 		if (username==None or password == None):
@@ -84,9 +82,8 @@ def registerPage(request):
 				return JsonResponse({'message':username_status + " " + password_status})
 	return JsonResponse({'message':'Error : Please use a post method with parameters username and password to create user'})
 
-def testpage(request):
-    return HttpResponse("testpage" + password_check("testa"))
 
+@csrf_exempt
 def signin(request):
 	if 'HTTP_AUTHORIZATION' in request.META:
 		auth = request.META['HTTP_AUTHORIZATION'].split()
@@ -97,8 +94,9 @@ def signin(request):
 				if not username and not password:
 					return JsonResponse({'message':'Error : User not logged, Please provide credentials'}, status=401)
 				user = authenticate(username=username, password=password)
-				if user is not None and user.is_staff:
-				# handle your view here
-					return JsonResponse({"current time": time.ctime()})
+				if user is not None:
+					current_time = time.ctime()
+					print(current_time)
+					return JsonResponse({"current time": current_time})
 	# otherwise ask for authentification
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)

@@ -56,6 +56,12 @@ press Ctrl+c
 deactivate
 ```
 
+## To run test
+
+```bash
+python3 manage.py test
+```
+
 #### Other common commands
 1. To make database migrations, navigate to csye6225-spring2019/webapp/WebProject/
 
