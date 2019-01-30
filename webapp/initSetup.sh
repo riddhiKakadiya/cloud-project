@@ -26,7 +26,6 @@ password = $password
 default-character-set = utf8
 EOF
 
-sudo rm -rf djangoEnv
 sudo apt-get update
 sudo apt-get install python3 virtualenv python3-pip mysql-server python3-dev libmysqlclient-dev -y
 virtualenv -p python3 djangoEnv
