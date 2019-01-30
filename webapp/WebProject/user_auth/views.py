@@ -17,7 +17,7 @@ import time
 def validatePassword(password):
 	message =""
 	if(len(password)==0):
-		return("Password can't be blank")
+		return JsonResponse({'message':'Password can\'t be blank'})
 
 	if(6>len(password) or len(password)>=12):
 		message+= 'The password must be between 6 and 12 characters. : '
@@ -37,7 +37,7 @@ def validatePassword(password):
 		message+= "Password must contain one numeric "
 
 	if (len(message)>0):
-		return message
+		return JsonResponse({'message':message})
 	else:
 		return True
 
@@ -46,7 +46,7 @@ def validateUserName(username):
 	valid = re.search(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$',username)
 	if valid:
 		return True
-	return "* please enter valid email ID *"
+	return JsonResponse({'message': '"* please enter valid email ID *"'})
 
 
 #--------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ def signin(request):
 				authstring = base64.b64decode(auth[1]).decode("utf-8")
 				username, password = authstring.split(':', 1)
 				if not username and not password:
-					return JsonResponse({'message':'ERROR: User not logged, Please provide credentials'})
+					return JsonResponse({'message':'Error : User not logged, Please provide credentials'})
 				user = authenticate(username=username, password=password)
 				if user is not None and user.is_staff:
 				# handle your view here
@@ -106,4 +106,4 @@ def signin(request):
 	response = HttpResponse("")
 	response.status_code = 401
 	response['WWW-Authenticate'] = 'Basic realm="restricted area"'
-	return JsonResponse({'message': 'ERROR: Incorrect user details'})
+	return JsonResponse({'message': 'Error : Incorrect user details'})
