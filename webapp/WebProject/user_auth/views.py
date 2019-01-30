@@ -52,7 +52,7 @@ def validateUserName(username):
 #--------------------------------------------------------------------------------	
 @csrf_exempt
 def index(request):
-	return HttpResponse("Hello, world. You're at the polls index." + validatePassword("password"))
+	return HttpResponse("Hello")
 
 @csrf_exempt
 def registerPage(request):
