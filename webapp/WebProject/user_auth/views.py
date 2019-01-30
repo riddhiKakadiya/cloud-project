@@ -90,20 +90,20 @@ def testpage(request):
     return HttpResponse("testpage" + password_check("testa"))
 
 def signin(request):
-    if 'HTTP_AUTHORIZATION' in request.META:
-        auth = request.META['HTTP_AUTHORIZATION'].split()
-        if len(auth) == 2:
-            if auth[0].lower() == "basic":
-                authstring = base64.b64decode(auth[1]).decode("utf-8")
-                username, password = authstring.split(':', 1)
-                user = authenticate(username=username, password=password)
-                if user is not None and user.is_staff:
-                # handle your view here
-                    #return render_to_response('my_template.html')
-                    return HttpResponse("Current time is : "+ time.ctime())
-
-    # otherwise ask for authentification
-    response = HttpResponse("")
-    response.status_code = 401
-    response['WWW-Authenticate'] = 'Basic realm="restricted area"'
-    return response
+	if 'HTTP_AUTHORIZATION' in request.META:
+		auth = request.META['HTTP_AUTHORIZATION'].split()
+		if len(auth) == 2:
+			if auth[0].lower() == "basic":
+				authstring = base64.b64decode(auth[1]).decode("utf-8")
+				username, password = authstring.split(':', 1)
+				if not username and not password:
+					return JsonResponse({'message':'ERROR: User not logged, Please provide credentials'})
+				user = authenticate(username=username, password=password)
+				if user is not None and user.is_staff:
+				# handle your view here
+					return JsonResponse({"current time": time.ctime()})
+	# otherwise ask for authentification
+	response = HttpResponse("")
+	response.status_code = 401
+	response['WWW-Authenticate'] = 'Basic realm="restricted area"'
+	return JsonResponse({'message': 'ERROR: Incorrect user details'})
