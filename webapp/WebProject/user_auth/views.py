@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-
+import json
 import re
 
 #--------------------------------------------------------------------------------
@@ -56,10 +56,14 @@ def index(request):
 @csrf_exempt
 def registerPage(request):
 	if request.method == 'POST':
-		username = request.POST.get('username')
-		password = request.POST.get('password')
+		received_json_data = json.loads(request.body.decode("utf-8"))
+		username = received_json_data['username']
+		password = received_json_data['password']
+		if (username==None or password == None):
+			return JsonResponse({'message':'Username or password cant be empty'})
 		username_status = validateUserName(username)
 		password_status = validatePassword(password)
+
 
 		if (username_status == True and password_status == True):
 			email = username
