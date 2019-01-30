@@ -97,13 +97,10 @@ def signin(request):
 				authstring = base64.b64decode(auth[1]).decode("utf-8")
 				username, password = authstring.split(':', 1)
 				if not username and not password:
-					return JsonResponse({'message':'Error : User not logged, Please provide credentials'})
+					return JsonResponse({'message':'Error : User not logged, Please provide credentials'}, status=401)
 				user = authenticate(username=username, password=password)
 				if user is not None and user.is_staff:
 				# handle your view here
 					return JsonResponse({"current time": time.ctime()})
 	# otherwise ask for authentification
-	response = HttpResponse("")
-	response.status_code = 401
-	response['WWW-Authenticate'] = 'Basic realm="restricted area"'
-	return JsonResponse({'message': 'Error : Incorrect user details'})
+	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
