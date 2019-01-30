@@ -1,8 +1,9 @@
 #importing Django libraries
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+
 import re
 
 #--------------------------------------------------------------------------------
@@ -17,7 +18,7 @@ def validatePassword(password):
 
 	if(6>len(password) or len(password)>=12):
 		message+= 'The password must be between 6 and 12 characters. : '
-
+	password_strength = {}
 	if re.search(r'[A-Z]', password):
 		password_strength['has_upper'] = True
 	else:
@@ -66,15 +67,15 @@ def registerPage(request):
 				user = User.objects.create_user(username,username, password)
 				user.is_staff= True
 				user.save()
-				return HttpResponse("user created")
+				return JsonResponse({"user created"})
 			except:
-				return HttpResponse('Error : ' +username + ' already exists')
+				return JsonResponse({'Error' :  username + ' already exists'})
 		else:
 			if(password_status == True):
 				return HttpResponse(username_status)	
 			elif (username_status == True):
 				return HttpResponse(password_status)
 			else:
-				return HttpResponse(username_status + " " + password_status)
-	return HttpResponse('Error : Please use a post method with parameters username and password to create user')
+				return JsonResponse({'message':username_status + " " + password_status})
+	return JsonResponse({'message':'Error : Please use a post method with parameters username and password to create user'})
 
