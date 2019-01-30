@@ -20,8 +20,8 @@ def validatePassword(password):
 	if(len(password)==0):
 		return JsonResponse({'message':'Password can\'t be blank'})
 
-	if (6>len(password) or len(password)>=12):
-		message+= 'The password must be between 6 and 12 characters. : '
+	if (8>len(password) or len(password)>=16):
+		message+= 'The password must be between 8 and 16 characters. : '
 	password_strength = {}
 	if not re.search(r'[A-Z]', password):
 		message+= "Password must contain one upppercase : "
