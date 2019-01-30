@@ -16,23 +16,23 @@ def validatePassword(password):
 	if(len(password)==0):
 		return("Password can't be blank")
 
-	if(6>len(password) or len(password)>=12):
+	if not (6>len(password) or len(password)>=12):
 		message+= 'The password must be between 6 and 12 characters. : '
 	password_strength = {}
-	if re.search(r'[A-Z]', password):
-		password_strength['has_upper'] = True
-	else:
+	if not re.search(r'[A-Z]', password):
 		message+= "Password must contain one upppercase : "
-	if re.search(r'[a-z]', password):
-		password_strength['has_lower'] = True
-	else:
+	if not re.search(r'[a-z]', password):
 		message+= "Password must contain one lowercase : "
 
-	if re.search(r'[0-9]', password):
-		password_strength['has_num'] = True
-	else:
-		message+= "Password must contain one numeric "
+	if not re.search(r'[0-9]', password):
+		message+= "Password must contain one numeric : "
 
+	# if re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~"+r'"]', password):
+		# message+= "Password must contain one special character : "
+
+	if not re.search(r'specialCharacters', password):
+		message+= "Password must contain one special character : "
+	
 	if (len(message)>0):
 		return message
 	else:
@@ -51,7 +51,7 @@ def validateUserName(username):
 #--------------------------------------------------------------------------------	
 @csrf_exempt
 def index(request):
-	return HttpResponse("Hello, world. You're at the polls index." + password_check("testa"))
+	return HttpResponse("Hello, world. You're at the polls index." + validatePassword("password"))
 
 @csrf_exempt
 def registerPage(request):
