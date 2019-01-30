@@ -1,10 +1,13 @@
 #importing Django libraries
 from django.shortcuts import render
+from django.contrib.auth import authenticate
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 import json
 import re
+import base64
+import time
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -14,7 +17,7 @@ import re
 def validatePassword(password):
 	message =""
 	if(len(password)==0):
-		return("Password can't be blank")
+		return JsonResponse({'message':'Password can\'t be blank'})
 
 	if(6>len(password) or len(password)>=12):
 		message+= 'The password must be between 6 and 12 characters. : '
@@ -34,7 +37,7 @@ def validatePassword(password):
 		message+= "Password must contain one numeric "
 
 	if (len(message)>0):
-		return message
+		return JsonResponse({'message':message})
 	else:
 		return True
 
@@ -43,7 +46,7 @@ def validateUserName(username):
 	valid = re.search(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$',username)
 	if valid:
 		return True
-	return "* please enter valid email ID *"
+	return JsonResponse({'message': '"* please enter valid email ID *"'})
 
 
 #--------------------------------------------------------------------------------
@@ -83,3 +86,21 @@ def registerPage(request):
 				return JsonResponse({'message':username_status + " " + password_status})
 	return JsonResponse({'message':'Error : Please use a post method with parameters username and password to create user'})
 
+def testpage(request):
+    return HttpResponse("testpage" + password_check("testa"))
+
+def signin(request):
+	if 'HTTP_AUTHORIZATION' in request.META:
+		auth = request.META['HTTP_AUTHORIZATION'].split()
+		if len(auth) == 2:
+			if auth[0].lower() == "basic":
+				authstring = base64.b64decode(auth[1]).decode("utf-8")
+				username, password = authstring.split(':', 1)
+				if not username and not password:
+					return JsonResponse({'message':'Error : User not logged, Please provide credentials'}, status=401)
+				user = authenticate(username=username, password=password)
+				if user is not None and user.is_staff:
+				# handle your view here
+					return JsonResponse({"current time": time.ctime()})
+	# otherwise ask for authentification
+	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
