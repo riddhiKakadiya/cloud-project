@@ -59,6 +59,7 @@ deactivate
 ## To run test
 
 ```bash
+cd csye6225-spring2019/webapp/WebProject/
 python3 manage.py test
 ```
 
