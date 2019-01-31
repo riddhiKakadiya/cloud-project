@@ -1,8 +1,8 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
 urlpatterns = [
-    path('', views.signin, name='signin'),
-    path('user/register', views.registerPage, name='registerPage'),
+    re_path(r'^$', views.signin, name='signin'),
+    re_path(r'^user/register/?$', views.registerPage, name='registerPage'),
 ]
