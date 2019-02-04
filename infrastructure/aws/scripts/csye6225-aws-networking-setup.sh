@@ -9,6 +9,7 @@ VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 | jq -r '.Vpc.VpcId')
 if [ $? = "0" ]
 then
 	echo "Created VPC Successfully"
+	echo $VPC_ID
 else
 	echo "Error : VPC Not created"
 	exit
@@ -28,7 +29,7 @@ else
 	exit
 fi
 
-SUBNET_ID_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.2.0/24 --availability-zone-id use1-az1| jq -r '.Subnet.SubnetId')
+SUBNET_ID_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.2.0/24 --availability-zone-id use1-az2| jq -r '.Subnet.SubnetId')
 if [ $? = "0" ]
 then
 	echo "Created Subnet-2 in use-az1 Successfully"
@@ -38,7 +39,7 @@ else
 	exit
 fi
 
-SUBNET_ID_3=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.3.0/24 --availability-zone-id use1-az1| jq -r '.Subnet.SubnetId')
+SUBNET_ID_3=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.3.0/24 --availability-zone-id use1-az3| jq -r '.Subnet.SubnetId')
 if [ $? = "0" ]
 then
 	echo "Created Subnet-3 in use-az1 Successfully"
