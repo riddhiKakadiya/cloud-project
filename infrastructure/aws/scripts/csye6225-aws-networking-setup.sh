@@ -5,7 +5,13 @@ echo "Executing creation command : VPC "
 #-----------------------------
 # Creating VPC
 #-----------------------------
-VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 | jq -r '.Vpc.VpcId')
+
+VPC=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16  | jq -r '.')
+VPC_ID=$(echo $VPC | jq -r '.Vpc.VpcId')
+# echo $VPC | jq '.'
+# exit
+
+
 if [ $? = "0" ]
 then
 	echo "Created VPC Successfully"
@@ -99,18 +105,31 @@ else
 	echo "Error : Route Table to Intenet Gayway  Not attached"
 	exit
 fi
-echo "End of Script"
-exit
 
-#-----------------------------
-# Attaching Route table to Subnet
-#-----------------------------
-# aws ec2 associate-route-table --route-table-id $ROUTE_TABLE_ID --subnet-id $SUBNET_ID_1
-# if [ $? = "0" ]
-# then
-# 	echo "Attached Intenet Gayway to VPC Successfully"
-# 	echo $INTERNET_GATEWAY_ID
-# else
-# 	echo "Error : Internet Gateway to VPC Not attached"
-# 	exit
-# fi
+SECURITY_GRP_ID=$(aws ec2 describe-security-groups --filter "Name=vpc-id,Values=$VPC_ID" | jq -r '.SecurityGroups[0].GroupId')
+echo $SECURITY_GRP_ID
+
+aws ec2 revoke-security-group-ingress --group-id $SECURITY_GRP_ID --protocol all
+
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges=[{CidrIp=0.0.0.0/0,Description="public 80"}]
+
+if [ $? = "0" ]
+then
+	echo "Attached port 80 to security group Successfully"
+else
+	echo "Error : port 80 to security group Not attached"
+	exit
+fi
+
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=0.0.0.0/0,Description="ssh 22"}]
+
+if [ $? = "0" ]
+then
+	echo "Attached port 22 to security group Successfully"
+else
+	echo "Error : port 22 to security group Not attached"
+	exit
+fi
+
+
+echo "End of Script"
