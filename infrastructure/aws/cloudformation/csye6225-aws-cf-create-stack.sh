@@ -5,7 +5,8 @@ set -e
 
 ##Check if enough arguements are passed
 if [ $# -lt 1 ]; then
-  echo "Kindly provide stack name! Try Again."
+  echo "Please provide stack name ! Try Again."
+  echo "e.g. ./csye6225-pring2019-aws-cf-create-stack.sh <STACK_NAME>"
   exit 1
 fi
 
@@ -15,4 +16,4 @@ response=$(aws cloudformation create-stack --stack-name "$1" --template-body fil
 echo "Waiting for Stack $1 to be created"
 echo "$response"
 aws cloudformation wait stack-create-complete --stack-name $1
-echo "stack $1 is created"
+echo "Stack $1 created successfully"
