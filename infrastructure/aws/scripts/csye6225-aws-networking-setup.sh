@@ -109,7 +109,16 @@ fi
 SECURITY_GRP_ID=$(aws ec2 describe-security-groups --filter "Name=vpc-id,Values=$VPC_ID" | jq -r '.SecurityGroups[0].GroupId')
 echo $SECURITY_GRP_ID
 
-aws ec2 revoke-security-group-ingress --group-id $SECURITY_GRP_ID --protocol all
+
+
+aws ec2 create-security-group --group-name default_2 --description "default VPC security group" --vpc-id $VPC_ID
+
+aws ec2 delete-security-group --group-id $SECURITY_GRP_ID
+
+SECURITY_GRP_ID=$(aws ec2 describe-security-groups --filter "Name=vpc-id,Values=$VPC_ID" | jq -r '.SecurityGroups[0].GroupId')
+echo $SECURITY_GRP_ID
+
+# aws ec2 revoke-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions '[{"IpProtocol":"-1","IpRanges":[{"CidrIp":"SECURITY_GRP_ID"}]}]'
 
 aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges=[{CidrIp=0.0.0.0/0,Description="public 80"}]
 
@@ -133,3 +142,4 @@ fi
 
 
 echo "End of Script"
+exit
