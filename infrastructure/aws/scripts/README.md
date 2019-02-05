@@ -8,12 +8,12 @@ The architecture contains networking resources such as Virtual Private Cloud (VP
 
 ####  infrastructure setup:
 
-1. Create a Virtual Private Cloud (VPC) resource called STACK_NAME-csye6225-vpc.
+1. Create a Virtual Private Cloud (VPC).
 2. Create subnets in your VPC. You must create 3 subnets, each in different availability zone in the same region under same VPC.
-3. Create Internet Gateway resource called STACK_NAME-csye6225-ig.
-4. Attach the Internet Gateway to STACK_NAME-csye6225-vpc VPC.
-5. Create a public Route Table called STACK_NAME-csye6225-rt. Attach all subnets created above to the route table.
-6. Create a public route in STACK_NAME-csye6225-rt route table with destination CIDR block 0.0.0.0/0 and STACK_NAME-csye6225-ig as the target.
+3. Create Internet Gateway resource.
+4. Attach the Internet Gateway to the created VPC.
+5. Create a public Route Table. Attach all subnets created above to the route table.
+6. Create a public route in the public route table created above with destination CIDR block 0.0.0.0/0 and internet gateway creted above as the target.
 7. Modify the default security group for your VPC to remove existing rules and add new rules to only allow TCP traffic on port 22 and 80 from anywhere.
 
 ### Executing the scripts
