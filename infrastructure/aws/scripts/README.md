@@ -20,13 +20,13 @@ The architecture contains networking resources such as Virtual Private Cloud (VP
 To run the script for creating the network stack :
 
 ```bash
-cd csye6225-spring2019/infrastructure/scripts
+cd csye6225-spring2019/infrastructure/aws/scripts
 sh csye6225-aws-networking-setup.sh
 ```
 
 To run the script for deleting the network stack :
 
 ```bash
-cd csye6225-spring2019/infrastructure/scripts
+cd csye6225-spring2019/infrastructure/aws/scripts
 sh csye6225-aws-networking-teardown.sh
 ```
