@@ -6,12 +6,30 @@ then
   echo " Empty Stack List!"
   exit 1
 else
-  echo "Enter Stack name to be deleted from below :"
+  echo "Available stacks :"
   echo $StackList
+  echo "Enter Stack name to be deleted"
   read StackName
-  echo "Deleting Stack $StackName"
 fi
 
+#Check if user has entered correct Stack Name
+flag=0
+for item in "$StackList"; do
+    if [ $StackName == "$item" ]
+    then
+        echo "$StackName is present"
+        flag=1
+        break
+    fi
+done
+
+if [ $flag == 0 ]
+then
+    echo "Error: Invalid StackName - $StackName"
+    exit
+fi
+
+echo "Deleting Stack $StackName"
 ResponseDelete=$(aws cloudformation delete-stack --stack-name $StackName)
 if [ $? -ne "0" ]
 then
@@ -31,3 +49,4 @@ else
   echo "$ResponseSuccess"
   exit 1
 fi
+
