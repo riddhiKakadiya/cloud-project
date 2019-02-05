@@ -47,43 +47,31 @@ Resources:
   Subnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-1a
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
       CidrBlock: {Ref: SubnetCIDR1}
       MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value:
-            Fn::Join:
-              - '-'
-              - [{Ref: 'AWS::StackName'}, 'us-east-1a']
       VpcId: {Ref: VPC}
 #SubNet-2
   Subnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-1b
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
       CidrBlock: {Ref: SubnetCIDR2}
       MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value:
-            Fn::Join:
-              - '-'
-              - [{Ref: 'AWS::StackName'}, 'us-east-1b']
       VpcId: {Ref: VPC}
 #SubNet-3
   Subnet3:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-1c
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
       CidrBlock: {Ref: SubnetCIDR3}
       MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value:
-            Fn::Join:
-              - '-'
-              - [{Ref: 'AWS::StackName'}, 'us-east-1c']
       VpcId: {Ref: VPC}
 #Internet Gateway
   InternetGateway:
@@ -145,3 +133,33 @@ Resources:
       DestinationCidrBlock: {Ref: DestinationCidrBlock}
       GatewayId:
         Ref: InternetGateway
+##Modifying existing security group
+  VPCDefaultSecurityGroupIngress1:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !GetAtt
+        - VPC
+        - DefaultSecurityGroup
+      IpProtocol: tcp
+      FromPort: '22'
+      ToPort: '22'
+      CidrIp: {Ref: DestinationCidrBlock}
+  VPCDefaultSecurityGroupIngress2:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !GetAtt
+        - VPC
+        - DefaultSecurityGroup
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: {Ref: DestinationCidrBlock}
+
+Outputs:
+  SGId:
+    Description: Default Security Group Id
+    Value: !GetAtt
+      - VPC
+      - DefaultSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-SGId"
