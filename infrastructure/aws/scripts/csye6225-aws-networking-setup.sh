@@ -90,6 +90,40 @@ else
 	echo "Error : Route Table Not created"
 	exit
 fi
+#-----------------------------
+# Attaching Subnets to Route Table
+#-----------------------------
+ROUTE_TABLE_SUBNET_ASSOCIATION_ID_1=$(aws ec2 associate-route-table --route-table-id $ROUTE_TABLE_ID --subnet-id $SUBNET_ID_1 | jq -r '.AssociationId')
+if [ $? = "0" ]
+then
+	echo "Associated subnet to route table Successfully"
+	echo $ROUTE_TABLE_SUBNET_ASSOCIATION_ID_1
+else
+	echo "Error : association of subnet to route table failed"
+	exit
+fi
+
+ROUTE_TABLE_SUBNET_ASSOCIATION_ID_2=$(aws ec2 associate-route-table --route-table-id $ROUTE_TABLE_ID --subnet-id $SUBNET_ID_2 | jq -r '.AssociationId')
+if [ $? = "0" ]
+then
+	echo "Associated subnet to route table Successfully"
+	echo $ROUTE_TABLE_SUBNET_ASSOCIATION_ID_2
+else
+	echo "Error : association of subnet to route table failed"
+	exit
+fi
+
+ROUTE_TABLE_SUBNET_ASSOCIATION_ID_3=$(aws ec2 associate-route-table --route-table-id $ROUTE_TABLE_ID --subnet-id $SUBNET_ID_3 | jq -r '.AssociationId')
+if [ $? = "0" ]
+then
+	echo "Associated subnet to route table Successfully"
+	echo $ROUTE_TABLE_SUBNET_ASSOCIATION_ID_3
+else
+	echo "Error : association of subnet to route table failed"
+	exit
+fi
+
+
 
 #-----------------------------
 # Attaching Route table to Gateway
