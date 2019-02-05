@@ -1,7 +1,15 @@
+#!/bin/sh
+
+echo "Starting Script to Delete VPC"
+
 VPCS=$(aws ec2 describe-vpcs | jq -r '.Vpcs')
 echo $VPCS | jq -c '.[]'  | while read k; do
     VPC_ID=$(echo $k | jq -r '.VpcId')
     echo "Deleting VPC : $VPC_ID"
+
+#-----------------------------
+# Deleting SUBNETS
+#-----------------------------
 
     SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" | jq -r '.Subnets')
 	echo $SUBNETS | jq -c '.[]'  | while read i; do
@@ -16,6 +24,10 @@ echo $VPCS | jq -c '.[]'  | while read k; do
 				exit
 		fi
 	done
+
+#-----------------------------
+# Deleting Internet Gateways
+#-----------------------------
 
 	INTERNET_GATEWAYS=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VPC_ID"| jq -r '.InternetGateways')
 	echo $INTERNET_GATEWAYS | jq -c '.[]'  | while read i; do
@@ -32,6 +44,10 @@ echo $VPCS | jq -c '.[]'  | while read k; do
 		fi
 	done
 
+#-----------------------------
+# Deleting Route Tables
+#-----------------------------
+
 	# Error mentioned in https://github.com/aws/aws-cli/issues/1549
 	ROUTE_TABLES=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID"| jq -r '.RouteTables')
 	echo $ROUTE_TABLES | jq -c '.[]'  | while read i; do
@@ -45,6 +61,10 @@ echo $VPCS | jq -c '.[]'  | while read k; do
 				echo "Error : $RT Not Deleted"
 		fi
 	done
+
+#-----------------------------
+# Deleting VPC
+#-----------------------------
 
 	echo "Deleting VPC : $VPC_ID"
 	aws ec2 delete-vpc --vpc-id $VPC_ID
