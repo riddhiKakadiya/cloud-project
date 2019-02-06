@@ -5,7 +5,10 @@ echo "Executing creation command : VPC "
 #-----------------------------
 # Creating VPC
 #-----------------------------
-VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 | jq -r '.Vpc.VpcId')
+
+VPC=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16  | jq -r '.')
+VPC_ID=$(echo $VPC | jq -r '.Vpc.VpcId')
+
 if [ $? = "0" ]
 then
 	echo "Created VPC Successfully"
@@ -32,7 +35,7 @@ fi
 SUBNET_ID_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.2.0/24 --availability-zone-id use1-az2| jq -r '.Subnet.SubnetId')
 if [ $? = "0" ]
 then
-	echo "Created Subnet-2 in use-az1 Successfully"
+	echo "Created Subnet-2 in use-az2 Successfully"
 	echo $SUBNET_ID_2
 else
 	echo "Error : Subnet-2 Not created"
@@ -42,7 +45,7 @@ fi
 SUBNET_ID_3=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.3.0/24 --availability-zone-id use1-az3| jq -r '.Subnet.SubnetId')
 if [ $? = "0" ]
 then
-	echo "Created Subnet-3 in use-az1 Successfully"
+	echo "Created Subnet-3 in use-az3 Successfully"
 	echo $SUBNET_ID_3
 else
 	echo "Error : Subnet-3 Not created"
@@ -87,6 +90,40 @@ else
 	echo "Error : Route Table Not created"
 	exit
 fi
+#-----------------------------
+# Attaching Subnets to Route Table
+#-----------------------------
+ROUTE_TABLE_SUBNET_ASSOCIATION_ID_1=$(aws ec2 associate-route-table --route-table-id $ROUTE_TABLE_ID --subnet-id $SUBNET_ID_1 | jq -r '.AssociationId')
+if [ $? = "0" ]
+then
+	echo "Associated subnet to route table Successfully"
+	echo $ROUTE_TABLE_SUBNET_ASSOCIATION_ID_1
+else
+	echo "Error : association of subnet to route table failed"
+	exit
+fi
+
+ROUTE_TABLE_SUBNET_ASSOCIATION_ID_2=$(aws ec2 associate-route-table --route-table-id $ROUTE_TABLE_ID --subnet-id $SUBNET_ID_2 | jq -r '.AssociationId')
+if [ $? = "0" ]
+then
+	echo "Associated subnet to route table Successfully"
+	echo $ROUTE_TABLE_SUBNET_ASSOCIATION_ID_2
+else
+	echo "Error : association of subnet to route table failed"
+	exit
+fi
+
+ROUTE_TABLE_SUBNET_ASSOCIATION_ID_3=$(aws ec2 associate-route-table --route-table-id $ROUTE_TABLE_ID --subnet-id $SUBNET_ID_3 | jq -r '.AssociationId')
+if [ $? = "0" ]
+then
+	echo "Associated subnet to route table Successfully"
+	echo $ROUTE_TABLE_SUBNET_ASSOCIATION_ID_3
+else
+	echo "Error : association of subnet to route table failed"
+	exit
+fi
+
+
 
 #-----------------------------
 # Attaching Route table to Gateway
@@ -99,18 +136,43 @@ else
 	echo "Error : Route Table to Intenet Gayway  Not attached"
 	exit
 fi
-echo "End of Script"
-exit
 
 #-----------------------------
-# Attaching Route table to Subnet
+# Attaching ingress rules to security group
 #-----------------------------
-# aws ec2 associate-route-table --route-table-id $ROUTE_TABLE_ID --subnet-id $SUBNET_ID_1
-# if [ $? = "0" ]
-# then
-# 	echo "Attached Intenet Gayway to VPC Successfully"
-# 	echo $INTERNET_GATEWAY_ID
-# else
-# 	echo "Error : Internet Gateway to VPC Not attached"
-# 	exit
-# fi
+
+SECURITY_GRP_ID=$(aws ec2 describe-security-groups --filter "Name=vpc-id,Values=$VPC_ID" | jq -r '.SecurityGroups[0].GroupId')
+echo $SECURITY_GRP_ID
+
+aws ec2 revoke-security-group-ingress --group-id $SECURITY_GRP_ID --protocol all --source-group $SECURITY_GRP_ID
+if [ $? = "0" ]
+then
+	echo "Revoke public access Successfully"
+else
+	echo "Error : Revoke public access failed"
+	exit
+fi
+
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges=[{CidrIp=0.0.0.0/0,Description="public 80"}]
+
+if [ $? = "0" ]
+then
+	echo "Attached port 80 to security group Successfully"
+else
+	echo "Error : port 80 to security group Not attached"
+	exit
+fi
+
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=0.0.0.0/0,Description="ssh 22"}]
+
+if [ $? = "0" ]
+then
+	echo "Attached port 22 to security group Successfully"
+else
+	echo "Error : port 22 to security group Not attached"
+	exit
+fi
+
+
+echo "End of Script"
+exit
