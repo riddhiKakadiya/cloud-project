@@ -14,8 +14,8 @@ fi
 
 ##Creating Stack
 echo "Creating Stack $1"
-#response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-networking.yaml --parameters file://csye6225-cf-networking-paramaters.json)
-response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-networking.yaml)
+response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-networking.yaml --parameters file://csye-6225-cf-networking-parameters.json)
+#response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-networking.yaml)
 echo "Waiting for Stack $1 to be created"
 echo "$response"
 aws cloudformation wait stack-create-complete --stack-name $1

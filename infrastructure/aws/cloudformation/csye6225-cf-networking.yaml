@@ -53,6 +53,12 @@ Resources:
       CidrBlock: {Ref: SubnetCIDR1}
       MapPublicIpOnLaunch: true
       VpcId: {Ref: VPC}
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - [{Ref: 'AWS::StackName'}, 'SubNet', '1']
 #SubNet-2
   Subnet2:
     Type: AWS::EC2::Subnet
@@ -63,6 +69,12 @@ Resources:
       CidrBlock: {Ref: SubnetCIDR2}
       MapPublicIpOnLaunch: true
       VpcId: {Ref: VPC}
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - [{Ref: 'AWS::StackName'}, 'SubNet', '2']
 #SubNet-3
   Subnet3:
     Type: AWS::EC2::Subnet
@@ -72,6 +84,12 @@ Resources:
         - Fn::GetAZs: !Ref 'AWS::Region'
       CidrBlock: {Ref: SubnetCIDR3}
       MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - [{Ref: 'AWS::StackName'}, 'SubNet', '3']
       VpcId: {Ref: VPC}
 #Internet Gateway
   InternetGateway:
