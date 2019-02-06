@@ -1,0 +1,27 @@
+[
+  {
+    "ParameterKey": "CidrBlock",
+    "ParameterValue": "11.0.0.0/16",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "DestinationCidrBlock",
+    "ParameterValue": "0.0.0.0/0",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "SubnetCIDR1",
+    "ParameterValue": "11.0.0.0/24",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "SubnetCIDR2",
+    "ParameterValue": "11.0.1.0/24",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "SubnetCIDR3",
+    "ParameterValue": "11.0.2.0/24",
+    "UsePreviousValue": true
+  }
+]
