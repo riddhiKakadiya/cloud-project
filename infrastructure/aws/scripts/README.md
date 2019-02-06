@@ -6,7 +6,7 @@ This folder contains the shell scripts used to setup and teardown an AWS network
 ### Architecture 
 The architecture contains networking resources such as Virtual Private Cloud (VPC), Internet Gateway, Route Table and Routes.
 
-####  infrastructure setup:
+#### Infrastructure setup:
 
 1. Create a Virtual Private Cloud (VPC).
 2. Create subnets in your VPC. You must create 3 subnets, each in different availability zone in the same region under same VPC.
