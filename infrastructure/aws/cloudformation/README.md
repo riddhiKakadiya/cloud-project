@@ -30,7 +30,7 @@ cd csye6225-spring2019/infrastructure/aws/cloudformation/
 ./csye6225-aws-cf-create-stack.sh MyStack
 ```
 
-The example code will setup a stack named 'MyStack'
+The example code will setup a stack named 'MyStack'. The paramaters required for the script can be configured in 'csye-6225-cf-networking-parameters.json'.
 
 #### To Terminate a Stack
 
