@@ -76,3 +76,5 @@ echo $VPCS | jq -c '.[]'  | while read k; do
 	fi
 done
 
+echo "End of Script"
+exit

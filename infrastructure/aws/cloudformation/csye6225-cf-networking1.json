@@ -1,0 +1,16 @@
+
+{
+   "AWSTemplateFormatVersion" : "2010-09-09_riddhi",
+   "Resources" : {
+      "-csye6225-vpc" : {
+         "Type" : "AWS::EC2::VPC",
+         "Properties" : {
+         "CidrBlock" : "10.0.0.0/16",  
+    	   "EnableDnsSupport" : "false",
+    	   "EnableDnsHostnames" : "false",
+         "InstanceTenancy" : "dedicated",
+         "Tags" : [ {"Key" : "Name", "Value" : "{Ref: 'AWS::StackName'}, '-csye6225', '-vpc'"} ]
+         }
+      }
+   }
+}   
