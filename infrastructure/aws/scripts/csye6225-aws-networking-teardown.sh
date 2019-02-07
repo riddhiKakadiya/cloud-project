@@ -1,111 +1,113 @@
-#!/bin/sh
+echo "Part 1.2 - Deleting Infrastructure Using AWS Command Line Interface"
 
 echo "Starting Script to Delete VPC"
 echo "Input one of the VPC to delete :"
+
 VPCS=$(aws ec2 describe-vpcs | jq -r '.Vpcs')
 
 VPC_ARRAY=(all)
 
 for row in $(echo $VPCS | jq -c '.[]'); do
-   	VPC=$(echo $row | jq -r '.VpcId')
-	echo "$VPC"
-	VPC_ARRAY+=($VPC)
+    VPC=$(echo $row | jq -r '.VpcId')
+    echo "$VPC"
+    VPC_ARRAY+=($VPC)
 done
 
 function deleteVPC()
 {
-#-----------------------------
-# Deleting SUBNETS
-#-----------------------------
-	VPC_ID=$1
-	echo "Deleting VPC : $VPC_ID"
+    VpcId=$1
+    res=$(aws ec2 describe-vpcs | jq -r '.Vpcs[].VpcId')
+    getAllVPC=$(aws ec2 describe-vpcs | jq -r '.Vpcs[].VpcId')
 
-    SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" | jq -r '.Subnets')
-	echo $SUBNETS | jq -c '.[]'  | while read i; do
-	    SUBNET=$(echo $i | jq -r '.SubnetId')
-	    echo "Deleting Subnet : $SUBNET"
-	    aws ec2 delete-subnet --subnet-id $SUBNET
-	    if [ $? = "0" ]
-			then
-				echo "Deleted Subnet successfully : $SUBNET"
-			else
-				echo "Error : $SUBNET Not Deleted"
-				exit
-		fi
-	done
+    echo "Checking for VPC"
+    for vpc in $getAllVPC; do
+        if [ $vpc = "$VpcId" ]
+        then
+            echo "VPC found"
 
-#-----------------------------
-# Deleting Internet Gateways
-#-----------------------------
+            echo "Getting InternetGatewayId"
 
-	INTERNET_GATEWAYS=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VPC_ID"| jq -r '.InternetGateways')
-	echo $INTERNET_GATEWAYS | jq -c '.[]'  | while read i; do
-	    IG=$(echo $i | jq -r '.InternetGatewayId')
-	    echo "Deleting Internet Gateway : $IG"
-	    aws ec2 detach-internet-gateway --internet-gateway-id $IG --vpc-id $VPC_ID
-	    aws ec2 delete-internet-gateway --internet-gateway-id $IG
-	    if [ $? = "0" ]
-			then
-				echo "Deleted Internet Gateway  successfully : $IG"
-			else
-				echo "Error : $IG Not Deleted"
-				exit
-		fi
-	done
+            #-----------------------------
+            # Deleting Internet Gateways
+            #-----------------------------
 
-#-----------------------------
-# Deleting Route Tables
-#-----------------------------
+            InternetGatewayId=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VpcId" | jq -r '.InternetGateways[0].InternetGatewayId')
+            echo "InternetGatewayId : $InternetGatewayId"
 
-	# Error mentioned in https://github.com/aws/aws-cli/issues/1549
-	ROUTE_TABLES=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VPC_ID"| jq -r '.RouteTables')
-	echo $ROUTE_TABLES | jq -c '.[]'  | while read i; do
-	    RT=$(echo $i | jq -r '.RouteTableId')
-	    echo "Deleting Route Table : $RT"
-	    aws ec2 delete-route-table --route-table-id $RT
-	    if [ $? = "0" ]
-			then
-				echo "Deleted Route Table  successfully : $RT"
-			else
-				echo "Error : $RT Not Deleted"
-		fi
-	done
+            echo "Deteching Internet Gateway"
+            aws ec2 detach-internet-gateway --internet-gateway-id "$InternetGatewayId" --vpc-id "$VpcId"
 
-#-----------------------------
-# Deleting VPC
-#-----------------------------
+            echo "Deleting Internet Gaeway"
+            aws ec2 delete-internet-gateway --internet-gateway-id "$InternetGatewayId"
 
-	echo "Deleting VPC : $VPC_ID"
-	aws ec2 delete-vpc --vpc-id $VPC_ID
-	if [ $? = "0" ]
-		then
-			echo "Deleted VPC  successfully : $VPC_ID"
-		else
-			echo "Error : $VPC_ID Not Deleted"
-	fi
+            #-----------------------------
+            # Deleting Route Tables
+            #-----------------------------
+            echo "Geting RouteTableId"
+
+            RouteTableId=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VpcId" "Name=association.main,Values=false" | jq -r '.RouteTables[].RouteTableId')
+            echo "RouteTableId : $RouteTableId"
+
+            echo "Geting RouteTableAssociation ID"
+            RouteTableAssociationId=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VpcId" "Name=association.main,Values=false" | jq -r '.RouteTables[0].Associations[].RouteTableAssociationId')
+            echo "RouteTableAssociationId : $RouteTableAssociationId"
+
+            echo "Disassociating a route table"
+            for routeAssID in $RouteTableAssociationId; do
+                echo "Disassociating route table : $routeAssID"
+                res=$(aws ec2 disassociate-route-table --association-id "$routeAssID")
+            done
+
+            echo "Deleting Route Table"
+            aws ec2 delete-route-table --route-table-id "$RouteTableId"
+
+            #-----------------------------
+            # Deleting SUBNETS
+            #-----------------------------
+
+            echo "Getting Subnet ID"
+
+            SubnetId=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VpcId" | jq -r '.Subnets[].SubnetId')
+            echo "SubnetId : $SubnetId"
+
+            echo "Deleting Subnet"
+            for subnet in $SubnetId; do
+                echo "Deleting subnet : $subnet"
+                aws ec2 delete-subnet --subnet-id "$subnet"
+            done
+            #-----------------------------
+            # Deleting VPC
+            #-----------------------------
+            echo "Deleting VPC Start"
+            aws ec2 delete-vpc --vpc-id "$VpcId"
+            echo "Process completed successfully"            
+        else
+            echo "VPC not found"
+        fi
+    done
 }
 
 VPC_FLAG=true
 
 while $VPC_FLAG; do
-	echo "Enter the VPC ID to delete VPC group (default : all), followed by [ENTER]:"
-	read VPC_ID
-	VPC_ID=${VPC_ID:-all}
-	if [[ " ${VPC_ARRAY[*]} " == *$VPC_ID* ]]; then
-	    VPC_FLAG=false
-	else
-		echo "Invalid parameter provided, please input again"
-	fi
+    echo "Enter the VPC ID to delete VPC group (default : all), followed by [ENTER]:"
+    read VPC_ID
+    VPC_ID=${VPC_ID:-all}
+    if [[ " ${VPC_ARRAY[*]} " == *$VPC_ID* ]]; then
+        VPC_FLAG=false
+    else
+        echo "Invalid parameter provided, please input again"
+    fi
 done 
 
 if [[ $VPC_ID == "all" ]]; then
-	    VPCS_ALL=$(aws ec2 describe-vpcs | jq -r '.Vpcs')
-		echo $VPCS_ALL | jq -c '.[]'  | while read k; do
-		    VPC_ONE=$(echo $k | jq -r '.VpcId')
-		    deleteVPC $VPC_ONE
-		done
-	else
-		deleteVPC $VPC_ID
+        VPCS_ALL=$(aws ec2 describe-vpcs | jq -r '.Vpcs')
+        echo $VPCS_ALL | jq -c '.[]'  | while read k; do
+            VPC_ONE=$(echo $k | jq -r '.VpcId')
+            deleteVPC $VPC_ONE
+        done
+    else
+        deleteVPC $VPC_ID
 fi
 
 echo "End of Script"
