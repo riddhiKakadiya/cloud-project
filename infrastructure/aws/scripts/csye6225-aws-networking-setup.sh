@@ -19,7 +19,6 @@ AllowedPattern='^((\d{1,3})\.){3}\d{1,3}/\d{1,2}$'
 function validate_cidr()
 {	
 	
-    #RGX='([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])'
     if echo $1 | grep -qP $AllowedPattern 
     then
         echo "valid: "$1
@@ -30,8 +29,6 @@ function validate_cidr()
 }
 
 ##############################
-
-
 
 #-----------------------------
 # Getting input form user for region, subnet and cidr configuration
@@ -67,7 +64,7 @@ while $ZONE_FLAG; do
 	echo "Enter the 1st Zone (default : use1-az1), followed by [ENTER]:"
 	read ZONE1
 	ZONE1=${ZONE1:-use1-az1}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* && ${#ZONE1} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
@@ -80,7 +77,7 @@ while $ZONE_FLAG; do
 	echo "Enter the 2nd Zone (default : use1-az2), followed by [ENTER]:"
 	read ZONE2
 	ZONE2=${ZONE2:-use1-az2}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE2* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE2* && ${#ZONE2} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
@@ -93,35 +90,64 @@ while $ZONE_FLAG; do
 	echo "Enter the 3rd Zone (default : use1-az3), followed by [ENTER]:"
 	read ZONE3
 	ZONE3=${ZONE3:-use1-az3}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE3* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE3* && ${#ZONE3} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
 	fi
 done
 
+CIDR_FLAG=true
 
-echo "Enter cidr value for VPC (default : 10.0.0.0/16), followed by [ENTER]:"
-read VPC_CIDR
-validate_cidr $VPC_CIDR
-VPC_CIDR=${VPC_CIDR:-10.0.0.0/16}
+while $CIDR_FLAG; do
+	echo "Enter cidr value for VPC (default : 10.0.0.0/16), followed by [ENTER]:"
+	read VPC_CIDR
+	VPC_CIDR=${VPC_CIDR:-10.0.0.0/16}
+	if [[ $VPC_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
+CIDR_FLAG=true
 
-echo "Enter cidr value for Subnets 1 : $ZONE1 (default : 10.0.1.0/24), followed by [ENTER]:"
-read SUBNET1_CIDR
-validate_cidr $SUBNET1_CIDR
-SUBNET1_CIDR=${SUBNET1_CIDR:-10.0.0.0/24}
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 1 : $ZONE1 (default : 10.0.1.0/24), followed by [ENTER]:"
+	read SUBNET1_CIDR
+	SUBNET1_CIDR=${SUBNET1_CIDR:-10.0.0.0/24}
+	if [[ $SUBNET1_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
-echo "Enter cidr value for Subnets 2 : $ZONE2 (default : 10.0.2.0/24), followed by [ENTER]:"
-read SUBNET2_CIDR
-validate_cidr $SUBNET2_CIDR
-SUBNET2_CIDR=${SUBNET2_CIDR:-10.0.2.0/24}
+CIDR_FLAG=true
 
-echo "Enter cidr value for Subnets 3 : $ZONE3 (default : 10.0.3.0/24), followed by [ENTER]:"
-read SUBNET3_CIDR
-validate_cidr $SUBNET3_CIDR
-SUBNET3_CIDR=${SUBNET3_CIDR:-10.0.3.0/24}
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 2 : $ZONE2 (default : 10.0.2.0/24), followed by [ENTER]:"
+	read SUBNET2_CIDR
+	SUBNET2_CIDR=${SUBNET2_CIDR:-10.0.2.0/24}
+	if [[ $SUBNET2_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
+CIDR_FLAG=true
+
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 3 : $ZONE3 (default : 10.0.3.0/24), followed by [ENTER]:"
+	read SUBNET3_CIDR
+	SUBNET3_CIDR=${SUBNET3_CIDR:-10.0.3.0/24}
+	if [[ $SUBNET3_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
 echo "Starting Script to Create VPC"
 echo "Executing creation command : VPC "
