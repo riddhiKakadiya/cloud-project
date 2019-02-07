@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo "Welcome to VPC creation script"
 echo "Ensuring that the jq is installed"
 
@@ -158,7 +158,7 @@ echo "Executing creation command : VPC "
 VPC=$(aws ec2 create-vpc --cidr-block $VPC_CIDR  | jq -r '.')
 VPC_ID=$(echo $VPC | jq -r '.Vpc.VpcId')
 
-if [ $? = "0" ]
+if [ $VPC_ID ]
 then
 	echo "Created VPC Successfully"
 	echo $VPC_ID
@@ -167,12 +167,14 @@ else
 	exit
 fi
 
+
+
 #-----------------------------
 # Creating Subnet
 #-----------------------------
 
 SUBNET_ID_1=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET1_CIDR --availability-zone-id $ZONE1| jq -r '.Subnet.SubnetId')
-if [ $? = "0" ]
+if [ $SUBNET_ID_1 ]
 then
 	echo "Created Subnet-1 in use-az1 Successfully"
 	echo $SUBNET_ID_1
@@ -182,7 +184,7 @@ else
 fi
 
 SUBNET_ID_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET2_CIDR --availability-zone-id $ZONE2| jq -r '.Subnet.SubnetId')
-if [ $? = "0" ]
+if [ $SUBNET_ID_2 ]
 then
 	echo "Created Subnet-2 in use-az2 Successfully"
 	echo $SUBNET_ID_2
@@ -192,7 +194,7 @@ else
 fi
 
 SUBNET_ID_3=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET3_CIDR --availability-zone-id $ZONE3| jq -r '.Subnet.SubnetId')
-if [ $? = "0" ]
+if [ $SUBNET_ID_3 ]
 then
 	echo "Created Subnet-3 in use-az3 Successfully"
 	echo $SUBNET_ID_3
