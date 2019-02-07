@@ -46,7 +46,7 @@ while $ZONE_FLAG; do
 	echo "Enter the 1st Zone (default : use1-az1), followed by [ENTER]:"
 	read ZONE1
 	ZONE1=${ZONE1:-use1-az1}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* && $($zone -ge 8) ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
