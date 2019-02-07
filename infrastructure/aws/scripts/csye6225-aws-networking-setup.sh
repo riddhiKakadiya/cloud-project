@@ -12,7 +12,24 @@ else
 	sudo apt-get install jq
 fi
 
-REGEX_IP='^((\d{1,3})\.){3}\d{1,3}/\d{1,2}$'
+AllowedPattern='^((\d{1,3})\.){3}\d{1,3}/\d{1,2}$'
+
+###### Validating CIDR #######
+function validate_cidr()
+{	
+	CIDR=$1
+    #RGX='([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])'
+    if echo $CIDR | grep -qP $AllowedPattern 
+    then
+        echo "valid: "$CIDR
+    else
+        echo "not valid: "$CIDR
+    fi
+}
+
+##############################
+
+validate_cidr $CIDR
 
 
 #-----------------------------
