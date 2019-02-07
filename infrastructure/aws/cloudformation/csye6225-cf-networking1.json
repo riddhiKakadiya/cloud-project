@@ -23,7 +23,7 @@
 
     },
     "SubnetCIDR3": {
-      "Description": "Private Subnet, like 10.0.1.0/24",
+      "Description": "Public Subnet, like 10.0.1.0/24",
       "Type": "String",
       "Default": "10.0.2.0/24"
     },
@@ -178,7 +178,7 @@
       "Type": "AWS::EC2::Route",
       "Properties": {
         "DestinationCidrBlock": {"Ref": "DestinationCidrBlock"},
-        "GatewayId": "InternetGateway",
+        "GatewayId": {"Ref": "InternetGateway"},
         "RouteTableId": {"Ref":"RouteTable"}
       }
     }

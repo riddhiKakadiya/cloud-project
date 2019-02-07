@@ -24,10 +24,12 @@ stack_id=$(aws cloudformation create-stack --stack-name "$1" --template-body fil
 echo "creating stack $1"
 echo "$stack_id"
 
-aws cloudformation wait stack-create-complete --stack-name $1 
+process_status=$(aws cloudformation wait stack-create-complete --stack-name $1) 
 #cf.get_waiter('stack_create_complete').wait(StackName=$1)
-echo "created stack $1"
 
+if [ "$process_status" -eq 'CREATE_COMPLETE' ]; then
+echo "created stack $1"
+fi
 
 
 
