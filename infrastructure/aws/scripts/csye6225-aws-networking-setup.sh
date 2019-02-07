@@ -1,5 +1,17 @@
 #!/bin/sh
 echo "Welcome to VPC creation script"
+echo "Ensuring that the jq is installed"
+
+echo "" |jq '.'
+if [ $? = "0" ]
+then
+	echo "JQ is installed continuing with script"
+	echo $VPC_ID
+else
+	echo "Error : JQ is not installed"
+	sudo apt-get install jq
+fi
+
 
 #-----------------------------
 # Getting input form user for region, subnet and cidr configuration
@@ -42,6 +54,7 @@ while $ZONE_FLAG; do
 	fi
 done 
 
+ZONE_FLAG=true
 
 while $ZONE_FLAG; do
 	echo "Enter the 2nd Zone (default : use1-az2), followed by [ENTER]:"
@@ -53,6 +66,8 @@ while $ZONE_FLAG; do
 		echo "Invalid parameter provided, please input again"
 	fi
 done
+
+ZONE_FLAG=true
 
 while $ZONE_FLAG; do
 	echo "Enter the 3rd Zone (default : use1-az3), followed by [ENTER]:"
@@ -243,7 +258,7 @@ else
 	exit
 fi
 
-aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges=[{CidrIp=0.0.0.0/0,Description="public 80"}]
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --protocol tcp --port 80 --cidr 0.0.0.0/0
 
 if [ $? = "0" ]
 then
@@ -253,7 +268,7 @@ else
 	exit
 fi
 
-aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=0.0.0.0/0,Description="ssh 22"}]
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --protocol tcp --port 22 --cidr 0.0.0.0/0
 
 if [ $? = "0" ]
 then
