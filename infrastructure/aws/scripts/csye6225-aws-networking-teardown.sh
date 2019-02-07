@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Part 1.2 - Deleting Infrastructure Using AWS Command Line Interface"
 
 echo "Starting Script to Delete VPC"
