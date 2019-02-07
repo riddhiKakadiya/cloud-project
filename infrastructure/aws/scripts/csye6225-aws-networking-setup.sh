@@ -183,6 +183,7 @@ else
 	exit
 fi
 
+
 SUBNET_ID_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET2_CIDR --availability-zone-id $ZONE2| jq -r '.Subnet.SubnetId')
 if [ $SUBNET_ID_2 ]
 then
