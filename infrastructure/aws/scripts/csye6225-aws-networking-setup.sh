@@ -46,7 +46,7 @@ while $ZONE_FLAG; do
 	echo "Enter the 1st Zone (default : use1-az1), followed by [ENTER]:"
 	read ZONE1
 	ZONE1=${ZONE1:-use1-az1}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* && $($zone -ge 8) ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* && ${#ZONE1} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
@@ -59,7 +59,7 @@ while $ZONE_FLAG; do
 	echo "Enter the 2nd Zone (default : use1-az2), followed by [ENTER]:"
 	read ZONE2
 	ZONE2=${ZONE2:-use1-az2}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE2* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE2* && ${#ZONE2} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
@@ -72,7 +72,7 @@ while $ZONE_FLAG; do
 	echo "Enter the 3rd Zone (default : use1-az3), followed by [ENTER]:"
 	read ZONE3
 	ZONE3=${ZONE3:-use1-az3}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE3* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE3* && ${#ZONE3} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
