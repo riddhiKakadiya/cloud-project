@@ -1,12 +1,10 @@
-#!/bin/sh
-
 echo "Part 1.2 - Deleting Infrastructure Using AWS Command Line Interface"
 
 echo enter vpc id
 read VpcId
 
-res=$(aws ec2 describe-vpcs)
-getAllVPC=$(echo -e "$res" |  /usr/bin/jq '.Vpcs[].VpcId' | tr -d '"')
+res=$(aws ec2 describe-vpcs | jq -r '.Vpcs[].VpcId')
+getAllVPC=$(aws ec2 describe-vpcs | jq -r '.Vpcs[].VpcId')
 
 echo "Checking for VPC"
 for vpc in $getAllVPC; do
@@ -16,9 +14,9 @@ for vpc in $getAllVPC; do
 
 echo "Getting InternetGatewayId"
 
-gateway_response=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VpcId")
+#gateway_response=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VpcId")
 #echo $gateway_response
-InternetGatewayId=$(echo -e "$gateway_response" |  /usr/bin/jq '.InternetGateways[0].InternetGatewayId' | tr -d '"')
+InternetGatewayId=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VpcId" | jq -r '.InternetGateways[0].InternetGatewayId')
 echo "InternetGatewayId : $InternetGatewayId"
 
 echo "Deteching Internet Gateway"
@@ -28,13 +26,13 @@ echo "Deleting Internet Gaeway"
 aws ec2 delete-internet-gateway --internet-gateway-id "$InternetGatewayId"
 
 echo "Geting RouteTableId"
-route_table_response=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VpcId" "Name=association.main,Values=false")
+#route_table_response=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VpcId" "Name=association.main,Values=false")
 #echo $route_table_response
-RouteTableId=$(echo -e "$route_table_response" |  /usr/bin/jq '.RouteTables[].RouteTableId' | tr -d '"')
+RouteTableId=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VpcId" "Name=association.main,Values=false" | jq -r '.RouteTables[].RouteTableId')
 echo "RouteTableId : $RouteTableId"
 
 echo "Geting RouteTableAssociation ID"
-RouteTableAssociationId=$(echo -e "$route_table_response" |  /usr/bin/jq '.RouteTables[0].Associations[].RouteTableAssociationId' | tr -d '"')
+RouteTableAssociationId=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$VpcId" "Name=association.main,Values=false" | jq -r '.RouteTables[0].Associations[].RouteTableAssociationId')
 echo "RouteTableAssociationId : $RouteTableAssociationId"
 
 echo "Disassociating a route table"
@@ -47,8 +45,8 @@ echo "Deleting Route Table"
 aws ec2 delete-route-table --route-table-id "$RouteTableId"
 
 echo "Getting Subnet ID"
-subnet_response=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VpcId")
-SubnetId=$(echo -e "$subnet_response" |  /usr/bin/jq '.Subnets[].SubnetId' | tr -d '"')
+#subnet_response=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VpcId")
+SubnetId=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VpcId" | jq -r '.Subnets[].SubnetId')
 echo "SubnetId : $SubnetId"
 
 echo "Deleting Subnet"
