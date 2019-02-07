@@ -72,9 +72,11 @@ def registerPage(request):
 						user = User.objects.create_user(username, email, password)
 						user.is_staff= True
 						user.save()
+
 						return JsonResponse({"message" : " : Useser created"})
 					else:
 						return JsonResponse({'Error' : "User already exists"})
+
 				else:
 					if(password_status == True):
 						return JsonResponse({"message" : username_status})	
@@ -83,7 +85,9 @@ def registerPage(request):
 					else:
 						return JsonResponse({'message':username_status + " " + password_status})
 			except:
+
 				JsonResponse({'Error':'Please use a post method with parameters username and password to create user'})
+
 	# If all the cases fail then return error message
 	return JsonResponse({'Error':'Please use a post method with parameters username and password to create user'})
 
