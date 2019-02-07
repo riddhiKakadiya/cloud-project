@@ -1,6 +1,19 @@
 #!/bin/bash
 
+
+echo "The following are the regions available for deleting stacks : "
+
+REGIONS=$(aws ec2 describe-regions | jq '.Regions')
+echo $REGIONS | jq -c '.[]'  | while read i; do
+  REGION=$(echo $i | jq -r '.RegionName')
+      echo "$REGION"
+done
+
+echo "Lets first configure your AWS account"
+aws configure
+
 StackList=$(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_IN_PROGRESS CREATE_IN_PROGRESS --query 'StackSummaries[].StackName' --output text )
+
 if [[ -z "$StackList" ]]
 then
   echo " Empty Stack List!"
@@ -14,14 +27,12 @@ fi
 
 #Check if user has entered correct Stack Name
 flag=0
-for item in "$StackList"; do
-    if [ $StackName == "$item" ]
-    then
-        echo "$StackName is present"
-        flag=1
-        break
-    fi
-done
+#checking the stack list
+if [[ " ${StackList[*]} " == *$StackName* ]]; then
+      flag=1
+  else
+    echo "Invalid parameter provided, please input again"
+  fi
 
 if [ $flag == 0 ]
 then
