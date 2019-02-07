@@ -1,0 +1,183 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+#Defining paramaters Required for resources setup
+Parameters:
+  CidrBlock:
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: 10.0.0.0/16
+    Description: VPC CIDR Block (eg 10.0.0.0/16)
+    Type: String
+  DestinationCidrBlock:
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: 0.0.0.0/0
+    Description: Destination CIDR Block (eg 0.0.0.0/0)
+    Type: String
+  SubnetCIDR1:
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: 10.0.0.0/24
+    Description: VPC CIDR Block for the Public Subnet (eg 10.0.0.0/24)
+    Type: String
+  SubnetCIDR2:
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: 10.0.1.0/24
+    Description: VPC CIDR Block for the Public Subnet (eg 10.0.0.0/24)
+    Type: String
+  SubnetCIDR3:
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: 10.0.2.0/24
+    Description: VPC CIDR Block for the Public Subnet (eg 10.0.0.0/24)
+    Type: String
+
+Resources:
+#VPC
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: {Ref: CidrBlock}
+      EnableDnsSupport: 'false'
+      EnableDnsHostnames: 'false'
+      InstanceTenancy: dedicated
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'vpc']
+#SubNet-1
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      CidrBlock: {Ref: SubnetCIDR1}
+      MapPublicIpOnLaunch: true
+      VpcId: {Ref: VPC}
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - [{Ref: 'AWS::StackName'}, 'SubNet', '1']
+#SubNet-2
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      CidrBlock: {Ref: SubnetCIDR2}
+      MapPublicIpOnLaunch: true
+      VpcId: {Ref: VPC}
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - [{Ref: 'AWS::StackName'}, 'SubNet', '2']
+#SubNet-3
+  Subnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      CidrBlock: {Ref: SubnetCIDR3}
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - [{Ref: 'AWS::StackName'}, 'SubNet', '3']
+      VpcId: {Ref: VPC}
+#Internet Gateway
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - [{Ref: 'AWS::StackName'}, 'csye6225', 'ig']
+# Attaching Internet Gateway to VPC
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: VPC
+      InternetGatewayId:
+        Ref: InternetGateway
+#Route Table
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: {Ref: VPC}
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rt']
+#Attaching subnets to Route Table
+  SubnetAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: Subnet1
+      RouteTableId:
+        Ref: RouteTable
+  SubnetAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: Subnet2
+      RouteTableId:
+        Ref: RouteTable
+  SubnetAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: Subnet3
+      RouteTableId:
+        Ref: RouteTable
+#Creating a public Route
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: RouteTable
+      DestinationCidrBlock: {Ref: DestinationCidrBlock}
+      GatewayId:
+        Ref: InternetGateway
+##Modifying existing security group
+  VPCDefaultSecurityGroupIngress1:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !GetAtt
+        - VPC
+        - DefaultSecurityGroup
+      IpProtocol: tcp
+      FromPort: '22'
+      ToPort: '22'
+      CidrIp: {Ref: DestinationCidrBlock}
+  VPCDefaultSecurityGroupIngress2:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: !GetAtt
+        - VPC
+        - DefaultSecurityGroup
+      IpProtocol: tcp
+      FromPort: '80'
+      ToPort: '80'
+      CidrIp: {Ref: DestinationCidrBlock}
+
+Outputs:
+  SGId:
+    Description: Default Security Group Id
+    Value: !GetAtt
+      - VPC
+      - DefaultSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-SGId"
