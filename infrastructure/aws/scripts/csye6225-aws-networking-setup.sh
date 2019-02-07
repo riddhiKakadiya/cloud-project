@@ -14,22 +14,23 @@ fi
 
 AllowedPattern='^((\d{1,3})\.){3}\d{1,3}/\d{1,2}$'
 
+
 ###### Validating CIDR #######
 function validate_cidr()
 {	
-	CIDR=$1
+	
     #RGX='([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])'
-    if echo $CIDR | grep -qP $AllowedPattern 
+    if echo $1 | grep -qP $AllowedPattern 
     then
-        echo "valid: "$CIDR
+        echo "valid: "$1
     else
-        echo "not valid: "$CIDR
+        echo "not valid: "$1
+        echo "switching back to default value"
     fi
 }
 
 ##############################
 
-validate_cidr $CIDR
 
 
 #-----------------------------
@@ -99,28 +100,26 @@ while $ZONE_FLAG; do
 	fi
 done
 
-# ip=1.2.3.4
-
-# if [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-#   echo "success"
-# else
-#   echo "fail"
-# fi
 
 echo "Enter cidr value for VPC (default : 10.0.0.0/16), followed by [ENTER]:"
 read VPC_CIDR
+validate_cidr $VPC_CIDR
 VPC_CIDR=${VPC_CIDR:-10.0.0.0/16}
+
 
 echo "Enter cidr value for Subnets 1 : $ZONE1 (default : 10.0.1.0/24), followed by [ENTER]:"
 read SUBNET1_CIDR
+validate_cidr $SUBNET1_CIDR
 SUBNET1_CIDR=${SUBNET1_CIDR:-10.0.0.0/24}
 
 echo "Enter cidr value for Subnets 2 : $ZONE2 (default : 10.0.2.0/24), followed by [ENTER]:"
 read SUBNET2_CIDR
+validate_cidr $SUBNET2_CIDR
 SUBNET2_CIDR=${SUBNET2_CIDR:-10.0.2.0/24}
 
 echo "Enter cidr value for Subnets 3 : $ZONE3 (default : 10.0.3.0/24), followed by [ENTER]:"
 read SUBNET3_CIDR
+validate_cidr $SUBNET3_CIDR
 SUBNET3_CIDR=${SUBNET3_CIDR:-10.0.3.0/24}
 
 
