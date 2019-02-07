@@ -1,15 +1,24 @@
 #!/bin/sh
 
 echo "Starting Script to Delete VPC"
-
+echo "Input one of the VPC to delete :"
 VPCS=$(aws ec2 describe-vpcs | jq -r '.Vpcs')
-echo $VPCS | jq -c '.[]'  | while read k; do
-    VPC_ID=$(echo $k | jq -r '.VpcId')
-    echo "Deleting VPC : $VPC_ID"
 
+VPC_ARRAY=(all)
+
+for row in $(echo $VPCS | jq -c '.[]'); do
+   	VPC=$(echo $row | jq -r '.VpcId')
+	echo "$VPC"
+	VPC_ARRAY+=($VPC)
+done
+
+function deleteVPC()
+{
 #-----------------------------
 # Deleting SUBNETS
 #-----------------------------
+	VPC_ID=$1
+	echo "Deleting VPC : $VPC_ID"
 
     SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" | jq -r '.Subnets')
 	echo $SUBNETS | jq -c '.[]'  | while read i; do
@@ -74,7 +83,30 @@ echo $VPCS | jq -c '.[]'  | while read k; do
 		else
 			echo "Error : $VPC_ID Not Deleted"
 	fi
-done
+}
+
+VPC_FLAG=true
+
+while $VPC_FLAG; do
+	echo "Enter the VPC ID to delete VPC group (default : all), followed by [ENTER]:"
+	read VPC_ID
+	VPC_ID=${VPC_ID:-all}
+	if [[ " ${VPC_ARRAY[*]} " == *$VPC_ID* ]]; then
+	    VPC_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done 
+
+if [[ $VPC_ID == "all" ]]; then
+	    VPCS_ALL=$(aws ec2 describe-vpcs | jq -r '.Vpcs')
+		echo $VPCS_ALL | jq -c '.[]'  | while read k; do
+		    VPC_ONE=$(echo $k | jq -r '.VpcId')
+		    deleteVPC $VPC_ONE
+		done
+	else
+		deleteVPC $VPC_ID
+fi
 
 echo "End of Script"
 exit
