@@ -12,6 +12,24 @@ else
 	sudo apt-get install jq
 fi
 
+AllowedPattern='^((\d{1,3})\.){3}\d{1,3}/\d{1,2}$'
+
+
+###### Validating CIDR #######
+function validate_cidr()
+{	
+	
+    if echo $1 | grep -qP $AllowedPattern 
+    then
+        echo "valid: "$1
+    else
+        echo "not valid: "$1
+        echo "switching back to default value"
+    fi
+}
+
+##############################
+
 #-----------------------------
 # Getting input form user for region, subnet and cidr configuration
 #-----------------------------
