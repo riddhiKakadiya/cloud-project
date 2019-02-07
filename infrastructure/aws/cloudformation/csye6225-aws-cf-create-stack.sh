@@ -11,6 +11,17 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
+echo "The following are the regions available for creating VPC : "
+
+REGIONS=$(aws ec2 describe-regions | jq '.Regions')
+echo $REGIONS | jq -c '.[]'  | while read i; do
+	REGION=$(echo $i | jq -r '.RegionName')
+	    echo "$REGION"
+done
+
+echo ""
+echo "Lets first configure your AWS account"
+aws configure
 
 ##Creating Stack
 echo "Creating Stack $1"

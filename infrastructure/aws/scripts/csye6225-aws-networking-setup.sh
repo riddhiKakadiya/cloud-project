@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo "Welcome to VPC creation script"
 echo "Ensuring that the jq is installed"
 
@@ -12,6 +12,23 @@ else
 	sudo apt-get install jq
 fi
 
+AllowedPattern='^((\d{1,3})\.){3}\d{1,3}/\d{1,2}$'
+
+
+###### Validating CIDR #######
+function validate_cidr()
+{	
+	
+    if echo $1 | grep -qP $AllowedPattern 
+    then
+        echo "valid: "$1
+    else
+        echo "not valid: "$1
+        echo "switching back to default value"
+    fi
+}
+
+##############################
 
 #-----------------------------
 # Getting input form user for region, subnet and cidr configuration
@@ -47,7 +64,7 @@ while $ZONE_FLAG; do
 	echo "Enter the 1st Zone (default : use1-az1), followed by [ENTER]:"
 	read ZONE1
 	ZONE1=${ZONE1:-use1-az1}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* && ${#ZONE1} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
@@ -60,7 +77,7 @@ while $ZONE_FLAG; do
 	echo "Enter the 2nd Zone (default : use1-az2), followed by [ENTER]:"
 	read ZONE2
 	ZONE2=${ZONE2:-use1-az2}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE2* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE2* && ${#ZONE2} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
@@ -73,37 +90,64 @@ while $ZONE_FLAG; do
 	echo "Enter the 3rd Zone (default : use1-az3), followed by [ENTER]:"
 	read ZONE3
 	ZONE3=${ZONE3:-use1-az3}
-	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE3* ]]; then
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE3* && ${#ZONE3} -ge 7 ]]; then
 	    ZONE_FLAG=false
 	else
 		echo "Invalid parameter provided, please input again"
 	fi
 done
 
-# ip=1.2.3.4
+CIDR_FLAG=true
 
-# if [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-#   echo "success"
-# else
-#   echo "fail"
-# fi
+while $CIDR_FLAG; do
+	echo "Enter cidr value for VPC (default : 10.0.0.0/16), followed by [ENTER]:"
+	read VPC_CIDR
+	VPC_CIDR=${VPC_CIDR:-10.0.0.0/16}
+	if [[ $VPC_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
-echo "Enter cidr value for VPC (default : 10.0.0.0/16), followed by [ENTER]:"
-read VPC_CIDR
-VPC_CIDR=${VPC_CIDR:-10.0.0.0/16}
+CIDR_FLAG=true
 
-echo "Enter cidr value for Subnets 1 : $ZONE1 (default : 10.0.1.0/24), followed by [ENTER]:"
-read SUBNET1_CIDR
-SUBNET1_CIDR=${SUBNET1_CIDR:-10.0.0.0/24}
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 1 : $ZONE1 (default : 10.0.1.0/24), followed by [ENTER]:"
+	read SUBNET1_CIDR
+	SUBNET1_CIDR=${SUBNET1_CIDR:-10.0.0.0/24}
+	if [[ $SUBNET1_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
-echo "Enter cidr value for Subnets 2 : $ZONE2 (default : 10.0.2.0/24), followed by [ENTER]:"
-read SUBNET2_CIDR
-SUBNET2_CIDR=${SUBNET2_CIDR:-10.0.2.0/24}
+CIDR_FLAG=true
 
-echo "Enter cidr value for Subnets 3 : $ZONE3 (default : 10.0.3.0/24), followed by [ENTER]:"
-read SUBNET3_CIDR
-SUBNET3_CIDR=${SUBNET3_CIDR:-10.0.3.0/24}
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 2 : $ZONE2 (default : 10.0.2.0/24), followed by [ENTER]:"
+	read SUBNET2_CIDR
+	SUBNET2_CIDR=${SUBNET2_CIDR:-10.0.2.0/24}
+	if [[ $SUBNET2_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
+CIDR_FLAG=true
+
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 3 : $ZONE3 (default : 10.0.3.0/24), followed by [ENTER]:"
+	read SUBNET3_CIDR
+	SUBNET3_CIDR=${SUBNET3_CIDR:-10.0.3.0/24}
+	if [[ $SUBNET3_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
 echo "Starting Script to Create VPC"
 echo "Executing creation command : VPC "
@@ -114,7 +158,7 @@ echo "Executing creation command : VPC "
 VPC=$(aws ec2 create-vpc --cidr-block $VPC_CIDR  | jq -r '.')
 VPC_ID=$(echo $VPC | jq -r '.Vpc.VpcId')
 
-if [ $? = "0" ]
+if [ $VPC_ID ]
 then
 	echo "Created VPC Successfully"
 	echo $VPC_ID
@@ -123,12 +167,14 @@ else
 	exit
 fi
 
+
+
 #-----------------------------
 # Creating Subnet
 #-----------------------------
 
 SUBNET_ID_1=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET1_CIDR --availability-zone-id $ZONE1| jq -r '.Subnet.SubnetId')
-if [ $? = "0" ]
+if [ $SUBNET_ID_1 ]
 then
 	echo "Created Subnet-1 in use-az1 Successfully"
 	echo $SUBNET_ID_1
@@ -137,8 +183,9 @@ else
 	exit
 fi
 
+
 SUBNET_ID_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET2_CIDR --availability-zone-id $ZONE2| jq -r '.Subnet.SubnetId')
-if [ $? = "0" ]
+if [ $SUBNET_ID_2 ]
 then
 	echo "Created Subnet-2 in use-az2 Successfully"
 	echo $SUBNET_ID_2
@@ -148,7 +195,7 @@ else
 fi
 
 SUBNET_ID_3=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET3_CIDR --availability-zone-id $ZONE3| jq -r '.Subnet.SubnetId')
-if [ $? = "0" ]
+if [ $SUBNET_ID_3 ]
 then
 	echo "Created Subnet-3 in use-az3 Successfully"
 	echo $SUBNET_ID_3
