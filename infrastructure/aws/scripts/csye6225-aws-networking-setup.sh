@@ -12,9 +12,6 @@ else
 	sudo apt-get install jq
 fi
 
-REGEX_IP='^((\d{1,3})\.){3}\d{1,3}/\d{1,2}$'
-
-
 #-----------------------------
 # Getting input form user for region, subnet and cidr configuration
 #-----------------------------
@@ -82,30 +79,57 @@ while $ZONE_FLAG; do
 	fi
 done
 
-# ip=1.2.3.4
+CIDR_FLAG=true
 
-# if [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-#   echo "success"
-# else
-#   echo "fail"
-# fi
+while $CIDR_FLAG; do
+	echo "Enter cidr value for VPC (default : 10.0.0.0/16), followed by [ENTER]:"
+	read VPC_CIDR
+	VPC_CIDR=${VPC_CIDR:-10.0.0.0/16}
+	if [[ $VPC_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
-echo "Enter cidr value for VPC (default : 10.0.0.0/16), followed by [ENTER]:"
-read VPC_CIDR
-VPC_CIDR=${VPC_CIDR:-10.0.0.0/16}
+CIDR_FLAG=true
 
-echo "Enter cidr value for Subnets 1 : $ZONE1 (default : 10.0.1.0/24), followed by [ENTER]:"
-read SUBNET1_CIDR
-SUBNET1_CIDR=${SUBNET1_CIDR:-10.0.0.0/24}
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 1 : $ZONE1 (default : 10.0.1.0/24), followed by [ENTER]:"
+	read SUBNET1_CIDR
+	SUBNET1_CIDR=${SUBNET1_CIDR:-10.0.0.0/24}
+	if [[ $SUBNET1_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
-echo "Enter cidr value for Subnets 2 : $ZONE2 (default : 10.0.2.0/24), followed by [ENTER]:"
-read SUBNET2_CIDR
-SUBNET2_CIDR=${SUBNET2_CIDR:-10.0.2.0/24}
+CIDR_FLAG=true
 
-echo "Enter cidr value for Subnets 3 : $ZONE3 (default : 10.0.3.0/24), followed by [ENTER]:"
-read SUBNET3_CIDR
-SUBNET3_CIDR=${SUBNET3_CIDR:-10.0.3.0/24}
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 2 : $ZONE2 (default : 10.0.2.0/24), followed by [ENTER]:"
+	read SUBNET2_CIDR
+	SUBNET2_CIDR=${SUBNET2_CIDR:-10.0.2.0/24}
+	if [[ $SUBNET2_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
+CIDR_FLAG=true
+
+while $CIDR_FLAG; do
+	echo "Enter cidr value for Subnets 3 : $ZONE3 (default : 10.0.3.0/24), followed by [ENTER]:"
+	read SUBNET3_CIDR
+	SUBNET3_CIDR=${SUBNET3_CIDR:-10.0.3.0/24}
+	if [[ $SUBNET3_CIDR =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}$ ]]; then
+	    CIDR_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
 
 echo "Starting Script to Create VPC"
 echo "Executing creation command : VPC "
