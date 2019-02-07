@@ -12,6 +12,8 @@ else
 	sudo apt-get install jq
 fi
 
+REGEX_IP='^((\d{1,3})\.){3}\d{1,3}/\d{1,2}$'
+
 
 #-----------------------------
 # Getting input form user for region, subnet and cidr configuration

@@ -37,12 +37,12 @@ To run the script for creating the network stack :
 
 ```bash
 cd csye6225-spring2019/infrastructure/aws/scripts
-sh csye6225-aws-networking-setup.sh
+bash csye6225-aws-networking-setup.sh
 ```
 
 To run the script for deleting the network stack :
 
 ```bash
 cd csye6225-spring2019/infrastructure/aws/scripts
-sh csye6225-aws-networking-teardown.sh
+bash csye6225-aws-networking-teardown.sh
 ```
