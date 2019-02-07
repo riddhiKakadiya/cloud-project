@@ -60,7 +60,7 @@
         "InternetGatewayAttachment": {
             "Type": "AWS::EC2::VPCGatewayAttachment",
             "Properties": {
-                "InternetGatewayId": {
+                " InternetGatewayId": {
                     "Ref": "InternetGateway"
                 },
                 "VpcId": {
@@ -277,3 +277,4 @@
         }
     }
 }
+

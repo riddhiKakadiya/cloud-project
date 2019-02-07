@@ -1,4 +1,109 @@
 #!/bin/sh
+echo "Welcome to VPC creation script"
+echo "Ensuring that the jq is installed"
+
+echo "" |jq '.'
+if [ $? = "0" ]
+then
+	echo "JQ is installed continuing with script"
+	echo $VPC_ID
+else
+	echo "Error : JQ is not installed"
+	sudo apt-get install jq
+fi
+
+
+#-----------------------------
+# Getting input form user for region, subnet and cidr configuration
+#-----------------------------
+
+echo "The following are the regions available for creating VPC : "
+
+REGIONS=$(aws ec2 describe-regions | jq '.Regions')
+echo $REGIONS | jq -c '.[]'  | while read i; do
+	REGION=$(echo $i | jq -r '.RegionName')
+	    echo "$REGION"
+done
+
+echo ""
+echo "Lets first configure your AWS account"
+aws configure
+
+echo "The following are the zones available for creating subnets : "
+
+ZONE_ARRAY=()
+
+AVAILABILITY_ZONES=$(aws ec2 describe-availability-zones | jq '.AvailabilityZones')
+for row in $(echo $AVAILABILITY_ZONES | jq -c '.[]'); do
+   	ZONE=$(echo $row | jq -r '.ZoneId')
+	echo "$ZONE"
+	ZONE_ARRAY+=($ZONE)
+done
+
+
+ZONE_FLAG=true
+
+while $ZONE_FLAG; do
+	echo "Enter the 1st Zone (default : use1-az1), followed by [ENTER]:"
+	read ZONE1
+	ZONE1=${ZONE1:-use1-az1}
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE1* ]]; then
+	    ZONE_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done 
+
+ZONE_FLAG=true
+
+while $ZONE_FLAG; do
+	echo "Enter the 2nd Zone (default : use1-az2), followed by [ENTER]:"
+	read ZONE2
+	ZONE2=${ZONE2:-use1-az2}
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE2* ]]; then
+	    ZONE_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
+
+ZONE_FLAG=true
+
+while $ZONE_FLAG; do
+	echo "Enter the 3rd Zone (default : use1-az3), followed by [ENTER]:"
+	read ZONE3
+	ZONE3=${ZONE3:-use1-az3}
+	if [[ " ${ZONE_ARRAY[*]} " == *$ZONE3* ]]; then
+	    ZONE_FLAG=false
+	else
+		echo "Invalid parameter provided, please input again"
+	fi
+done
+
+# ip=1.2.3.4
+
+# if [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+#   echo "success"
+# else
+#   echo "fail"
+# fi
+
+echo "Enter cidr value for VPC (default : 10.0.0.0/16), followed by [ENTER]:"
+read VPC_CIDR
+VPC_CIDR=${VPC_CIDR:-10.0.0.0/16}
+
+echo "Enter cidr value for Subnets 1 : $ZONE1 (default : 10.0.1.0/24), followed by [ENTER]:"
+read SUBNET1_CIDR
+SUBNET1_CIDR=${SUBNET1_CIDR:-10.0.0.0/24}
+
+echo "Enter cidr value for Subnets 2 : $ZONE2 (default : 10.0.2.0/24), followed by [ENTER]:"
+read SUBNET2_CIDR
+SUBNET2_CIDR=${SUBNET2_CIDR:-10.0.2.0/24}
+
+echo "Enter cidr value for Subnets 3 : $ZONE3 (default : 10.0.3.0/24), followed by [ENTER]:"
+read SUBNET3_CIDR
+SUBNET3_CIDR=${SUBNET3_CIDR:-10.0.3.0/24}
+
 
 echo "Starting Script to Create VPC"
 echo "Executing creation command : VPC "
@@ -6,7 +111,7 @@ echo "Executing creation command : VPC "
 # Creating VPC
 #-----------------------------
 
-VPC=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16  | jq -r '.')
+VPC=$(aws ec2 create-vpc --cidr-block $VPC_CIDR  | jq -r '.')
 VPC_ID=$(echo $VPC | jq -r '.Vpc.VpcId')
 
 if [ $? = "0" ]
@@ -22,7 +127,7 @@ fi
 # Creating Subnet
 #-----------------------------
 
-SUBNET_ID_1=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.1.0/24 --availability-zone-id use1-az1| jq -r '.Subnet.SubnetId')
+SUBNET_ID_1=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET1_CIDR --availability-zone-id $ZONE1| jq -r '.Subnet.SubnetId')
 if [ $? = "0" ]
 then
 	echo "Created Subnet-1 in use-az1 Successfully"
@@ -32,7 +137,7 @@ else
 	exit
 fi
 
-SUBNET_ID_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.2.0/24 --availability-zone-id use1-az2| jq -r '.Subnet.SubnetId')
+SUBNET_ID_2=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET2_CIDR --availability-zone-id $ZONE2| jq -r '.Subnet.SubnetId')
 if [ $? = "0" ]
 then
 	echo "Created Subnet-2 in use-az2 Successfully"
@@ -42,7 +147,7 @@ else
 	exit
 fi
 
-SUBNET_ID_3=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.3.0/24 --availability-zone-id use1-az3| jq -r '.Subnet.SubnetId')
+SUBNET_ID_3=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block $SUBNET3_CIDR --availability-zone-id $ZONE3| jq -r '.Subnet.SubnetId')
 if [ $? = "0" ]
 then
 	echo "Created Subnet-3 in use-az3 Successfully"
@@ -153,7 +258,7 @@ else
 	exit
 fi
 
-aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges=[{CidrIp=0.0.0.0/0,Description="public 80"}]
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --protocol tcp --port 80 --cidr 0.0.0.0/0
 
 if [ $? = "0" ]
 then
@@ -163,7 +268,7 @@ else
 	exit
 fi
 
-aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=0.0.0.0/0,Description="ssh 22"}]
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GRP_ID --protocol tcp --port 22 --cidr 0.0.0.0/0
 
 if [ $? = "0" ]
 then
