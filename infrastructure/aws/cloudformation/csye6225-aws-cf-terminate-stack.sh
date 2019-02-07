@@ -27,19 +27,20 @@ fi
 
 #Check if user has entered correct Stack Name
 flag=0
-#checking the stack list
-if [[ " ${StackList[*]} " == *$StackName* ]]; then
-      flag=1
-  else
-    echo "Invalid parameter provided, please input again"
-  fi
 
-if [ $flag == 0 ]
-then
-    echo "Error: Invalid StackName - $StackName"
-    exit
-fi
-
+# if [[ stacknameLen -eq stacklistlen ]]
+#   then
+    if [[ " ${StackList[*]} " = *$StackName* ]]; then
+          flag=1
+      else
+        echo "Invalid parameter provided, please input again"
+    fi
+#fi
+    if [ $flag == 0 ]
+      then
+        echo "Error: Invalid StackName - $StackName"
+        exit
+    fi
 echo "Deleting Stack $StackName"
 ResponseDelete=$(aws cloudformation delete-stack --stack-name $StackName)
 if [ $? -ne "0" ]
