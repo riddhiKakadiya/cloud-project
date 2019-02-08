@@ -4,13 +4,13 @@ from django.contrib.auth import authenticate
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from uuid import UUID
 import json
 import re
 import base64
 import time
 import datetime
 from .models import *
-
 #--------------------------------------------------------------------------------
 # Function definitions
 #--------------------------------------------------------------------------------
@@ -146,4 +146,20 @@ def createNotes(request):
 				message['created_on'] = time_now
 				message['last_updated_on'] = time_now
 				return JsonResponse(message, status=201)
+
+	elif request.method == 'GET':
+			user = validateSignin(request.META)
+			if (user):
+				notes = NotesModel.objects.filter(user=user)
+				message_list=[]
+				for note in notes:
+					print(note.user)
+					message={}
+					message['id'] = note.id
+					message['title'] = note.title
+					message['content'] = note.content
+					message['created_on'] = note.created_on
+					message['last_updated_on'] = note.last_updated_on
+					message_list.append(message)
+				return JsonResponse(message_list, status=201, safe=False)
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
