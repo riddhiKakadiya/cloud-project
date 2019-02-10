@@ -165,18 +165,48 @@ def createNotes(request):
 
 @csrf_exempt
 def getNoteFromId(request, note_id=""):
-	if request.method == 'GET':
-		user = validateSignin(request.META)
-		if (user):
-			notes = NotesModel.objects.filter(id=note_id, user=user)
-			if(notes.exists()):
-				message={}
-				message['id'] = notes[0].id
-				message['title'] = notes[0].title
-				message['content'] = notes[0].content
-				message['created_on'] = notes[0].created_on
-				message['last_updated_on'] = notes[0].last_updated_on
-				return JsonResponse(message, status=201)
-			else:
-				return JsonResponse({'message': 'Error : Invalid Note ID'}, status=401)
-	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+    if request.method == 'GET':
+        user = validateSignin(request.META)
+        if(is_valid_uuid(note_id)):
+            if (user):
+                notes = NotesModel.objects.filter(id=note_id, user=user)
+                if(notes.exists()):
+                    message={}
+                    message['id'] = notes[0].id
+                    message['title'] = notes[0].title
+                    message['content'] = notes[0].content
+                    message['created_on'] = notes[0].created_on
+                    message['last_updated_on'] = notes[0].last_updated_on
+                    return JsonResponse(message, status=201)
+                else:
+                    return JsonResponse({'message': 'Error : Invalid Note ID'}, status=401)
+        else:
+            return JsonResponse({'message': 'Error : Invalid Note ID'}, status=401)
+    return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+
+def is_valid_uuid(uuid_to_test, version=4):
+    """
+    Check if uuid_to_test is a valid UUID.
+
+    Parameters
+    ----------
+    uuid_to_test : str
+    version : {1, 2, 3, 4}
+
+    Returns
+    -------
+    `True` if uuid_to_test is a valid UUID, otherwise `False`.
+
+    Examples
+    --------
+    >>> is_valid_uuid('c9bf9e57-1685-4c89-bafb-ff5af830be8a')
+    True
+    >>> is_valid_uuid('c9bf9e58')
+    False
+    """
+    try:
+        uuid_obj = UUID(uuid_to_test, version=version)
+    except:
+        return False
+
+    return str(uuid_obj) == uuid_to_test
