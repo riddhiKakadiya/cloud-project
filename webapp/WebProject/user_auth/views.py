@@ -164,20 +164,19 @@ def createNotes(request):
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
 
 @csrf_exempt
-def getNotes(request, note_id=""):
+def getNoteFromId(request, note_id=""):
 	if request.method == 'GET':
 		user = validateSignin(request.META)
 		if (user):
 			notes = NotesModel.objects.filter(id=note_id, user=user)
-			for note in notes:
-				if(note):
-					message={}
-					message['id'] = note.id
-					message['title'] = note.title
-					message['content'] = note.content
-					message['created_on'] = note.created_on
-					message['last_updated_on'] = note.last_updated_on
-					return JsonResponse(message, status=201)
-				else:
-					return JsonResponse({'message': 'Error : Invalid Note ID'}, status=401)
+			if(notes.exists()):
+				message={}
+				message['id'] = notes[0].id
+				message['title'] = notes[0].title
+				message['content'] = notes[0].content
+				message['created_on'] = notes[0].created_on
+				message['last_updated_on'] = notes[0].last_updated_on
+				return JsonResponse(message, status=201)
+			else:
+				return JsonResponse({'message': 'Error : Invalid Note ID'}, status=401)
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
