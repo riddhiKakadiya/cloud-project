@@ -136,7 +136,7 @@ def signin(request):
         return JsonResponse({'Error': 'Please use a get method with user credentials'})
 
 @csrf_exempt
-def createNotes(request):
+def createOrGetNotes(request):
     if request.method == 'POST':
         if (request.body):
             received_json_data = json.loads(request.body.decode("utf-8"))
