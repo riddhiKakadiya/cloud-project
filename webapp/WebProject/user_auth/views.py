@@ -4,14 +4,32 @@ from django.contrib.auth import authenticate
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from uuid import UUID
 import json
 import re
 import base64
 import time
-
+import datetime
+from .models import *
 #--------------------------------------------------------------------------------
 # Function definitions
 #--------------------------------------------------------------------------------
+
+#Verify signed in user
+def validateSignin(meta):
+	if 'HTTP_AUTHORIZATION' in meta:
+		auth = meta['HTTP_AUTHORIZATION'].split()
+		if len(auth) == 2:
+			if auth[0].lower() == "basic":
+				authstring = base64.b64decode(auth[1]).decode("utf-8")
+				username, password = authstring.split(':', 1)
+				if not username and not password:
+					return JsonResponse({'message':'Error : User not logged, Please provide credentials'}, status=401)
+				user = authenticate(username=username, password=password)
+				if user is not None:
+					return user
+	else:
+		return False
 
 #Validating passwords
 def validatePassword(password):
@@ -107,4 +125,58 @@ def signin(request):
 					current_time = time.ctime()
 					return JsonResponse({"current time": current_time})
 	# otherwise ask for authentification
+	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+
+@csrf_exempt
+def createNotes(request):
+	if request.method == 'POST':
+		if(request.body):
+			received_json_data = json.loads(request.body.decode("utf-8"))
+			title = received_json_data['title']
+			content = received_json_data['content']
+			time_now = datetime.datetime.now()
+			user = validateSignin(request.META)
+			if(user):
+				note= NotesModel(title=title,content=content,created_on=time_now, last_updated_on=time_now, user=user)
+				note.save()
+				message = {}
+				message['id'] = note.id
+				message['title'] = title
+				message['content'] = content
+				message['created_on'] = time_now
+				message['last_updated_on'] = time_now
+				return JsonResponse(message, status=201)
+
+	elif request.method == 'GET':
+			user = validateSignin(request.META)
+			if (user):
+				notes = NotesModel.objects.filter(user=user)
+				message_list=[]
+				for note in notes:
+					message={}
+					message['id'] = note.id
+					message['title'] = note.title
+					message['content'] = note.content
+					message['created_on'] = note.created_on
+					message['last_updated_on'] = note.last_updated_on
+					message_list.append(message)
+				return JsonResponse(message_list, status=201, safe=False)
+	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+
+@csrf_exempt
+def getNoteFromId(request, note_id=""):
+	if request.method == 'GET':
+		user = validateSignin(request.META)
+		if (user):
+			notes = NotesModel.objects.filter(id=note_id, user=user)
+			if(notes.exists()):
+				message={}
+				message['id'] = notes[0].id
+				message['title'] = notes[0].title
+				message['content'] = notes[0].content
+				message['created_on'] = notes[0].created_on
+				message['last_updated_on'] = notes[0].last_updated_on
+				return JsonResponse(message, status=201)
+			else:
+				return JsonResponse({'message': 'Error : Invalid Note ID'}, status=401)
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
