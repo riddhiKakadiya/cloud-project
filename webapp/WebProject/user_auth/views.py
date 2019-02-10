@@ -116,21 +116,24 @@ def registerPage(request):
 
 @csrf_exempt
 def signin(request):
-    if 'HTTP_AUTHORIZATION' in request.META:
-        auth = request.META['HTTP_AUTHORIZATION'].split()
-        if len(auth) == 2:
-            if auth[0].lower() == "basic":
-                authstring = base64.b64decode(auth[1]).decode("utf-8")
-                username, password = authstring.split(':', 1)
-                if not username and not password:
-                    return JsonResponse({'message': 'Error : User not logged, Please provide credentials'}, status=401)
-                user = authenticate(username=username, password=password)
-                if user is not None:
-                    current_time = time.ctime()
-                    return JsonResponse({"current time": current_time})
-    # otherwise ask for authentification
-    return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
-
+    # check if method is get
+    if request.method == 'GET':
+        if 'HTTP_AUTHORIZATION' in request.META:
+            auth = request.META['HTTP_AUTHORIZATION'].split()
+            if len(auth) == 2:
+                if auth[0].lower() == "basic":
+                    authstring = base64.b64decode(auth[1]).decode("utf-8")
+                    username, password = authstring.split(':', 1)
+                    if not username and not password:
+                        return JsonResponse({'message': 'Error : User not logged, Please provide credentials'}, status=401)
+                    user = authenticate(username=username, password=password)
+                    if user is not None:
+                        current_time = time.ctime()
+                        return JsonResponse({"current time": current_time})
+        # otherwise ask for authentification
+        return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+    else:
+        return JsonResponse({'Error': 'Please use a get method with user credentials'})
 
 @csrf_exempt
 def createNotes(request):
