@@ -11,6 +11,7 @@ import base64
 import time
 import datetime
 from .models import *
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 #--------------------------------------------------------------------------------
 # Function definitions
 #--------------------------------------------------------------------------------
@@ -162,6 +163,29 @@ def createNotes(request):
 					message_list.append(message)
 				return JsonResponse(message_list, status=201, safe=False)
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+
+#@csrf_exempt
+#def updateNotes(request, id):
+#	if request.method == 'POST':
+#		note = NotesModel.objects.filter(id=id)
+#		received_json_data = json.loads(request.body.decode("utf-8"))
+#		note.title = received_json_data['title']
+# 		note.content = received_json_data['content']
+# 		note.last_updated_on = datetime.datetime.now()
+#		
+# 		user = validateSignin(request.META)
+# 		if(user):
+# 			note.save()
+#			message = "Note updated!""
+#			return JsonResponse(message, status=201)
+#
+#
+#else
+#	user = validateSignin(request.META)
+#	if(user):
+#		NotesModel.objects.filter(pk=id).update('title'=title, 'content'=content, 'last_updated_on'=last_updated_on)
+#		message = "Note updated!""
+#		return JsonResponse(message, status=201)
 
 @csrf_exempt
 def getNotes(request, note_id=""):
