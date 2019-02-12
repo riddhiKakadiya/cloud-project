@@ -185,7 +185,7 @@ def createOrGetNotes(request):
 	                return JsonResponse(message, status=201)
 	            return JsonResponse({'message': 'Error : User not authorized'}, status=401)
 	        except:
-	        	JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'})
+	        	JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'}, status=400)
         return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
     # Get method to retrive all notes for authorized user
     elif request.method == 'GET':
