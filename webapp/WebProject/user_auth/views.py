@@ -12,8 +12,7 @@ import time
 import datetime
 from .models import *
 
-
-# --------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
 # Function definitions
 # --------------------------------------------------------------------------------
 
@@ -208,25 +207,57 @@ def createOrGetNotes(request):
         return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
     return JsonResponse({'message': 'Error : Incorrect Request'}, status=400)
 
-
 @csrf_exempt
-def getNoteFromId(request, note_id=""):
-    if request.method == 'GET':
-        user = validateSignin(request.META)
-        if (is_valid_uuid(note_id)):
-            if (user):
-                notes = NotesModel.objects.filter(id=note_id, user=user)
-                if (notes.exists()):
-                    message = {}
-                    message['id'] = notes[0].id
-                    message['title'] = notes[0].title
-                    message['content'] = notes[0].content
-                    message['created_on'] = notes[0].created_on
-                    message['last_updated_on'] = notes[0].last_updated_on
-                    return JsonResponse(message, status=200)
-                else:
-                    return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
-        else:
-            return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
-    return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+def noteFromId(request, note_id=""):
+	if request.method == 'GET':
+		user = validateSignin(request.META)
+		if (is_valid_uuid(note_id)):
+			if (user):
+				notes = NotesModel.objects.filter(id=note_id, user=user)
+				if (notes.exists()):
+					message = {}
+					message['id'] = notes[0].id
+					message['title'] = notes[0].title
+					message['content'] = notes[0].content
+					message['created_on'] = notes[0].created_on
+					message['last_updated_on'] = notes[0].last_updated_on
+					return JsonResponse(message, status=200)
+				else:
+					return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
+		else:
+			return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
 
+
+#update
+	elif request.method=='PUT':
+		print(note_id)
+		user = validateSignin(request.META)
+		if (is_valid_uuid(note_id)):
+			if(user):
+				note = NotesModel.objects.get(pk=note_id)
+				if(note.user==user):
+					print(note.content)
+					received_json_data = json.loads(request.body.decode("utf-8"))
+					note.title = received_json_data['title']
+					note.content = received_json_data['content']
+					note.last_updated_on = datetime.datetime.now()		
+					note.save()
+					return JsonResponse({'message':'note updated!'}, status=202)
+				else:
+					return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
+			else:	
+				return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+		else:	
+			return JsonResponse({'message': 'Error : Invalid note id'}, status=404)	
+#delete			
+    elif request.method == 'DELETE':
+        user = validateSignin(request.META)
+        if (user):
+            note = NotesModel.objects.get(pk=note_id)
+            if(note):
+                if(user == note.user):
+                    note.delete()
+                    return JsonResponse({'message': 'Note deleted successfully'}, status=204)
+            else:
+                return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
+    return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
