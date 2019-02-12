@@ -228,5 +228,18 @@ def getNoteFromId(request, note_id=""):
                     return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
         else:
             return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
+    #return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+
+
+    if request.method == 'DELETE':
+        user = validateSignin(request.META)
+        if (user):
+            note = NotesModel.objects.get(pk=note_id)
+            if(note):
+                if(user == note.user):
+                    note.delete()
+                    return JsonResponse({'message': 'Note deleted successfully'}, status=204)
+            else:
+                return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
     return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
 
