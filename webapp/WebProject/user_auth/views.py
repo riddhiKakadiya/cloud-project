@@ -163,25 +163,31 @@ def signin(request):
 
 @csrf_exempt
 def createOrGetNotes(request):
+	# Post method to create new notes for authorized user
     if request.method == 'POST':
         if (request.body):
-            received_json_data = json.loads(request.body.decode("utf-8"))
-            title = received_json_data['title']
-            content = received_json_data['content']
-            time_now = datetime.datetime.now()
-            user = validateSignin(request.META)
-            if (user):
-                note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
-                                  user=user)
-                note.save()
-                message = {}
-                message['id'] = note.id
-                message['title'] = title
-                message['content'] = content
-                message['created_on'] = time_now
-                message['last_updated_on'] = time_now
-                return JsonResponse(message, status=201)
-
+        	try:
+	            received_json_data = json.loads(request.body.decode("utf-8"))
+	            title = received_json_data['title']
+	            content = received_json_data['content']
+	            time_now = datetime.datetime.now()
+	            user = validateSignin(request.META)
+	            if (user):
+	                note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
+	                                  user=user)
+	                note.save()
+	                message = {}
+	                message['id'] = note.id
+	                message['title'] = title
+	                message['content'] = content
+	                message['created_on'] = time_now
+	                message['last_updated_on'] = time_now
+	                return JsonResponse(message, status=201)
+	            return JsonResponse({'message': 'Error : User not authorized'}, status=401)
+	        except:
+	        	JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'})
+        return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
+    # Get method to retrive all notes for authorized user
     elif request.method == 'GET':
         user = validateSignin(request.META)
         if (user):
@@ -200,6 +206,7 @@ def createOrGetNotes(request):
             else:
                 return JsonResponse({'message': 'Error : Note List Empty'}, status=204)
         return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+    return JsonResponse({'message': 'Error : Incorrect Request'}, status=400)
 
 
 @csrf_exempt
