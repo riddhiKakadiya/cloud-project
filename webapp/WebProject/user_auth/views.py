@@ -240,9 +240,9 @@ def noteFromId(request, note_id=""):
 					note.content = received_json_data['content']
 					note.last_updated_on = datetime.datetime.now()		
 					note.save()
-					return JsonResponse({'message':'note updated!'}, status=202)
+					return JsonResponse({'message':'note updated!'}, status=204)
 				else:
-					return JsonResponse({'message': 'Error : Invalid note id'}, status=403)
+					return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
 			else:	
 				return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
 		else:	
