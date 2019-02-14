@@ -242,7 +242,7 @@ def noteFromId(request, note_id=""):
 					note.save()
 					return JsonResponse({'message':'note updated!'}, status=202)
 				else:
-					return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
+					return JsonResponse({'message': 'Error : Invalid note id'}, status=403)
 			else:	
 				return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
 		else:	
