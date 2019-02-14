@@ -184,7 +184,7 @@ def createOrGetNotes(request):
 	                return JsonResponse(message, status=201)
 	            return JsonResponse({'message': 'Error : User not authorized'}, status=401)
 	        except:
-	        	JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'})
+	        	JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'}, status=400)
         return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
     # Get method to retrive all notes for authorized user
     elif request.method == 'GET':
@@ -226,9 +226,7 @@ def noteFromId(request, note_id=""):
 					return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
 		else:
 			return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
-
-
-#update
+	#update
 	elif request.method=='PUT':
 		print(note_id)
 		user = validateSignin(request.META)
@@ -249,15 +247,15 @@ def noteFromId(request, note_id=""):
 				return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
 		else:	
 			return JsonResponse({'message': 'Error : Invalid note id'}, status=404)	
-#delete			
-    elif request.method == 'DELETE':
-        user = validateSignin(request.META)
-        if (user):
-            note = NotesModel.objects.get(pk=note_id)
-            if(note):
-                if(user == note.user):
-                    note.delete()
-                    return JsonResponse({'message': 'Note deleted successfully'}, status=204)
-            else:
-                return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
-    return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+	#delete			
+	elif request.method == 'DELETE':
+		user = validateSignin(request.META)
+		if (user):
+			note = NotesModel.objects.get(pk=note_id)
+			if(note):
+				if(user == note.user):
+					note.delete()
+					return JsonResponse({'message': 'Note deleted successfully'}, status=204)
+			else:
+				return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
+	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
