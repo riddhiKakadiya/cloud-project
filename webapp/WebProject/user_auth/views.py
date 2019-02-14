@@ -244,6 +244,7 @@ def noteFromId(request, note_id=""):
 						return JsonResponse({'message':'note updated!'}, status=204)
 					except:
 						return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
+
 				else:
 					return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
 			else:	
@@ -252,13 +253,16 @@ def noteFromId(request, note_id=""):
 			return JsonResponse({'message': 'Error : Invalid note id'}, status=400)	
 	#delete			
 	elif request.method == 'DELETE':
-		user = validateSignin(request.META)
+		user = validateSignin(request.META)		
 		if (user):
-			note = NotesModel.objects.get(pk=note_id)
+			try:
+				note = NotesModel.objects.get(pk=note_id)
+			except:
+				return JsonResponse({'Error': 'Invalid note ID'}, status=400)		
 			if(note):
 				if(user == note.user):
 					note.delete()
 					return JsonResponse({'message': 'Note deleted successfully'}, status=204)
-			else:
-				return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
+				else:
+					return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
