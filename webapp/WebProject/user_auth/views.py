@@ -193,6 +193,7 @@ def createOrGetNotes(request):
             notes = NotesModel.objects.filter(user=user)
             if (notes.exists()):
                 message_list = []
+                attachment_list = []
                 for note in notes:
                     message = {}
                     message['id'] = note.id
@@ -200,6 +201,15 @@ def createOrGetNotes(request):
                     message['content'] = note.content
                     message['created_on'] = note.created_on
                     message['last_updated_on'] = note.last_updated_on
+                    attachments = Attachment.objects.filter(note=note.id)
+                    if (attachments):
+                        for attachment in attachments:
+                            note_attachment={}
+                            note_attachment['id'] = attachment.id
+                            note_attachment['url'] = attachment.url
+                            attachment_list.append(note_attachment)
+                        message['attachments'] = attachment_list
+                    print("Attachments:",attachments)
                     message_list.append(message)
                 return JsonResponse(message_list, status=200, safe=False)
             else:
@@ -266,3 +276,30 @@ def noteFromId(request, note_id=""):
 				else:
 					return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+
+@csrf_exempt
+def addAttachmentToNotes(request,note_id=""):
+    # Post method to create new notes for authorized user
+    if request.method == 'POST':
+        if (request.body):
+            try:
+                received_json_data = json.loads(request.body.decode("utf-8"))
+                title = received_json_data['title']
+                content = received_json_data['content']
+                time_now = datetime.datetime.now()
+                user = validateSignin(request.META)
+                if (user):
+                    note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
+                                      user=user)
+                    note.save()
+                    message = {}
+                    message['id'] = note.id
+                    message['title'] = title
+                    message['content'] = content
+                    message['created_on'] = time_now
+                    message['last_updated_on'] = time_now
+                    return JsonResponse(message, status=201)
+                return JsonResponse({'message': 'Error : User not authorized'}, status=401)
+            except:
+                JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'}, status=400)
+        return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
