@@ -11,17 +11,17 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-echo "The following are the regions available for creating VPC : "
+# echo "The following are the regions available for creating VPC : "
 
-REGIONS=$(aws ec2 describe-regions | jq '.Regions')
-echo $REGIONS | jq -c '.[]'  | while read i; do
-	REGION=$(echo $i | jq -r '.RegionName')
-	    echo "$REGION"
-done
+# REGIONS=$(aws ec2 describe-regions | jq '.Regions')
+# echo $REGIONS | jq -c '.[]'  | while read i; do
+# 	REGION=$(echo $i | jq -r '.RegionName')
+# 	    echo "$REGION"
+# done
 
-echo ""
-echo "Lets first configure your AWS account"
-aws configure
+# echo ""
+# echo "Lets first configure your AWS account"
+# aws configure
 
 ##Creating Stack
 echo "Creating Stack $1"
@@ -46,4 +46,6 @@ else
 	echo "Error : Revoke public access failed"
 	exit
 fi
+
+aws cloudformation describe-stack-resources --stack-name $1| jq '.StackResources' | jq -c '.[]' | jq '.PhysicalResourceId'
 
