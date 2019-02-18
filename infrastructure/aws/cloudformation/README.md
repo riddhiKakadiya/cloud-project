@@ -17,7 +17,7 @@ The architecture contains networking resources such as Virtual Private Cloud (VP
 7. Modify the default security group for your VPC to remove existing rules and add new rules to only allow TCP traffic on port 22 and 80 from anywhere. No longer a requirement.
 
 ### Executing the scripts
-#### To Create a Stack
+#### To Create a Network Stack
 
 ```bash
 cd csye6225-spring2019/infrastructure/aws/cloudformation/
@@ -37,6 +37,31 @@ The example code will setup a stack named 'MyStack'. The paramaters required for
 ```bash
 cd csye6225-spring2019/infrastructure/aws/cloudformation/
 ./csye6225-aws-cf-terminate-stack.sh
+```
+
+The above code will list available stacks and ask for the STACK_NAME to be deleted.
+
+
+#### To Create a Application Stack
+
+```bash
+cd csye6225-spring2019/infrastructure/aws/cloudformation/
+./csye6225-aws-cf-create-application-stack.sh <STACK_NAME>
+```
+Example:
+
+```bash
+cd csye6225-spring2019/infrastructure/aws/cloudformation/
+./csye6225-aws-cf-create-application-stack.sh MyAppStack
+```
+
+The example code will setup a stack named 'MyAppStack'. The paramaters required for the script can be configured in 'csye-6225-cf-application-parameters.json'.
+
+#### To Terminate a Stack
+
+```bash
+cd csye6225-spring2019/infrastructure/aws/cloudformation/
+./csye6225-aws-cf-terminate-application-stack.sh
 ```
 
 The above code will list available stacks and ask for the STACK_NAME to be deleted.
