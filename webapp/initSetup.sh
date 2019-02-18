@@ -1,4 +1,4 @@
-#!/bin/bash
+pip3#!/bin/bash
 #Run with sudo permisions
 echo Setingup Dev environment
 
@@ -22,7 +22,8 @@ cat > WebProject/WebProject/config/my.cnf << EOF
 [client]
 database = $databasename
 user = $user
-password = $password
+password = $passwordpip3
+ppxmmx
 default-character-set = utf8
 EOF
 
@@ -44,6 +45,8 @@ EOF
 sudo rm -rf djangoEnv
 virtualenv -p python3 djangoEnv
 source djangoEnv/bin/activate
+#For CentOS
+#cat requirements.txt | xargs -n 1 pip install
 pip install -r requirements.txt
 cd WebProject
 python3 manage.py makemigrations

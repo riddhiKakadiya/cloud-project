@@ -7,21 +7,21 @@ set -e
 ##Check if enough arguements are passed
 if [ $# -lt 1 ]; then
   echo "Please provide stack name ! Try Again."
-  echo "e.g. ./csye6225-pring2019-aws-cf-create-stack.sh <STACK_NAME>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME>"
   exit 1
 fi
 
-echo "The following are the regions available for creating VPC : "
+# echo "The following are the regions available for creating VPC : "
 
-REGIONS=$(aws ec2 describe-regions | jq '.Regions')
-echo $REGIONS | jq -c '.[]'  | while read i; do
-	REGION=$(echo $i | jq -r '.RegionName')
-	    echo "$REGION"
-done
+# REGIONS=$(aws ec2 describe-regions | jq '.Regions')
+# echo $REGIONS | jq -c '.[]'  | while read i; do
+# 	REGION=$(echo $i | jq -r '.RegionName')
+# 	    echo "$REGION"
+# done
 
-echo ""
-echo "Lets first configure your AWS account"
-aws configure
+# echo ""
+# echo "Lets first configure your AWS account"
+# aws configure
 
 ##Creating Stack
 echo "Creating Stack $1"
