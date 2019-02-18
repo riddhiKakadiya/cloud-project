@@ -358,7 +358,28 @@ def addAttachmentToNotes(request,note_id=""):
 				return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 		else:
 			return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
-
-
-
 	return JsonResponse({'message': 'Error : Request method should be GET or POST'}, status=400)
+
+# @csrf_exempt
+# def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
+# 	# Update method to update attachments for authorized user
+# 	if request.method == 'PUT':
+# 		print("Note ID is :", note_id)
+# 		print("Attachment ID is :", attachment_id)
+# 		user = validateSignin(request.META)
+# 		if(user):
+# 			if(is_valid_uuid(note_id)):                    
+# 				try:
+# 					note = NotesModel.objects.get(pk=note_id)
+# 				except:
+# 					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+# 			else:
+# 				return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+# 			if(is_valid_uuid(attachment_id)):
+
+# 			else:
+# 				return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+
+
+
+# 	return JsonResponse({'message': 'Error : Request method should be GET or POST'}, status=400)
