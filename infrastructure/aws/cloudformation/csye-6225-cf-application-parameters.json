@@ -1,17 +1,17 @@
 [
   {
     "ParameterKey": "ImageIdparam",
-    "ParameterValue": "ami-0282cf077acf11412",
+    "ParameterValue": "ami-07712a49c068fc7f8",
     "UsePreviousValue": true
   },
   {
     "ParameterKey": "myVPC",
-    "ParameterValue": "vpc-0b93a6df8d9d664ac",
+    "ParameterValue": "vpc-03a2b06765063f9fe",
     "UsePreviousValue": true
   },
   {
     "ParameterKey": "PublicSubnet",
-    "ParameterValue": "subnet-0b4c51a4a5e6a3493",
+    "ParameterValue": "subnet-0f71c2cb0e52e0a84",
     "UsePreviousValue": true
   }
 ]
