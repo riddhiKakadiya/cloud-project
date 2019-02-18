@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CSYE 6225 - application cf stack
+
+Parameters:
+  ImageIdparam:
+    Default: "ami-0282cf077acf11412"
+    Description: ImageId parameter (eg ami-0282cf077acf11412)
+    Type: String
+  PublicSubnet:
+    Default: "subnet-08edd817a280766ff"
+    Description: subnet parameter (eg subnet-08edd817a280766ff)
+    Type: String
+  myVPC:
+    Default: "vpc-0b9b80e139f334558"
+    Description: VPC parameter (eg vpc-0b9b80e139f334558)
+    Type: String
+
+Resources:
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http, SSH and SSL to client host
+      VpcId:
+        Ref: myVPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'sg']
+
+  MyEC2Instance: #Creation of EC2
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: {Ref: ImageIdparam} #Refrence to the custom AMI
+      InstanceType: t2.micro
+      BlockDeviceMappings: 
+          - DeviceName: "/dev/sdm"
+            Ebs: 
+              VolumeType: "gp2"
+              DeleteOnTermination: "false"
+              VolumeSize: "20"
+          - DeviceName: "/dev/sdk"
+            NoDevice: {}
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet: 
+            - Ref: "InstanceSecurityGroup"
+          SubnetId: 
+            Ref: "PublicSubnet"
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'EC2']
