@@ -1,4 +1,4 @@
-pip3#!/bin/bash
+#!/bin/bash
 #Run with sudo permisions
 echo Setingup Dev environment
 
