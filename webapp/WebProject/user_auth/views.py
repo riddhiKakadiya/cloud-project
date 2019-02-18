@@ -228,14 +228,14 @@ def noteFromId(request, note_id=""):
 		user = validateSignin(request.META)
 		if (is_valid_uuid(note_id)):
 			if (user):
-				notes = NotesModel.objects.filter(id=note_id, user=user)
-				if (notes.exists()):
+				note = NotesModel.objects.get(pk=note_id)
+				if (note.user==user):
 					message = {}
-					message['id'] = notes[0].id
-					message['title'] = notes[0].title
-					message['content'] = notes[0].content
-					message['created_on'] = notes[0].created_on
-					message['last_updated_on'] = notes[0].last_updated_on
+					message['id'] = note.id
+					message['title'] = note.title
+					message['content'] = note.content
+					message['created_on'] = note.created_on
+					message['last_updated_on'] = note.last_updated_on
 					return JsonResponse(message, status=200)
 				else:
 					return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
@@ -304,7 +304,7 @@ def addAttachmentToNotes(request,note_id=""):
                     if(data._get_name().lower().endswith(('.png', '.jpg', '.jpeg'))):
                         #-----------Primary Logic for saving attachments-----------#
                         attachment = Attachment(url = data, note = note)
-                        print("--------")
+                        print("--------") 
                         print(data._get_name())
                         path = default_storage.save(data._get_name(), ContentFile(data.read()))
                         tmp_file = os.path.join(settings.MEDIA_ROOT, path)
