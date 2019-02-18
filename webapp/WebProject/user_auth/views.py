@@ -4,6 +4,10 @@ from django.contrib.auth import authenticate
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
 from uuid import UUID
 import json
 import re
@@ -11,6 +15,7 @@ import base64
 import time
 import datetime
 from .models import *
+
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -193,8 +198,8 @@ def createOrGetNotes(request):
             notes = NotesModel.objects.filter(user=user)
             if (notes.exists()):
                 message_list = []
-                attachment_list = []
                 for note in notes:
+                    attachment_list = []
                     message = {}
                     message['id'] = note.id
                     message['title'] = note.title
@@ -281,25 +286,36 @@ def noteFromId(request, note_id=""):
 def addAttachmentToNotes(request,note_id=""):
     # Post method to create new notes for authorized user
     if request.method == 'POST':
-        if (request.body):
-            try:
-                received_json_data = json.loads(request.body.decode("utf-8"))
-                title = received_json_data['title']
-                content = received_json_data['content']
-                time_now = datetime.datetime.now()
-                user = validateSignin(request.META)
-                if (user):
-                    note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
-                                      user=user)
-                    note.save()
-                    message = {}
-                    message['id'] = note.id
-                    message['title'] = title
-                    message['content'] = content
-                    message['created_on'] = time_now
-                    message['last_updated_on'] = time_now
-                    return JsonResponse(message, status=201)
-                return JsonResponse({'message': 'Error : User not authorized'}, status=401)
-            except:
-                JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'}, status=400)
-        return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
+        print("Note ID is :", note_id)
+        # print(request.FILES)
+        if (request.FILES):
+            user = validateSignin(request.META)
+            if(user):
+                if(is_valid_uuid(note_id)):                    
+                    try:
+                        note = NotesModel.objects.get(pk=note_id)
+                    except:
+                        return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+                else:
+                    return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+                if(note.user==user):
+                    data = request.FILES['attachment']
+                    #-----------Check for file type-----------#
+                    if(data._get_name().lower().endswith(('.png', '.jpg', '.jpeg'))):
+                        #-----------Primary Logic for saving attachments-----------#
+                        attachment = Attachment(url = data, note = note)
+                        print("--------")
+                        print(data._get_name())
+                        path = default_storage.save(data._get_name(), ContentFile(data.read()))
+                        tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+                        attachment.save()
+                        return JsonResponse({'message': 'Image Saved'}, status=200)
+                    else:
+                       return JsonResponse({'message': 'Error : Allowed file types are jpg,jpeg or png '}, status=401) 
+                else:
+                    return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
+            else:
+                return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
+        else:
+            return JsonResponse({'message': 'Error : Files not selected'}, status=400)
+    return JsonResponse({'message': 'Error : Please use POST method'}, status=400)
