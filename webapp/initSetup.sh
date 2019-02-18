@@ -22,8 +22,7 @@ cat > WebProject/WebProject/config/my.cnf << EOF
 [client]
 database = $databasename
 user = $user
-password = $passwordpip3
-ppxmmx
+password = $password
 default-character-set = utf8
 EOF
 
