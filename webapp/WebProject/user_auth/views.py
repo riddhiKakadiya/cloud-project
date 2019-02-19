@@ -328,7 +328,16 @@ def noteFromId(request, note_id=""):
 						return JsonResponse({'message':'note updated!'}, status=204)
 					except:
 						return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
-
+						#----------------If attachment is sent as POST method while creating note--------#
+					if (request.FILES):
+						data = request.FILES['attachment']
+						#-----------Primary Logic for saving attachments-----------#
+						attachment = Attachment(url = data, note = note)
+						path = default_storage.save(data._get_name(), ContentFile(data.read()))
+						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+						attachment.save()
+						attachment_list.append(attachment)
+						message['attachments'] = attachment_list
 				else:
 					return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
 			else:	
