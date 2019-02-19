@@ -25,7 +25,7 @@ from django.conf import settings
 # Function definitions for AWS S3
 # --------------------------------------------------------------------------------
 
-def save_attachment_to_s3(file_to_upload):
+def save_attachment_to_s3(file_to_upload,filename,acl="public-read"):
 #Get AWS keys from local aws_credentials file
 	print("INSIDE S3 function")
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
@@ -41,7 +41,20 @@ def save_attachment_to_s3(file_to_upload):
 	outPutname = 'uuid'
 
 	s3 = session.client('s3')
-	s3.upload_file(Key,bucketName,outPutname)
+	try:
+		s3.upload_fileobj(
+			file_to_upload,
+			bucketName,
+			filename,
+			# ExtraArgs={
+			# 	"ACL": acl,
+			# 	"ContentType": "jpg"
+			# }
+		)
+	except Exception as e:
+		# This is a catch all exception, edit this part to fit your needs.
+		print("Something Happened: ", e)
+		return e
 
 	
 	return JsonResponse({'message': 'Attachment yploaded to S3 bucket successfully'}, status=200)
@@ -360,9 +373,10 @@ def addAttachmentToNotes(request,note_id=""):
 				else:
 					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 				if(note.user==user):
-					data = request.FILES['attachment']
+					file = request.FILES['attachment']
+					print(request.FILES)
 					#-----------Primary Logic for saving attachments-----------#
-					save_attachment_to_s3(data)
+					save_attachment_to_s3(file,filename=file._get_name())
 					print("Saved to S3")
 					# attachment = Attachment(url = data, note = note)
 					# path = default_storage.save(attachment.id, ContentFile(data.read()))

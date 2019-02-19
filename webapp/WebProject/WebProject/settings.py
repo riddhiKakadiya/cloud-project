@@ -36,7 +36,7 @@ AWS_SECRET_ACCESS_KEY = config['AWS']['aws_secret_access_key']
 SECRET_KEY = 'l_k3zyn7$2j*vsvk&m3t5&*bp++r*=v*$c9gmoiy9z0xk5u_6m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config['django_settings']['debug']
 
 ALLOWED_HOSTS = []
 
