@@ -113,3 +113,6 @@ venv.bak/
 *.pyc
 .idea/
 /webapp/WebProject/user_auth/migrations/
+/webapp/WebProject/user_auth/attachments/
+/infrastructure/aws/cloudformation/csye-6225-cf-networking-parameters.json
+/infrastructure/aws/cloudformation/csye-6225-cf-application-parameters.json

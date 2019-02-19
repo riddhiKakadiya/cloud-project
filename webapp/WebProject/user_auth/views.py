@@ -15,8 +15,49 @@ import base64
 import time
 import datetime
 from .models import *
+import boto
+import boto.s3
+import sys
+from boto.s3.key import Key
+from django.conf import settings
 
 
+
+#--------------------------------------------------------------------------------
+# Function definitions for AWS S3
+# --------------------------------------------------------------------------------
+
+def save_attachment_to_s3(file_to_upload):
+#Get AWS keys from local aws_credentials file
+	print("INSIDE S3 function")
+	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
+	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+
+	#Define Bucket name
+	bucket_name = settings.S3_BUCKETNAME
+	print("BUCKET_NAME: ",bucket_name)
+	#Connect to S3 bucket
+	# try:
+	conn = boto.connect_s3(AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY)
+		# bucket = conn.create_bucket(bucket_name,location=boto.s3.connection.Location.DEFAULT)
+	# except:
+		# return JsonResponse({'message': 'ERROR: Invalid AWS keys, set keys using "aws configure" on command line'}, status = 401)
+	# try:
+	conn.get_bucket(bucket_name)
+	# except:
+		# return JsonResponse({'message': 'ERROR: Bucket does not exist, Create a bucket named "Note-attachments" in S3'}, status = 401)
+
+	print ("Uploading %s to Amazon S3 bucket %s", file_to_upload, bucket_name)
+
+	def percent_cb(complete, total):
+		sys.stdout.write('.')
+		sys.stdout.flush()
+
+	k = Key(bucket_name)
+	k.key = file_to_upload
+	k.set_contents_from_filename(file_to_upload,cb=percent_cb, num_cb=10)
+	# print(file_to_upload.url)
+	return JsonResponse({'message': 'Attachment yploaded to S3 bucket successfully'}, status=200)
 #--------------------------------------------------------------------------------
 # Function definitions
 # --------------------------------------------------------------------------------
@@ -179,14 +220,29 @@ def createOrGetNotes(request):
 				if (user):
 					note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
 									  user=user)
-					note.save()
+					note.save() 
 					message = {}
+					attachment_list=[]
 					message['id'] = note.id
 					message['title'] = title
 					message['content'] = content
 					message['created_on'] = time_now
 					message['last_updated_on'] = time_now
+					#----------------If attachment is sent as POST method while creating note--------#
+					if (request.FILES):
+						data = request.FILES['attachment']
+						#-----------Primary Logic for saving attachments-----------#
+						attachment = Attachment(url = data, note = note)
+						path = default_storage.save(data._get_name(), ContentFile(data.read()))
+						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+						attachment.save()
+						attachment_list.append(attachment)
+						message['attachments'] = attachment_list
+
+					message['created_on'] = time_now
+					message['last_updated_on'] = time_now
 					return JsonResponse(message, status=201)
+
 				return JsonResponse({'message': 'Error : User not authorized'}, status=401)
 			except:
 				JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'}, status=400)
@@ -268,7 +324,16 @@ def noteFromId(request, note_id=""):
 						return JsonResponse({'message':'note updated!'}, status=204)
 					except:
 						return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
-
+						#----------------If attachment is sent as POST method while creating note--------#
+					if (request.FILES):
+						data = request.FILES['attachment']
+						#-----------Primary Logic for saving attachments-----------#
+						attachment = Attachment(url = data, note = note)
+						path = default_storage.save(data._get_name(), ContentFile(data.read()))
+						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+						attachment.save()
+						attachment_list.append(attachment)
+						message['attachments'] = attachment_list
 				else:
 					return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
 			else:	
@@ -296,7 +361,7 @@ def addAttachmentToNotes(request,note_id=""):
 	# Post method to create new notes for authorized user
 	if request.method == 'POST':
 		print("Note ID is :", note_id)
-		# print(request.FILES)
+		print(request.FILES['attachment'])
 		if (request.FILES):
 			user = validateSignin(request.META)
 			if(user):
@@ -309,28 +374,23 @@ def addAttachmentToNotes(request,note_id=""):
 					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 				if(note.user==user):
 					data = request.FILES['attachment']
-					#-----------Check for file type-----------#
-					if(data._get_name().lower().endswith(('.png', '.jpg', '.jpeg'))):
-						#-----------Primary Logic for saving attachments-----------#
-						attachment = Attachment(url = data, note = note)
-						print("--------") 
-						print(data._get_name())
-						path = default_storage.save(data._get_name(), ContentFile(data.read()))
-						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-						attachment.save()
-						return JsonResponse({'message': 'Image Saved'}, status=200)
-					else:
-					   return JsonResponse({'message': 'Error : Allowed file types are jpg,jpeg or png '}, status=401) 
+					#-----------Primary Logic for saving attachments-----------#
+					save_attachment_to_s3(data)
+					print("Saved to S3")
+					# attachment = Attachment(url = data, note = note)
+					# path = default_storage.save(attachment.id, ContentFile(data.read()))
+					# tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+					# attachment.save()
+					return JsonResponse({'message': 'Attachment Saved'}, status=200)
 				else:
 					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 			else:
 				return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 		else:
 			return JsonResponse({'message': 'Error : Files not selected'}, status=400)
+
 	# GET method to create new notes for authorized user
 	if request.method == 'GET':
-		print("Note ID is :", note_id)
-		# print(request.FILES)
 		user = validateSignin(request.META)
 		if(user):
 			if(is_valid_uuid(note_id)):                    
@@ -358,7 +418,80 @@ def addAttachmentToNotes(request,note_id=""):
 				return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 		else:
 			return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
-
-
-
 	return JsonResponse({'message': 'Error : Request method should be GET or POST'}, status=400)
+
+@csrf_exempt
+def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
+	# Update method to update attachments for authorized user
+	if request.method == 'PUT':
+		print("------------")
+		print(request.FILES)
+		print("------------")
+		if(request.FILES):
+			user = validateSignin(request.META)
+			if(user):
+				if(is_valid_uuid(note_id)):                    
+					try:
+						note = NotesModel.objects.get(pk=note_id)
+					except:
+						return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+				else:
+					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+				if(is_valid_uuid(attachment_id)):
+					try:
+						attachment = Attachment.objects.get(pk=attachment_id)
+					except:
+						return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+				else:
+					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+				
+				if(note.user == user):
+					if(attachment.note == note):
+						#-----------Primary Logic for upfating attachments-----------#
+						data = request.FILES['attachment']
+						attachment.url = data
+						path = default_storage.save(data._get_name(), ContentFile(data.read()))
+						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+						attachment.save()
+						note.last_updated_on = datetime.datetime.now()
+						return JsonResponse({'message': 'Attachment Updated'}, status=200)
+					else:
+						return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+				else:
+					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
+		else:
+			return JsonResponse({'message': 'Error : Files not selected'}, status=400)
+
+	# Delete method to delete attachments for authorized user	
+	if request.method == 'DELETE':
+		user = validateSignin(request.META)
+		if(user):
+			if(is_valid_uuid(note_id)):                    
+				try:
+					note = NotesModel.objects.get(pk=note_id)
+				except:
+					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+			else:
+				return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+			if(is_valid_uuid(attachment_id)):
+				try:
+					attachment = Attachment.objects.get(pk=attachment_id)
+				except:
+					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+			else:
+				return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+			
+			if(note.user == user):
+				if(attachment.note.id == note.id):
+					#-----------Primary Logic for deleting attachments-----------#
+					attachment.delete()
+					note.last_updated_on = datetime.datetime.now()
+					return JsonResponse({'message': 'Attachment Deleted'}, status=200)
+				else:
+					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+			else:
+				return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
+
+
+	return JsonResponse({'message': 'Error : Request method should be PUT or DELETE'}, status=400)
+
