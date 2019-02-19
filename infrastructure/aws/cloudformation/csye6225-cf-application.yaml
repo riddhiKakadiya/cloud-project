@@ -69,3 +69,26 @@ Resources:
           Fn::Join:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'EC2']
+
+
+  MyDynamoDB: #creation of DynamoDB
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - 
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "csye6225"
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']

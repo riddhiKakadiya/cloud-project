@@ -11,10 +11,23 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import configparser
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+#Get configuration from my.cnf
+#Open and parse the file
+config = configparser.ConfigParser()
+pathToConfig = os.path.join(BASE_DIR, 'WebProject/config/my.cnf')
+config.read(pathToConfig)
+#Get variable
+
+S3_BUCKETNAME=config['S3']['bucketname']
+
+AWS_ACCESS_KEY_ID = config['AWS']['aws_access_key_id']
+AWS_SECRET_ACCESS_KEY = config['AWS']['aws_secret_access_key']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -23,7 +36,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'l_k3zyn7$2j*vsvk&m3t5&*bp++r*=v*$c9gmoiy9z0xk5u_6m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config['django_settings']['debug']
 
 ALLOWED_HOSTS = []
 

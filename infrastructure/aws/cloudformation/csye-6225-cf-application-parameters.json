@@ -6,12 +6,12 @@
   },
   {
     "ParameterKey": "myVPC",
-    "ParameterValue": "vpc-0b93a6df8d9d664ac",
+    "ParameterValue": "vpc-04586f232c97925f7",
     "UsePreviousValue": true
   },
   {
     "ParameterKey": "PublicSubnet",
-    "ParameterValue": "subnet-0b4c51a4a5e6a3493",
+    "ParameterValue": "subnet-051707490a2af1bb9",
     "UsePreviousValue": true
   }
 ]
