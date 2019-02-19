@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "ImageIdparam",
+    "ParameterValue": "ami-05b20bfcadc0e1922",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "myVPC",
+    "ParameterValue": "vpc-0da8848c971eb9aa3",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "EC2Subnet",
+    "ParameterValue": "subnet-054379b3f39cce09e",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "DBInstanceType",
+    "ParameterValue": "db.t2.micro",
+    "UsePreviousValue": true
+  }
+]

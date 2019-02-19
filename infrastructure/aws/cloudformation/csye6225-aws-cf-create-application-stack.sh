@@ -44,6 +44,13 @@ fi
 ##Creating Stack automation script
 echo "Creating Stack $1"
 
+# response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-application.yaml --parameters file://csye-6225-cf-application-parameters.json)
+response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://rds.yaml --parameters file://rds-parameters.json)
+
+
+#response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-networking.yaml)
+
+
 NETWORK_STACK=$(aws cloudformation describe-stack-resources --stack-name $2| jq '.StackResources' )
 VPC_ID=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "VPC")' | jq -r '.PhysicalResourceId')
 SUBNET_ID=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "Subnet1")' | jq -r '.PhysicalResourceId')
@@ -58,3 +65,7 @@ aws cloudformation wait stack-create-complete --stack-name $1
 echo "Stack $1 created successfully"
 
 aws cloudformation describe-stack-resources --stack-name $1| jq '.StackResources' | jq -c '.[]' | jq '.PhysicalResourceId'
+
+
+eC2RoleName=$(aws iam list-roles --query 'Roles[*].[RoleName]' --output text|grep EC2Service|awk '{print $1}')
+#echo "rdsSecurityGroupId : ${rdsSecurityGroupId}"
