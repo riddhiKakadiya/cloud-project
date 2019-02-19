@@ -153,4 +153,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'user_auth/attachments')
-MEDIA_URL = '/user_auth/attachments/'
+MEDIA_URL = '/attachments/'
