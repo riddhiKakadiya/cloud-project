@@ -15,8 +15,53 @@ import base64
 import time
 import datetime
 from .models import *
+import boto
+import boto.s3
+import sys
+from boto.s3.key import Key
 
 
+#--------------------------------------------------------------------------------
+# Function definitions for AWS S3
+# --------------------------------------------------------------------------------
+def save_attachment_to_s3(file_to_upload):
+#Get AWS keys from local aws_credentials file
+	path_to_aws_credentials_file = os.path.dirname(os.path.abspath("~/")) + "/.aws/credentials"
+	aws_credentials_file = open(path_to_aws_credentials_file, "r")
+	for i, line in enumerate(aws_file):
+		if (i==1):
+			aws_access_key_id = line.replace('aws_access_key_id = ','').strip()
+		if (i==2):
+			aws_secret_access_key = line.replace('aws_secret_access_key = ','').strip()
+
+	AWS_ACCESS_KEY_ID = aws_access_key_id
+	AWS_SECRET_ACCESS_KEY = aws_secret_access_key
+
+	#Define Bucket name
+	bucket_name = "Note-attachments"
+
+	#Connect to S3 bucket
+	try:
+		conn = boto.connect_s3(AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY)
+		# bucket = conn.create_bucket(bucket_name,location=boto.s3.connection.Location.DEFAULT)
+	except:
+		return JsonResponse({'message': 'ERROR: Invalid AWS keys, set keys using "aws configure" on command line'}, status = 401)
+	try:
+		conn.get_bucket(bucket_name)
+	except:
+		return JsonResponse({'message': 'ERROR: Bucket does not exist, Create a bucket named "Note-attachments" in S3'}, status = 401)
+
+	print ("Uploading %s to Amazon S3 bucket %s", file_to_upload, bucket_name)
+
+	def percent_cb(complete, total):
+		sys.stdout.write('.')
+		sys.stdout.flush()
+
+	k = Key(bucket_name)
+	k.key = file_to_upload
+	k.set_contents_from_filename(file_to_upload,cb=percent_cb, num_cb=10)
+
+	return JsonResponse({'message': 'Attachment yploaded to S3 bucket successfully'}, status=200)
 #--------------------------------------------------------------------------------
 # Function definitions
 # --------------------------------------------------------------------------------
@@ -311,7 +356,7 @@ def addAttachmentToNotes(request,note_id=""):
 	# Post method to create new notes for authorized user
 	if request.method == 'POST':
 		print("Note ID is :", note_id)
-		print(request.FILES['attachment'][0])
+		print(request.FILES['attachment'])
 		if (request.FILES):
 			user = validateSignin(request.META)
 			if(user):
@@ -371,7 +416,10 @@ def addAttachmentToNotes(request,note_id=""):
 @csrf_exempt
 def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 	# Update method to update attachments for authorized user
-	if request.method == 'POST':
+	if request.method == 'PUT':
+		print("------------")
+		print(request.FILES)
+		print("------------")
 		if(request.FILES):
 			user = validateSignin(request.META)
 			if(user):
