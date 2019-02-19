@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: CSYE 6225 - Network cf stack
 
 #Defining paramaters Required for resources setup
 Parameters:
