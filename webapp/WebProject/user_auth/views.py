@@ -15,10 +15,8 @@ import base64
 import time
 import datetime
 from .models import *
-import boto
-import boto.s3
 import sys
-from boto.s3.key import Key
+import boto3
 from django.conf import settings
 
 
@@ -33,30 +31,19 @@ def save_attachment_to_s3(file_to_upload):
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
 
-	#Define Bucket name
-	bucket_name = settings.S3_BUCKETNAME
-	print("BUCKET_NAME: ",bucket_name)
-	#Connect to S3 bucket
-	# try:
-	conn = boto.connect_s3(AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY)
-		# bucket = conn.create_bucket(bucket_name,location=boto.s3.connection.Location.DEFAULT)
-	# except:
-		# return JsonResponse({'message': 'ERROR: Invalid AWS keys, set keys using "aws configure" on command line'}, status = 401)
-	# try:
-	conn.get_bucket(bucket_name)
-	# except:
-		# return JsonResponse({'message': 'ERROR: Bucket does not exist, Create a bucket named "Note-attachments" in S3'}, status = 401)
+	session = boto3.Session(
+	    aws_access_key_id = AWS_ACCESS_KEY_ID,
+	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
+	)
 
-	print ("Uploading %s to Amazon S3 bucket %s", file_to_upload, bucket_name)
+	bucketName = settings.S3_BUCKETNAME
+	Key = '/path/to/the/file'
+	outPutname = 'uuid'
 
-	def percent_cb(complete, total):
-		sys.stdout.write('.')
-		sys.stdout.flush()
+	s3 = session.client('s3')
+	s3.upload_file(Key,bucketName,outPutname)
 
-	k = Key(bucket_name)
-	k.key = file_to_upload
-	k.set_contents_from_filename(file_to_upload,cb=percent_cb, num_cb=10)
-	# print(file_to_upload.url)
+	
 	return JsonResponse({'message': 'Attachment yploaded to S3 bucket successfully'}, status=200)
 #--------------------------------------------------------------------------------
 # Function definitions
