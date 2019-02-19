@@ -34,7 +34,7 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds_subnet']        
   RDSSecurityGroup: 
-    Type: AWS::RDS::SecurityGroup
+    Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow http, SSH and SSL to client host
       VpcId:
@@ -67,8 +67,10 @@ Resources:
         #Ref: "DBPassword"
       PubliclyAccessible: true
       DBName: "csye6225"
-      DBSubnetGroupName: "MyRDSsubnetGroup"
-      DBSecurityGroups: "MyDBSecurityGroup"
+      DBSubnetGroupName: 
+        Ref: "MyRDSsubnetGroup"
+      DBSecurityGroups: 
+        Ref: "MyDBSecurityGroup"
       Tags:
       - Key: Name
         Value:
@@ -79,6 +81,7 @@ Resources:
   MyDBSecurityGroup: 
     Type: AWS::RDS::DBSecurityGroup
     Properties: 
+      GroupDescription: "Ingress for Amazon EC2 security group"
       EC2VpcId: 
         Ref: "myVPC"
       DBSecurityGroupIngress: 
