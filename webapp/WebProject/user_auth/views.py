@@ -20,14 +20,38 @@ import boto3
 from django.conf import settings
 
 
+#--------------------------------------------------------------------------------
+# Function definitions for reading, saving, updating and deleting
+# --------------------------------------------------------------------------------
+def save_attachments(file_to_upload,filename,note):
+	if (settings.PROFILE  == "dev"):
+		response = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
+	else:
+		response = save_attachment_to_local(file_to_upload,filename,note)
+	return response
 
 #--------------------------------------------------------------------------------
-# Function definitions for AWS S3
+# Function definitions for CRUD on local - default profile
+# --------------------------------------------------------------------------------
+def save_attachment_to_local(file_to_upload,filename,note):
+	print("Saving attachment locally")
+	filename, file_extension = os.path.splitext(filename)
+	filename = filename + '_' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + file_extension
+	url = os.path.join(settings.MEDIA_ROOT, filename)
+	attachment = Attachment(url = url, note = note)
+	path = default_storage.save(filename, ContentFile(file_to_upload.read()))
+	tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+	attachment.save()
+	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
+
+
+#--------------------------------------------------------------------------------
+# Function definitions for AWS S3 - dev profile
 # --------------------------------------------------------------------------------
 
-def save_attachment_to_s3(file_to_upload,filename,acl="public-read"):
+def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
-	print("INSIDE S3 function")
+	print("Saving attachment to S3")
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
 
@@ -56,8 +80,10 @@ def save_attachment_to_s3(file_to_upload,filename,acl="public-read"):
 		print("Something Happened: ", e)
 		return e
 
-	
-	return JsonResponse({'message': 'Attachment yploaded to S3 bucket successfully'}, status=200)
+	# url = 
+	attachment = Attachment(url = file_to_upload, note = note)
+	attachment.save()
+	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
 #--------------------------------------------------------------------------------
 # Function definitions
 # --------------------------------------------------------------------------------
@@ -374,15 +400,9 @@ def addAttachmentToNotes(request,note_id=""):
 					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 				if(note.user==user):
 					file = request.FILES['attachment']
-					print(request.FILES)
-					#-----------Primary Logic for saving attachments-----------#
-					save_attachment_to_s3(file,filename=file._get_name())
-					print("Saved to S3")
-					# attachment = Attachment(url = data, note = note)
-					# path = default_storage.save(attachment.id, ContentFile(data.read()))
-					# tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-					# attachment.save()
-					return JsonResponse({'message': 'Attachment Saved'}, status=200)
+					#-----------Primary Logic for saving attachments-----------# 
+					response = save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+					return response
 				else:
 					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 			else:
