@@ -40,6 +40,8 @@ DEBUG = config['django_settings']['debug']
 
 ALLOWED_HOSTS = []
 
+# Define whether to run in dev environment or default(local) environment
+PROFILE = config['profile_env']['profile']
 
 # Application definition
 

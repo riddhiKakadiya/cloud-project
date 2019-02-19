@@ -15,3 +15,5 @@ aws_secret_access_key =
 [django_settings]
 debug = True
 
+[profile_env]
+profile = default
