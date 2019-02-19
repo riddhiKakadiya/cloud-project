@@ -1,6 +1,13 @@
 # my.cnf
 [client]
-database = WebProject
-user = USER
-password = PASSWORD
+database =
+user =
+password =
 default-character-set = utf8
+
+[S3]
+bucketname = 
+
+[AWS]
+aws_access_key_id = 
+aws_secret_access_key = 

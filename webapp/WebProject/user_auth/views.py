@@ -19,37 +19,33 @@ import boto
 import boto.s3
 import sys
 from boto.s3.key import Key
+from django.conf import settings
+
 
 
 #--------------------------------------------------------------------------------
 # Function definitions for AWS S3
 # --------------------------------------------------------------------------------
+
 def save_attachment_to_s3(file_to_upload):
 #Get AWS keys from local aws_credentials file
-	path_to_aws_credentials_file = os.path.dirname(os.path.abspath("~/")) + "/.aws/credentials"
-	aws_credentials_file = open(path_to_aws_credentials_file, "r")
-	for i, line in enumerate(aws_file):
-		if (i==1):
-			aws_access_key_id = line.replace('aws_access_key_id = ','').strip()
-		if (i==2):
-			aws_secret_access_key = line.replace('aws_secret_access_key = ','').strip()
-
-	AWS_ACCESS_KEY_ID = aws_access_key_id
-	AWS_SECRET_ACCESS_KEY = aws_secret_access_key
+	print("INSIDE S3 function")
+	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
+	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
 
 	#Define Bucket name
-	bucket_name = "Note-attachments"
-
+	bucket_name = settings.S3_BUCKETNAME
+	print("BUCKET_NAME: ",bucket_name)
 	#Connect to S3 bucket
-	try:
-		conn = boto.connect_s3(AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY)
+	# try:
+	conn = boto.connect_s3(AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY)
 		# bucket = conn.create_bucket(bucket_name,location=boto.s3.connection.Location.DEFAULT)
-	except:
-		return JsonResponse({'message': 'ERROR: Invalid AWS keys, set keys using "aws configure" on command line'}, status = 401)
-	try:
-		conn.get_bucket(bucket_name)
-	except:
-		return JsonResponse({'message': 'ERROR: Bucket does not exist, Create a bucket named "Note-attachments" in S3'}, status = 401)
+	# except:
+		# return JsonResponse({'message': 'ERROR: Invalid AWS keys, set keys using "aws configure" on command line'}, status = 401)
+	# try:
+	conn.get_bucket(bucket_name)
+	# except:
+		# return JsonResponse({'message': 'ERROR: Bucket does not exist, Create a bucket named "Note-attachments" in S3'}, status = 401)
 
 	print ("Uploading %s to Amazon S3 bucket %s", file_to_upload, bucket_name)
 
@@ -60,7 +56,7 @@ def save_attachment_to_s3(file_to_upload):
 	k = Key(bucket_name)
 	k.key = file_to_upload
 	k.set_contents_from_filename(file_to_upload,cb=percent_cb, num_cb=10)
-
+	# print(file_to_upload.url)
 	return JsonResponse({'message': 'Attachment yploaded to S3 bucket successfully'}, status=200)
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -379,10 +375,12 @@ def addAttachmentToNotes(request,note_id=""):
 				if(note.user==user):
 					data = request.FILES['attachment']
 					#-----------Primary Logic for saving attachments-----------#
-					attachment = Attachment(url = data, note = note)
-					path = default_storage.save(data._get_name(), ContentFile(data.read()))
-					tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-					attachment.save()
+					save_attachment_to_s3(data)
+					print("Saved to S3")
+					# attachment = Attachment(url = data, note = note)
+					# path = default_storage.save(attachment.id, ContentFile(data.read()))
+					# tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+					# attachment.save()
 					return JsonResponse({'message': 'Attachment Saved'}, status=200)
 				else:
 					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
