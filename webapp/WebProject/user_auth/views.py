@@ -20,11 +20,12 @@ import boto3
 from django.conf import settings
 
 
+
 #--------------------------------------------------------------------------------
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
 def save_attachments(file_to_upload,filename,note):
-	if (settings.PROFILE  == "dev"):
+	if (settings.PROFILE  == "default"):
 		response = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
 		response = save_attachment_to_local(file_to_upload,filename,note)
@@ -41,7 +42,7 @@ def save_attachment_to_local(file_to_upload,filename,note):
 	attachment.save()
 	filename, file_extension = os.path.splitext(filename)
 	filename = str(attachment.id) + file_extension
-	attachment.url = filename
+	attachment.url = settings.MEDIA_URL+filename
 	attachment.save()
 	path = default_storage.save(filename, ContentFile(file_to_upload.read()))
 	tmp_file = os.path.join(settings.MEDIA_ROOT, path)
@@ -63,15 +64,18 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	    aws_access_key_id = AWS_ACCESS_KEY_ID,
 	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
 	)
+
+	bucketName = settings.S3_BUCKETNAME
+
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
 	attachment.save()
 	filename, file_extension = os.path.splitext(filename)
 	filename = str(attachment.id) + file_extension
-	attachment.url = filename
+	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
 	attachment.save()
 
-	bucketName = settings.S3_BUCKETNAME
+	
 
 	s3 = session.client('s3')
 	try:
@@ -390,6 +394,7 @@ def noteFromId(request, note_id=""):
 
 @csrf_exempt
 def addAttachmentToNotes(request,note_id=""):
+
 	# Post method to create new notes for authorized user
 	if request.method == 'POST':
 		print("Note ID is :", note_id)
