@@ -63,6 +63,8 @@ echo "Stack $1 created successfully"
 
 aws cloudformation describe-stack-resources --stack-name $1| jq '.StackResources' | jq -c '.[]' | jq '.PhysicalResourceId'
 
+aws rds describe-db-instances | jq -r '.DBInstances[]|select(.DBInstanceIdentifier="mysqlforlambdatest").Endpoint|.Address'
+
 
 eC2RoleName=$(aws iam list-roles --query 'Roles[*].[RoleName]' --output text|grep EC2Service|awk '{print $1}')
 #echo "rdsSecurityGroupId : ${rdsSecurityGroupId}"
