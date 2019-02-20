@@ -43,7 +43,10 @@ SECRET_KEY = 'l_k3zyn7$2j*vsvk&m3t5&*bp++r*=v*$c9gmoiy9z0xk5u_6m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config['django_settings']['debug']
 
-ALLOWED_HOSTS = []
+HOSTNAME1 = config['django_settings']['host1']
+HOSTNAME2 = config['django_settings']['host2']
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', ]
 
 # Define whether to run in dev environment or default(local) environment
 PROFILE = config['profile_env']['profile']
