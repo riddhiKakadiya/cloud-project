@@ -25,11 +25,18 @@ from django.conf import settings
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
 def save_attachments(file_to_upload,filename,note):
-	if (settings.PROFILE  == "dev"):
+	if (settings.PROFILE  == "default"):
 		response = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
 		response = save_attachment_to_local(file_to_upload,filename,note)
 	return response
+
+# def read_attachments():
+# 	#Jai
+# def update_attachments():
+# 	#krapali
+# def delete_attachments():
+# 	#Riddhi
 
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
