@@ -23,5 +23,10 @@
     "ParameterKey": "EC2Subnet",
     "ParameterValue": "subnet-051707490a2af1bb9",
     "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "KeyPair",
+    "ParameterValue": "test1-sree",
+    "UsePreviousValue": true
   }
 ]

@@ -29,6 +29,12 @@ if [ $# -lt 3 ]; then
   exit 1
 fi
 
+if [ $# -lt 4 ]; then
+  echo "Please Key Pair! Try Again."
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <AMI_ID> <KEY_PAIR>"
+  exit 1
+fi
+
 # echo "The following are the regions available for creating VPC : "
 
 # REGIONS=$(aws ec2 describe-regions | jq '.Regions')
@@ -54,7 +60,7 @@ SUBNET_ID3=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "S
 
 echo $VPC_ID $SUBNET_ID1
 
-response=$(aws cloudformation create-stack --stack-name $1 --template-body file://csye6225-cf-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=EC2Subnet,ParameterValue=$SUBNET_ID1 ParameterKey=RDSSubnet1,ParameterValue=$SUBNET_ID2 ParameterKey=RDSSubnet2,ParameterValue=$SUBNET_ID3)
+response=$(aws cloudformation create-stack --stack-name $1 --template-body file://csye6225-cf-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=EC2Subnet,ParameterValue=$SUBNET_ID1 ParameterKey=RDSSubnet1,ParameterValue=$SUBNET_ID2 ParameterKey=RDSSubnet2,ParameterValue=$SUBNET_ID3 ParameterKey=KeyPair,ParameterValue=$4)
 
 echo "Waiting for Stack $1 to be created"
 echo "$response"
