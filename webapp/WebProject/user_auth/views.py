@@ -264,43 +264,30 @@ def signin(request):
 def createOrGetNotes(request):
 	# Post method to create new notes for authorized user
 	if request.method == 'POST':
-		if (request.body):
+		if (request.POST):
 			try:
-				received_json_data = json.loads(request.body.decode("utf-8"))
-				title = received_json_data['title']
-				content = received_json_data['content']
+				title = request.POST.get('title')
+				print("title : ", title)
+				content = request.POST.get('content')
+				print("content :", content)
 				time_now = datetime.datetime.now()
 				user = validateSignin(request.META)
 				if (user):
 					note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
 									  user=user)
-					note.save() 
-					message = {}
-					attachment_list=[]
-					message['id'] = note.id
-					message['title'] = title
-					message['content'] = content
-					message['created_on'] = time_now
-					message['last_updated_on'] = time_now
-					#----------------If attachment is sent as POST method while creating note--------#
+					note.save()
+	#----------------If attachment is sent as POST method while creating note--------#
 					if (request.FILES):
-						data = request.FILES['attachment']
+						file = request.FILES['attachment']
 						#-----------Primary Logic for saving attachments-----------#
-						attachment = Attachment(url = data, note = note)
-						path = default_storage.save(data._get_name(), ContentFile(data.read()))
-						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-						attachment.save()
-						attachment_list.append(attachment)
-						message['attachments'] = attachment_list
-
-					message['created_on'] = time_now
-					message['last_updated_on'] = time_now
-					return JsonResponse(message, status=201)
-
-				return JsonResponse({'message': 'Error : User not authorized'}, status=401)
-			except:
-				JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'}, status=400)
-		return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
+						save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+					else:
+						print("No Attachment added")
+					return JsonResponse({'message': 'Note Saved'}, status=200)
+				else:
+					return JsonResponse({'message': 'Error : User not authorized'}, status=401)
+			except: 
+				return JsonResponse({'message': 'Error : provide title and content in form-data'}, status=400)
 	# Get method to retrive all notes for authorized user
 	elif request.method == 'GET':
 		user = validateSignin(request.META)
@@ -375,7 +362,7 @@ def noteFromId(request, note_id=""):
 						note.content = received_json_data['content']
 						note.last_updated_on = datetime.datetime.now()		
 						note.save()
-						return JsonResponse({'message':'note updated!'}, status=204)
+						# return JsonResponse({'message':'note updated!'}, status=204)
 					except:
 						return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
 						#----------------If attachment is sent as POST method while creating note--------#
