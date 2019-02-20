@@ -25,7 +25,7 @@ from django.conf import settings
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
 def save_attachments(file_to_upload,filename,note):
-	if (settings.PROFILE  == "default"):
+	if (settings.PROFILE  == "dev"):
 		response = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
 		response = save_attachment_to_local(file_to_upload,filename,note)
@@ -35,8 +35,17 @@ def save_attachments(file_to_upload,filename,note):
 # 	#Jai
 # def update_attachments():
 # 	#krapali
-# def delete_attachments():
-# 	#Riddhi
+
+#def delete_attachment(filename,attachment_id):
+	# if (settings.PROFILE  == "dev"):
+	# 	response = delete_attachment_from_s3(filename=filename,acl="public-read",note=note)
+	# else:
+	# 	response = delete_attachment_from_local(filename,note)
+	# return response
+
+
+
+
 
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
@@ -101,6 +110,8 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 		return e
 
 	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
+
+
 #--------------------------------------------------------------------------------
 # Function definitions
 # --------------------------------------------------------------------------------
@@ -395,6 +406,11 @@ def noteFromId(request, note_id=""):
 				if(user == note.user):
 					note.delete()
 					return JsonResponse({'message': 'Note deleted successfully'}, status=204)
+				#delete attachments if any
+					# attachments = Attachment.objects.filter(note=note)
+					# if (attachments):
+					# 	for attachment in attachments:
+					# 		delete_attachment(note.id,attachment.id)	
 				else:
 					return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
