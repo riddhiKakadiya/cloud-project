@@ -51,11 +51,6 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', ]
 # Define whether to run in dev environment or default(local) environment
 PROFILE = config['profile_env']['profile']
 
-# if PROFILE=='dev':
-#     MEDIA_HOSTNAME = 'localhost:8000'
-# else:
-#     MEDIA_HOSTNAME = 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -169,7 +164,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
