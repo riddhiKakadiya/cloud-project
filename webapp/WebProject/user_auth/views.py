@@ -25,7 +25,7 @@ from django.conf import settings
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
 def save_attachments(file_to_upload,filename,note):
-	if (settings.PROFILE  == "default"):
+	if (settings.PROFILE  == "dev"):
 		response = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
 		response = save_attachment_to_local(file_to_upload,filename,note)

@@ -98,16 +98,30 @@ WSGI_APPLICATION = 'WebProject.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+DATABASES = {}
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': os.path.join(BASE_DIR, 'WebProject/config/my.cnf'),
-        },
+if PROFILE == "default":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config['local_db']['database'],
+            'USER': config['local_db']['user'],
+            'PASSWORD': config['local_db']['password']
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config['aws_rds']['database'],
+            'USER': config['aws_rds']['user'],
+            'PASSWORD': config['aws_rds']['password'],
+            'HOST': config['aws_rds']['host'],
+            'PORT': config['aws_rds']['port'],
+        }
+    }
 
+print(DATABASES)
 #Password to Bcrypt
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
