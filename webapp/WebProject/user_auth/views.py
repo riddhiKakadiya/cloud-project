@@ -20,11 +20,12 @@ import boto3
 from django.conf import settings
 
 
+
 #--------------------------------------------------------------------------------
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
 def save_attachments(file_to_upload,filename,note):
-	if (settings.PROFILE  == "dev"):
+	if (settings.PROFILE  == "default"):
 		response = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
 		response = save_attachment_to_local(file_to_upload,filename,note)
@@ -35,13 +36,17 @@ def save_attachments(file_to_upload,filename,note):
 # --------------------------------------------------------------------------------
 def save_attachment_to_local(file_to_upload,filename,note):
 	print("Saving attachment locally")
-	filename, file_extension = os.path.splitext(filename)
-	filename = filename + '_' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + file_extension
+	
 	url = os.path.join(settings.MEDIA_ROOT, filename)
 	attachment = Attachment(url = url, note = note)
+	attachment.save()
+	filename, file_extension = os.path.splitext(filename)
+	filename = str(attachment.id) + file_extension
+	attachment.url = settings.MEDIA_URL+filename
+	attachment.save()
 	path = default_storage.save(filename, ContentFile(file_to_upload.read()))
 	tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-	attachment.save()
+	
 	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
 
 
@@ -61,8 +66,16 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	)
 
 	bucketName = settings.S3_BUCKETNAME
-	Key = '/path/to/the/file'
-	outPutname = 'uuid'
+
+	url = "dummy"
+	attachment = Attachment(url = url, note = note)
+	attachment.save()
+	filename, file_extension = os.path.splitext(filename)
+	filename = str(attachment.id) + file_extension
+	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
+	attachment.save()
+
+	
 
 	s3 = session.client('s3')
 	try:
@@ -70,19 +83,16 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 			file_to_upload,
 			bucketName,
 			filename,
-			# ExtraArgs={
-			# 	"ACL": acl,
-			# 	"ContentType": "jpg"
-			# }
+			ExtraArgs={
+				"ACL": acl
+			}
 		)
 	except Exception as e:
 		# This is a catch all exception, edit this part to fit your needs.
 		print("Something Happened: ", e)
+		attachment.delete()
 		return e
 
-	# url = 
-	attachment = Attachment(url = file_to_upload, note = note)
-	attachment.save()
 	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -384,6 +394,7 @@ def noteFromId(request, note_id=""):
 
 @csrf_exempt
 def addAttachmentToNotes(request,note_id=""):
+
 	# Post method to create new notes for authorized user
 	if request.method == 'POST':
 		print("Note ID is :", note_id)
@@ -445,9 +456,6 @@ def addAttachmentToNotes(request,note_id=""):
 def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 	# Update method to update attachments for authorized user
 	if request.method == 'PUT':
-		print("------------")
-		print(request.FILES)
-		print("------------")
 		if(request.FILES):
 			user = validateSignin(request.META)
 			if(user):

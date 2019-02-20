@@ -6,13 +6,21 @@ Parameters:
     Default: "ami-0282cf077acf11412"
     Description: ImageId parameter (eg ami-0282cf077acf11412)
     Type: String
-  PublicSubnet:
+  EC2Subnet:
     Default: "subnet-08edd817a280766ff"
     Description: subnet parameter (eg subnet-08edd817a280766ff)
     Type: String
   myVPC:
     Default: "vpc-0b9b80e139f334558"
     Description: VPC parameter (eg vpc-0b9b80e139f334558)
+    Type: String
+  RDSSubnet1:
+    Default: "subnet-054379b3f39cce09e"
+    Description: subnet parameter (eg subnet-08edd817a280766ff)
+    Type: String  
+  RDSSubnet2:
+    Default: "subnet-054379b3f39cce09e"
+    Description: subnet parameter (eg subnet-08edd817a280766ff)
     Type: String
 
 Resources:
@@ -62,7 +70,7 @@ Resources:
           GroupSet: 
             - Ref: "InstanceSecurityGroup"
           SubnetId: 
-            Ref: "PublicSubnet"
+            Ref: "EC2Subnet"
       Tags:
       - Key: Name
         Value:
@@ -92,3 +100,77 @@ Resources:
           Fn::Join:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
+
+  MyRDSsubnetGroup: 
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: RDS subnet group
+      SubnetIds: 
+        - Ref: RDSSubnet1
+        - Ref: RDSSubnet2
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds_subnet']
+
+  RDSSecurityGroup: 
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http, SSH and SSL to client host
+      VpcId:
+        Ref: myVPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 3306
+        ToPort: 3306
+        CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds_sg']  
+
+  MyDBSecurityGroup: 
+    Type: AWS::RDS::DBSecurityGroup
+    Properties: 
+      GroupDescription: "Ingress for Amazon EC2 security group"
+      EC2VpcId: 
+        Ref: "myVPC"
+      DBSecurityGroupIngress: 
+      - EC2SecurityGroupId: !GetAtt
+          - "RDSSecurityGroup"
+          - "GroupId"
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'db_sg']  
+
+  MyRDSInstance: 
+    Type: AWS::RDS::DBInstance
+    Properties: 
+      AllocatedStorage: "100"
+      DBInstanceClass: "db.m4.xlarge"
+      Engine: "mysql"
+      EngineVersion: "5.6.34"
+      MultiAZ : false
+      MasterUsername: "csye6225master"
+        #Ref: "DBUser"
+      MasterUserPassword: "csye6225password"
+        #Ref: "DBPassword"
+      PubliclyAccessible: true
+      DBName: "csye6225"
+      DBSubnetGroupName: 
+        Ref: "MyRDSsubnetGroup"
+      DBSecurityGroups: 
+        - Ref: "MyDBSecurityGroup"
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']

@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import configparser
 
+try:
+    HOSTNAME = socket.gethostname()
+except:
+    HOSTNAME = 'localhost'
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -42,6 +47,11 @@ ALLOWED_HOSTS = []
 
 # Define whether to run in dev environment or default(local) environment
 PROFILE = config['profile_env']['profile']
+
+# if PROFILE=='dev':
+#     MEDIA_HOSTNAME = 'localhost:8000'
+# else:
+#     MEDIA_HOSTNAME = 
 
 # Application definition
 
@@ -153,4 +163,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'user_auth/attachments')
-MEDIA_URL = '/user_auth/attachments/'
+MEDIA_URL = '/attachments/'

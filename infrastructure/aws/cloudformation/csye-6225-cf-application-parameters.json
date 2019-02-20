@@ -10,7 +10,17 @@
     "UsePreviousValue": true
   },
   {
-    "ParameterKey": "PublicSubnet",
+    "ParameterKey": "RDSSubnet1",
+    "ParameterValue": "subnet-0f32f06bd6f9c78e9",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "RDSSubnet2",
+    "ParameterValue": "subnet-0ca2386733b99e9d0",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "EC2Subnet",
     "ParameterValue": "subnet-051707490a2af1bb9",
     "UsePreviousValue": true
   }

@@ -24,7 +24,7 @@ if [ $# -lt 2 ]; then
 fi
 
 if [ $# -lt 3 ]; then
-  echo "Please ami id ! Try Again."
+  echo "Please provide ami id ! Try Again."
   echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <AMI_ID>"
   exit 1
 fi
@@ -44,20 +44,17 @@ fi
 ##Creating Stack automation script
 echo "Creating Stack $1"
 
-# response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-application.yaml --parameters file://csye-6225-cf-application-parameters.json)
-response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://rds.yaml --parameters file://rds-parameters.json)
-
-
-#response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-networking.yaml)
 
 
 NETWORK_STACK=$(aws cloudformation describe-stack-resources --stack-name $2| jq '.StackResources' )
 VPC_ID=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "VPC")' | jq -r '.PhysicalResourceId')
-SUBNET_ID=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "Subnet1")' | jq -r '.PhysicalResourceId')
+SUBNET_ID1=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "Subnet1")' | jq -r '.PhysicalResourceId')
+SUBNET_ID2=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "Subnet2")' | jq -r '.PhysicalResourceId')
+SUBNET_ID3=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "Subnet3")' | jq -r '.PhysicalResourceId')
 
-echo $VPC_ID $SUBNET_ID
+echo $VPC_ID $SUBNET_ID1
 
-response=$(aws cloudformation create-stack --stack-name $1 --template-body file://csye6225-cf-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=PublicSubnet,ParameterValue=$SUBNET_ID)
+response=$(aws cloudformation create-stack --stack-name $1 --template-body file://csye6225-cf-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=EC2Subnet,ParameterValue=$SUBNET_ID1 ParameterKey=RDSSubnet1,ParameterValue=$SUBNET_ID2 ParameterKey=RDSSubnet2,ParameterValue=$SUBNET_ID3)
 
 echo "Waiting for Stack $1 to be created"
 echo "$response"
