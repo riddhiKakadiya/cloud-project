@@ -120,8 +120,6 @@ else:
             'PORT': config['aws_rds']['port'],
         }
     }
-
-print(DATABASES)
 #Password to Bcrypt
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
