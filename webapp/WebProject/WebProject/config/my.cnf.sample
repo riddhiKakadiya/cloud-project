@@ -1,5 +1,11 @@
 # my.cnf
-[client]
+[local]
+database =
+user =
+password =
+default-character-set = utf8
+
+[RDS]
 database =
 user =
 password =
