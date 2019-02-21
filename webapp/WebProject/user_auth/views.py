@@ -45,6 +45,13 @@ def get_note_details(note):
 	note_details['last_updated_on'] = note.last_updated_on
 	return note_details
 
+def update_attachment(file_to_upload,filename,note,attachment):
+	if (settings.PROFILE  == "dev"):
+		response = update_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note,attachment=attachment)
+	else:
+		response = update_attachment_to_local(file_to_upload,filename,note,attachment)
+	return response
+
 def delete_attachment(attachment):
 
 #def delete_attachment(note_id,attachment_id):
@@ -54,9 +61,6 @@ def delete_attachment(attachment):
 	# else:
 	 response = delete_attachment_from_local(attachment)
 	 return response
-
-
-
 
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
@@ -83,6 +87,80 @@ def delete_attachment_from_local(attachment):
 	default_storage.delete(path) 
 	attachment.delete()
 	return JsonResponse({'message': 'Attachment deleted from Local'}, status=200)
+
+def update_attachment_to_local(file_to_upload,filename,note,attachment):
+	attachment_url = attachment.url
+	filename=attachment_url[13:]
+	path = os.path.join(settings.MEDIA_ROOT, filename)
+	default_storage.delete(path) 
+	attachment.delete()
+
+	url = os.path.join(settings.MEDIA_ROOT, filename)
+	attachment = Attachment(url = url, note = note)
+	attachment.save()
+	filename, file_extension = os.path.splitext(filename)
+	filename = str(attachment.id) + file_extension
+	attachment.url = settings.MEDIA_URL+filename
+	attachment.save()
+	path = default_storage.save(filename, ContentFile(file_to_upload.read()))
+	tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+	
+	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
+
+def update_attachment_to_s3(file_to_upload,filename,acl,note, attachment):
+#Get AWS keys from local aws_credentials file
+
+
+
+	print("Saving attachment to S3")
+	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
+	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+
+	session = boto3.Session(
+	    aws_access_key_id = AWS_ACCESS_KEY_ID,
+	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
+	)
+
+	bucketName = settings.S3_BUCKETNAME
+	for key in bucketName.list():
+		if(str(attachment.id) in key.name.encode('utf-8')):
+			print (key.name.encode('utf-8'))
+			file_in_bucket = key
+			s3 = session.client('s3')
+			try:
+				bucketName.delete_key(key.key)
+		#or
+				s3.delete_object(Bucket=bucketName,Key=key)
+			except Exception as e:
+		# This is a catch all exception, edit this part to fit your needs.
+				print("Something Happened: ", e)
+				return e
+
+	url = "dummy"
+	attachment = Attachment(url = url, note = note)
+	attachment.save()
+	filename, file_extension = os.path.splitext(filename)
+	filename = str(attachment.id) + file_extension
+	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
+	attachment.save()
+
+	s3 = session.client('s3')
+	try:
+		s3.upload_fileobj(
+			file_to_upload,
+			bucketName,
+			filename,
+			ExtraArgs={
+				"ACL": acl
+			}
+		)
+	except Exception as e:
+		# This is a catch all exception, edit this part to fit your needs.
+		print("Something Happened: ", e)
+		attachment.delete()
+		return e
+
+	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
 
 #--------------------------------------------------------------------------------
 # Function definitions for AWS S3 - dev profile
@@ -127,30 +205,30 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 
 	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
 
-#def delete_attachment_from_s3(attachment_id,acl):
-	# print("Saving attachment to S3")
-	# AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
-	# AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
-	# session = boto3.Session(
-	#     aws_access_key_id = AWS_ACCESS_KEY_ID,
-	#     aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
-	# )
-	# bucketName = settings.S3_BUCKETNAME
-	# for key in bucketName.list():
- 	# 	if(str(attachment.id) in key.name.encode('utf-8'))
- 	#		print key.name.encode('utf-8')
- 	#		file_in_bucket = key
+def delete_attachment_from_s3(attachment_id,acl):
+	print("Saving attachment to S3")
+	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
+	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+	session = boto3.Session(
+	    aws_access_key_id = AWS_ACCESS_KEY_ID,
+	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
+	)
+	bucketName = settings.S3_BUCKETNAME
+	for key in bucketName.list():
+		if(str(attachment.id) in key.name.encode('utf-8')):
+			print(key.name.encode('utf-8'))
+			file_in_bucket = key
 
-	# 		s3 = session.client('s3')
-		# 	try:
-		#		bucketName.delete_key(key.key)
-		##or
-		# 		s3.delete_object(Bucket=bucketName,Key=key)
+			s3 = session.client('s3')
+			try:
+				bucketName.delete_key(key.key)
+		#or
+				s3.delete_object(Bucket=bucketName,Key=key)
 
-	# 		except Exception as e:
-	# 	# This is a catch all exception, edit this part to fit your needs.
-		# 	print("Something Happened: ", e)
-		# 	return e
+			except Exception as e:
+		# This is a catch all exception, edit this part to fit your needs.
+				print("Something Happened: ", e)
+				return e
 
 
 
