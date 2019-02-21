@@ -373,36 +373,47 @@ def noteFromId(request, note_id=""):
 			return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
 	#update
 	elif request.method=='PUT':
-		user = validateSignin(request.META)
-		if (is_valid_uuid(note_id)):
-			if(user):
-				note = NotesModel.objects.get(pk=note_id)
-				if(note.user==user):
-					try:
-						received_json_data = json.loads(request.body.decode("utf-8"))
-						note.title = received_json_data['title']
-						note.content = received_json_data['content']
-						note.last_updated_on = datetime.datetime.now()		
-						note.save()
-						# return JsonResponse({'message':'note updated!'}, status=204)
-					except:
-						return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
-						#----------------If attachment is sent as POST method while creating note--------#
-					if (request.FILES):
-						data = request.FILES['attachment']
-						#-----------Primary Logic for saving attachments-----------#
-						attachment = Attachment(url = data, note = note)
-						path = default_storage.save(data._get_name(), ContentFile(data.read()))
-						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-						attachment.save()
-						attachment_list.append(attachment)
-						message['attachments'] = attachment_list
-				else:
-					return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
-			else:	
-				return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
-		else:	
-			return JsonResponse({'message': 'Error : Invalid note id'}, status=400)	
+		try:
+			user = validateSignin(request.META)
+			if (is_valid_uuid(note_id)):
+				if(user):
+					note = NotesModel.objects.get(pk=note_id)
+					if(note.user==user):
+						try:
+							print("Function start-------------")
+							print("request.PUT :", request.PUT)
+							print("request.PUT.get('title') :",request.PUT.get('title'))
+							print("request.PUT.get('content') :", request.PUT.get('content'))
+							note.title = request.PUT.get('title')
+							note.content = request.PUT.get('content')
+							note.last_updated_on = datetime.datetime.now()		
+							note.save()
+						except:
+							print("HERE $$$$$$$$$$")
+							return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
+							#----------------If attachment is sent as POST method while creating note--------#
+						try:
+							if (request.FILES):
+								file = request.FILES['attachment']
+								#-----------Primary Logic for saving attachments-----------#
+								save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+								return JsonResponse({'message':'Note updated!'}, status=204)
+							else:
+								print("No Attachment added")
+								return JsonResponse({'message':'Note updated!'}, status=204)
+						except:
+							return JsonResponse({'message': 'Error : Invalid attachment'}, status=400)
+					else:
+						print("HERE--------------")
+						return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
+				else:	
+					return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
+			else:
+				print("HERE##########")
+				return JsonResponse({'message': 'Error : Invalid note id'}, status=400)
+		except:
+			return JsonResponse({'message': 'Error : Bad Request, provide title(req), content(req) and attachment(optional) in form-data'}, status=400)
+
 	#delete			
 	elif request.method == 'DELETE':
 		user = validateSignin(request.META)		
