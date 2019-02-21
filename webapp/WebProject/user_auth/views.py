@@ -424,7 +424,6 @@ def noteFromId(request, note_id=""):
 
 @csrf_exempt
 def addAttachmentToNotes(request,note_id=""):
-
 	# Post method to create new notes for authorized user
 	if request.method == 'POST':
 		print("Note ID is :", note_id)
