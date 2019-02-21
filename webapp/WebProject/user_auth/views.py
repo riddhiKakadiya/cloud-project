@@ -48,11 +48,11 @@ def get_note_details(note):
 # def update_attachments():
 # 	#krapali
 
-#def delete_attachment(note_id,attachment_id):
+def delete_attachment(attachment_id,attachment_url):
 	# if (settings.PROFILE  == "dev"):
 	# 	response = delete_attachment_from_s3(attachment_id=attachment_id,acl="public-read")
 	# else:
-	# 	response = delete_attachment_from_local(filename,note)
+	 response = delete_attachment_from_local(attachment_id,attachment_url)
 	# return response
 
 #--------------------------------------------------------------------------------
@@ -132,15 +132,21 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 
 	# 		s3 = session.client('s3')
 		# 	try:
-		# 		s3.delete_object(Bucket=bucketName, Key=key, ExtraArgs={"ACL": acl})
+		#		bucketName.delete_key(key.key)
+		##or
+		# 		s3.delete_object(Bucket=bucketName,Key=key)
+
 	# 		except Exception as e:
 	# 	# This is a catch all exception, edit this part to fit your needs.
 		# 	print("Something Happened: ", e)
 		# 	return e
 
 
-#def delete_attachment_from_local(filename, note):
-
+def delete_attachment_from_local(attachment_id,attachment_url):
+	filename=attachment_url[13:]
+	path = os.path.join(settings.MEDIA_ROOT, filename)
+	default_storage.delete(path) 
+	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -402,11 +408,11 @@ def noteFromId(request, note_id=""):
 				return JsonResponse({'Error': 'Invalid note ID'}, status=400)		
 			if(note):
 				if(user == note.user):
-					#delete attachments if any
-					# attachments = Attachment.objects.filter(note=note)
-					# if (attachments):
-					# 	for attachment in attachments:
-					# 		delete_attachment(note.id,attachment.id)
+					##delete attachments if any
+					attachments = Attachment.objects.filter(note=note)
+					if (attachments):
+						for attachment in attachments:
+							delete_attachment(attachment.id,attachment.url)
 					note.delete()
 					return JsonResponse({'message': 'Note deleted successfully'}, status=204)
 				else:
