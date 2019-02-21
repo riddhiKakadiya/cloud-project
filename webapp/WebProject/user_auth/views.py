@@ -453,6 +453,8 @@ def addAttachmentToNotes(request,note_id=""):
 					file = request.FILES['attachment']
 					#-----------Primary Logic for saving attachments-----------# 
 					response = save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+					note.last_updated_on = datetime.datetime.now()	
+					note.save()
 					return response
 				else:
 					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
@@ -547,13 +549,12 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
 			else:
 				return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
-			print("BEFORE DELETE-----------------")
 			if(note.user == user):
 				if(attachment.note.id == note.id):
 					#-----------Primary Logic for deleting attachments-----------#
 					delete_attachment(attachment)
-					print("after DELETE-----------------")
 					note.last_updated_on = datetime.datetime.now()
+					note.save()
 					return JsonResponse({'message': 'Attachment Deleted'}, status=200)
 				else:
 					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
