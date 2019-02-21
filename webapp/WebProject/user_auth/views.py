@@ -124,6 +124,9 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	filename = str(attachment.id) + file_extension
 	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
 	attachment.save()
+	meta = {}
+	meta['note_id'] = note.id
+	meta['user_id'] = note.user
 
 	s3 = session.client('s3')
 	try:
@@ -132,7 +135,8 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 			bucketName,
 			filename,
 			ExtraArgs={
-				"ACL": acl
+				"ACL": acl,
+				"Metadata": meta
 			}
 		)
 	except Exception as e:
