@@ -1,7 +1,7 @@
 # importing Django libraries
 from django.shortcuts import render
 from django.contrib.auth import authenticate
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 import os
@@ -496,6 +496,7 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 	# Update method to update attachments for authorized user
 	try:
 		if request.method == 'PUT':
+			print(request)
 			if(request.FILES):
 				user = validateSignin(request.META)
 				if(user):
