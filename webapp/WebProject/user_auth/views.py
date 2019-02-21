@@ -53,7 +53,7 @@ def delete_attachment(attachment_id,attachment_url):
 	# 	response = delete_attachment_from_s3(attachment_id=attachment_id,acl="public-read")
 	# else:
 	 response = delete_attachment_from_local(attachment_id,attachment_url)
-	# return response
+	 return response
 
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
@@ -146,7 +146,7 @@ def delete_attachment_from_local(attachment_id,attachment_url):
 	filename=attachment_url[13:]
 	path = os.path.join(settings.MEDIA_ROOT, filename)
 	default_storage.delete(path) 
-	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
+	return JsonResponse({'message': 'Attachment deleted from Local'}, status=200)
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -537,6 +537,7 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 			if(note.user == user):
 				if(attachment.note.id == note.id):
 					#-----------Primary Logic for deleting attachments-----------#
+					delete_attachment(attachment.id,attachment.url)
 					attachment.delete()
 					note.last_updated_on = datetime.datetime.now()
 					return JsonResponse({'message': 'Attachment Deleted'}, status=200)
