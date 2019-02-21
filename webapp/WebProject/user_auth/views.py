@@ -45,15 +45,16 @@ def get_note_details(note):
 	note_details['last_updated_on'] = note.last_updated_on
 	return note_details
 
-# def update_attachments():
-# 	#krapali
-
 def delete_attachment(attachment_id,attachment_url):
+
+#def delete_attachment(note_id,attachment_id):
+
 	# if (settings.PROFILE  == "dev"):
 	# 	response = delete_attachment_from_s3(attachment_id=attachment_id,acl="public-read")
 	# else:
 	 response = delete_attachment_from_local(attachment_id,attachment_url)
 	 return response
+
 
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
