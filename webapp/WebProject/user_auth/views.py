@@ -53,6 +53,8 @@ def get_note_details(note):
 	# return response
 
 
+
+
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
 # --------------------------------------------------------------------------------
