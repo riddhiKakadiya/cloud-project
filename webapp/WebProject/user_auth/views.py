@@ -53,14 +53,12 @@ def update_attachment(file_to_upload,filename,note,attachment):
 	return response
 
 def delete_attachment(attachment):
+	if (settings.PROFILE  == "dev"):
+		response = delete_attachment_from_s3(attachment,acl="public-read")
+	else:
+		response = delete_attachment_from_local(attachment)
+		return response
 
-#def delete_attachment(note_id,attachment_id):
-
-	# if (settings.PROFILE  == "dev"):
-	# 	response = delete_attachment_from_s3(attachment_id=attachment_id,acl="public-read")
-	# else:
-	 response = delete_attachment_from_local(attachment)
-	 return response
 
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
@@ -89,82 +87,22 @@ def delete_attachment_from_local(attachment):
 	return JsonResponse({'message': 'Attachment deleted from Local'}, status=200)
 
 def update_attachment_to_local(file_to_upload,filename,note,attachment):
-	attachment_url = attachment.url
-	filename=attachment_url[13:]
-	path = os.path.join(settings.MEDIA_ROOT, filename)
-	default_storage.delete(path) 
-	attachment.delete()
-
-	url = os.path.join(settings.MEDIA_ROOT, filename)
-	attachment = Attachment(url = url, note = note)
-	attachment.save()
-	filename, file_extension = os.path.splitext(filename)
-	filename = str(attachment.id) + file_extension
-	attachment.url = settings.MEDIA_URL+filename
-	attachment.save()
-	path = default_storage.save(filename, ContentFile(file_to_upload.read()))
-	tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+	delete_attachment_from_local(attachment)
+	save_attachment_to_local(file_to_upload,filename,note)
 	
 	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
 
 def update_attachment_to_s3(file_to_upload,filename,acl,note, attachment):
 #Get AWS keys from local aws_credentials file
+	delete_attachment(attachment)
+	save_attachments(file_to_upload,filename,note)
 
 
-
-	print("Saving attachment to S3")
-	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
-	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
-
-	session = boto3.Session(
-	    aws_access_key_id = AWS_ACCESS_KEY_ID,
-	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
-	)
-
-	bucketName = settings.S3_BUCKETNAME
-	for key in bucketName.list():
-		if(str(attachment.id) in key.name.encode('utf-8')):
-			print (key.name.encode('utf-8'))
-			file_in_bucket = key
-			s3 = session.client('s3')
-			try:
-				bucketName.delete_key(key.key)
-		#or
-				s3.delete_object(Bucket=bucketName,Key=key)
-			except Exception as e:
-		# This is a catch all exception, edit this part to fit your needs.
-				print("Something Happened: ", e)
-				return e
-
-	url = "dummy"
-	attachment = Attachment(url = url, note = note)
-	attachment.save()
-	filename, file_extension = os.path.splitext(filename)
-	filename = str(attachment.id) + file_extension
-	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
-	attachment.save()
-
-	s3 = session.client('s3')
-	try:
-		s3.upload_fileobj(
-			file_to_upload,
-			bucketName,
-			filename,
-			ExtraArgs={
-				"ACL": acl
-			}
-		)
-	except Exception as e:
-		# This is a catch all exception, edit this part to fit your needs.
-		print("Something Happened: ", e)
-		attachment.delete()
-		return e
-
-	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
+	return JsonResponse({'message': 'File Updated in S3'}, status=200)
 
 #--------------------------------------------------------------------------------
 # Function definitions for AWS S3 - dev profile
-# --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
@@ -200,13 +138,17 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	except Exception as e:
 		# This is a catch all exception, edit this part to fit your needs.
 		print("Something Happened: ", e)
-		attachment.delete()
 		return e
 
 	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
 
-def delete_attachment_from_s3(attachment_id,acl):
-	print("Saving attachment to S3")
+def delete_attachment_from_s3(attachment,acl):
+	print("deleting attachment from S3")
+	attachment_url=attachment.url
+	extension=os.path.splitext(attachment_url)[1]
+	filename=str(attachment.id)+extension
+	print (filename)
+
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
 	session = boto3.Session(
@@ -214,24 +156,16 @@ def delete_attachment_from_s3(attachment_id,acl):
 	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
 	)
 	bucketName = settings.S3_BUCKETNAME
-	for key in bucketName.list():
-		if(str(attachment.id) in key.name.encode('utf-8')):
-			print(key.name.encode('utf-8'))
-			file_in_bucket = key
-
-			s3 = session.client('s3')
-			try:
-				bucketName.delete_key(key.key)
-		#or
-				s3.delete_object(Bucket=bucketName,Key=key)
-
-			except Exception as e:
-		# This is a catch all exception, edit this part to fit your needs.
-				print("Something Happened: ", e)
-				return e
-
-
-
+	try:
+		s3 = boto3.resource('s3')
+		object=s3.Bucket(bucketName).Object(filename)
+		object.delete()
+		attachment.delete()
+		print("s3 attachment deleted")
+		return JsonResponse({'message':'Note updated!'}, status=204)
+	except Exception as e:
+		print("Something Happened: ", e)
+		return e
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -494,23 +428,26 @@ def noteFromId(request, note_id=""):
 
 	#delete			
 	elif request.method == 'DELETE':
-		user = validateSignin(request.META)		
-		if (user):
-			try:
-				note = NotesModel.objects.get(pk=note_id)
-			except:
-				return JsonResponse({'Error': 'Invalid note ID'}, status=400)		
-			if(note):
-				if(user == note.user):
-					##delete attachments if any
-					attachments = Attachment.objects.filter(note=note)
-					if (attachments):
-						for attachment in attachments:
-							delete_attachment(attachment)
-					note.delete()
-					return JsonResponse({'message': 'Note deleted successfully'}, status=204)
-				else:
-					return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
+		try: 
+			user = validateSignin(request.META)		
+			if (user):
+				try:
+					note = NotesModel.objects.get(pk=note_id)
+				except:
+					return JsonResponse({'Error': 'Invalid note ID'}, status=400)		
+				if(note):
+					if(user == note.user):
+						##delete attachments if any
+						attachments = Attachment.objects.filter(note=note)
+						if (attachments):
+							for attachment in attachments:
+								delete_attachment(attachment)
+						note.delete()
+						return JsonResponse({'message':'Note Deleted!'}, status=204) 
+					else:
+						return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
+		except:
+			return JsonResponse({'message': 'Bad Request'}, status=400)
 	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
 
 @csrf_exempt
@@ -627,11 +564,12 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
 			else:
 				return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
-			
+			print("BEFORE DELETE-----------------")
 			if(note.user == user):
 				if(attachment.note.id == note.id):
 					#-----------Primary Logic for deleting attachments-----------#
 					delete_attachment(attachment)
+					print("after DELETE-----------------")
 					note.last_updated_on = datetime.datetime.now()
 					return JsonResponse({'message': 'Attachment Deleted'}, status=200)
 				else:
