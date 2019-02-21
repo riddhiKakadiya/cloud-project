@@ -261,7 +261,7 @@ def registerPage(request):
 						user.is_staff = True
 						user.save()
 
-						return JsonResponse({"message": " : Useser created"})
+						return JsonResponse({"message": " : User created"})
 					else:
 						return JsonResponse({'Error': "User already exists"})
 
@@ -404,12 +404,10 @@ def noteFromId(request, note_id=""):
 						except:
 							return JsonResponse({'message': 'Error : Invalid attachment'}, status=400)
 					else:
-						print("HERE--------------")
 						return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
 				else:	
 					return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
 			else:
-				print("HERE##########")
 				return JsonResponse({'message': 'Error : Invalid note id'}, status=400)
 		except:
 			return JsonResponse({'message': 'Error : Bad Request, provide title(req), content(req) and attachment(optional) in form-data'}, status=400)
@@ -494,42 +492,42 @@ def addAttachmentToNotes(request,note_id=""):
 @csrf_exempt
 def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 	# Update method to update attachments for authorized user
-	if request.method == 'PUT':
-		if(request.FILES):
-			user = validateSignin(request.META)
-			if(user):
-				if(is_valid_uuid(note_id)):                    
-					try:
-						note = NotesModel.objects.get(pk=note_id)
-					except:
+	try:
+		if request.method == 'PUT':
+			if(request.FILES):
+				user = validateSignin(request.META)
+				if(user):
+					if(is_valid_uuid(note_id)):                    
+						try:
+							note = NotesModel.objects.get(pk=note_id)
+						except:
+							return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+					else:
 						return JsonResponse({'Error': 'Invalid note ID'}, status=400)
-				else:
-					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
-				if(is_valid_uuid(attachment_id)):
-					try:
-						attachment = Attachment.objects.get(pk=attachment_id)
-					except:
-						return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
-				else:
-					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
-				
-				if(note.user == user):
-					if(attachment.note == note):
-						#-----------Primary Logic for upfating attachments-----------#
-						data = request.FILES['attachment']
-						attachment.url = data
-						path = default_storage.save(data._get_name(), ContentFile(data.read()))
-						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-						attachment.save()
-						note.last_updated_on = datetime.datetime.now()
-						return JsonResponse({'message': 'Attachment Updated'}, status=200)
+					if(is_valid_uuid(attachment_id)):
+						try:
+							attachment = Attachment.objects.get(pk=attachment_id)
+						except:
+							return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
 					else:
 						return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
-				else:
-					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
-		else:
-			return JsonResponse({'message': 'Error : Files not selected'}, status=400)
-
+					
+					if(note.user == user):
+						if(attachment.note == note):
+							#-----------Primary Logic for updating attachments-----------#
+							delete_attachment(attachment)
+							file = request.FILES['attachment']
+							save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+							note.last_updated_on = datetime.datetime.now()
+							return JsonResponse({'message': 'Attachment Updated'}, status=200)
+						else:
+							return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+					else:
+						return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
+			else:
+				return JsonResponse({'message': 'Error : Files not selected'}, status=400)
+	except:
+		return JsonResponse({'Error': 'Bad Request'}, status=400)
 	# Delete method to delete attachments for authorized user	
 	if request.method == 'DELETE':
 		user = validateSignin(request.META)
