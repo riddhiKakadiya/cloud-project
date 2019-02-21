@@ -71,6 +71,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'user_auth.middleware.PutParsingMiddleware',
+    'user_auth.middleware.JSONParsingMiddleware',
 ]
 
 ROOT_URLCONF = 'WebProject.urls'
