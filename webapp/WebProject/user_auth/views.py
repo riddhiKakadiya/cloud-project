@@ -48,6 +48,28 @@ def get_note_details(note):
 
 # def update_attachments():
 # 	#krapali
+# def update_note_details(note):
+# 	note = NotesModel.objects.get(pk=note_id)
+# 	note.title= request.PUT.get('title')
+# 	note.content= request.PUT.get('content')
+# 	note.last_updated_on = datetime.datetime.now()		
+# 	note.save()
+# 	return print("Note updated successfully...")
+# 	if (request.FILES):
+# 		data = request.FILES['attachment']
+# 		#-----------Primary Logic for saving attachments-----------#
+# 		attachment = Attachment(url = data, note = note)
+# 		path = default_storage.save(data._get_name(), ContentFile(data.read()))
+# 		tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+# 		attachment.save()
+# 		attachment_list.append(attachment)
+# 		message['attachments'] = attachment_list
+
+
+# def update_attachment_details(attachment):
+
+
+
 # def delete_attachments():
 # 	#Riddhi
 
