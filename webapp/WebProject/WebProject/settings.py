@@ -11,10 +11,28 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import configparser
+
+try:
+    HOSTNAME = socket.gethostname()
+except:
+    HOSTNAME = 'localhost'
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+#Get configuration from my.cnf
+#Open and parse the file
+config = configparser.ConfigParser()
+pathToConfig = os.path.join(BASE_DIR, 'WebProject/config/my.cnf')
+config.read(pathToConfig)
+#Get variable
+
+S3_BUCKETNAME=config['S3']['bucketname']
+
+AWS_ACCESS_KEY_ID = config['AWS']['aws_access_key_id']
+AWS_SECRET_ACCESS_KEY = config['AWS']['aws_secret_access_key']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -23,10 +41,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'l_k3zyn7$2j*vsvk&m3t5&*bp++r*=v*$c9gmoiy9z0xk5u_6m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config['django_settings']['debug']
 
-ALLOWED_HOSTS = []
+HOSTNAME1 = config['django_settings']['host1']
+HOSTNAME2 = config['django_settings']['host2']
 
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', ]
+
+# Define whether to run in dev environment or default(local) environment
+PROFILE = config['profile_env']['profile']
 
 # Application definition
 
@@ -48,6 +71,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'user_auth.middleware.PutParsingMiddleware',
+    'user_auth.middleware.JSONParsingMiddleware',
 ]
 
 ROOT_URLCONF = 'WebProject.urls'
@@ -73,16 +98,28 @@ WSGI_APPLICATION = 'WebProject.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
+DATABASES = {}
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'read_default_file': os.path.join(BASE_DIR, 'WebProject/config/my.cnf'),
-        },
+if PROFILE == "default":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config['local_db']['database'],
+            'USER': config['local_db']['user'],
+            'PASSWORD': config['local_db']['password']
+        }
     }
-}
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config['aws_rds']['database'],
+            'USER': config['aws_rds']['user'],
+            'PASSWORD': config['aws_rds']['password'],
+            'HOST': config['aws_rds']['host'],
+            'PORT': config['aws_rds']['port'],
+        }
+    }
 #Password to Bcrypt
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
@@ -129,10 +166,13 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'user_auth/attachments')
+MEDIA_URL = '/attachments/'

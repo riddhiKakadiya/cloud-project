@@ -1,6 +1,29 @@
 # my.cnf
-[client]
-database = WebProject
-user = USER
-password = PASSWORD
+[local_db]
+database = 
+user = 
+password = 
 default-character-set = utf8
+
+[aws_rds]
+database = csye6225
+user = csye6225master
+password = csye6225password
+default-character-set = utf8
+host = 
+port = 3306
+
+[S3]
+bucketname = 
+
+[AWS]
+aws_access_key_id = 
+aws_secret_access_key = 
+
+[django_settings]
+debug = True
+host1 = 
+host2 = 
+
+[profile_env]
+profile = default
