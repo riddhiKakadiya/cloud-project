@@ -20,7 +20,6 @@ import boto3
 from django.conf import settings
 
 
-
 #--------------------------------------------------------------------------------
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
@@ -46,10 +45,13 @@ def get_note_details(note):
 	note_details['last_updated_on'] = note.last_updated_on
 	return note_details
 
-# def update_attachments():
-# 	#krapali
-# def delete_attachments():
-# 	#Riddhi
+#def delete_attachment(note_id,attachment_id):
+	# if (settings.PROFILE  == "dev"):
+	# 	response = delete_attachment_from_s3(attachment_id=attachment_id,acl="public-read")
+	# else:
+	# 	response = delete_attachment_from_local(filename,note)
+	# return response
+
 
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
@@ -111,6 +113,32 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 		return e
 
 	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
+
+#def delete_attachment_from_s3(attachment_id,acl):
+	# print("Saving attachment to S3")
+	# AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
+	# AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+	# session = boto3.Session(
+	#     aws_access_key_id = AWS_ACCESS_KEY_ID,
+	#     aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
+	# )
+	# bucketName = settings.S3_BUCKETNAME
+	# for key in bucketName.list():
+ 	# 	if(str(attachment.id) in key.name.encode('utf-8'))
+ 	#		print key.name.encode('utf-8')
+ 	#		file_in_bucket = key
+
+	# 		s3 = session.client('s3')
+		# 	try:
+		# 		s3.delete_object(Bucket=bucketName, Key=key, ExtraArgs={"ACL": acl})
+	# 		except Exception as e:
+	# 	# This is a catch all exception, edit this part to fit your needs.
+		# 	print("Something Happened: ", e)
+		# 	return e
+
+
+#def delete_attachment_from_local(filename, note):
+
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -372,6 +400,11 @@ def noteFromId(request, note_id=""):
 				return JsonResponse({'Error': 'Invalid note ID'}, status=400)		
 			if(note):
 				if(user == note.user):
+					#delete attachments if any
+					# attachments = Attachment.objects.filter(note=note)
+					# if (attachments):
+					# 	for attachment in attachments:
+					# 		delete_attachment(note.id,attachment.id)
 					note.delete()
 					return JsonResponse({'message': 'Note deleted successfully'}, status=204)
 				else:
