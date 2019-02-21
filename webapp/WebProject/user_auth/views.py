@@ -248,9 +248,8 @@ def createOrGetNotes(request):
 	if request.method == 'POST':
 		if (request.body):
 			try:
-				received_json_data = json.loads(request.body.decode("utf-8"))
-				title = received_json_data['title']
-				content = received_json_data['content']
+				title = request.POST.get('title')
+				content = request.POST.get('content')
 				time_now = datetime.datetime.now()
 				user = validateSignin(request.META)
 				if (user):
@@ -394,7 +393,6 @@ def noteFromId(request, note_id=""):
 
 @csrf_exempt
 def addAttachmentToNotes(request,note_id=""):
-
 	# Post method to create new notes for authorized user
 	if request.method == 'POST':
 		print("Note ID is :", note_id)
