@@ -596,10 +596,10 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 					if(note.user == user):
 						if(attachment.note == note):
 							#-----------Primary Logic for updating attachments-----------#
-							delete_attachment(attachment)
 							file = request.FILES['attachment']
-							save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+							update_attachment(file_to_upload=file, filename= file._get_name(), note=note,attachment=attachment)
 							note.last_updated_on = datetime.datetime.now()
+							note.save()
 							return JsonResponse({'message': 'Attachment Updated'}, status=200)
 						else:
 							return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
