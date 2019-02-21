@@ -18,8 +18,6 @@ from .models import *
 import sys
 import boto3
 from django.conf import settings
-
-
 #--------------------------------------------------------------------------------
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
@@ -64,8 +62,6 @@ def delete_attachment(attachment):
 # Function definitions for CRUD on local - default profile
 # --------------------------------------------------------------------------------
 def save_attachment_to_local(file_to_upload,filename,note):
-	print("Saving attachment locally")
-	
 	url = os.path.join(settings.MEDIA_ROOT, filename)
 	attachment = Attachment(url = url, note = note)
 	attachment.save()
@@ -75,7 +71,6 @@ def save_attachment_to_local(file_to_upload,filename,note):
 	attachment.save()
 	path = default_storage.save(filename, ContentFile(file_to_upload.read()))
 	tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-	
 	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
 
 def delete_attachment_from_local(attachment): 
@@ -88,16 +83,13 @@ def delete_attachment_from_local(attachment):
 
 def update_attachment_to_local(file_to_upload,filename,note,attachment):
 	delete_attachment_from_local(attachment)
-	save_attachment_to_local(file_to_upload,filename,note)
-	
+	save_attachment_to_local(file_to_upload,filename,note)	
 	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
 
 def update_attachment_to_s3(file_to_upload,filename,acl,note, attachment):
 #Get AWS keys from local aws_credentials file
 	delete_attachment(attachment)
 	save_attachments(file_to_upload,filename,note)
-
-
 	return JsonResponse({'message': 'File Updated in S3'}, status=200)
 
 #--------------------------------------------------------------------------------
@@ -109,14 +101,11 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	print("Saving attachment to S3")
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
-
 	session = boto3.Session(
 	    aws_access_key_id = AWS_ACCESS_KEY_ID,
 	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
 	)
-
 	bucketName = settings.S3_BUCKETNAME
-
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
 	attachment.save()
@@ -124,7 +113,6 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	filename = str(attachment.id) + file_extension
 	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
 	attachment.save()
-
 	s3 = session.client('s3')
 	try:
 		s3.upload_fileobj(
@@ -139,16 +127,12 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 		# This is a catch all exception, edit this part to fit your needs.
 		print("Something Happened: ", e)
 		return e
-
 	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
 
 def delete_attachment_from_s3(attachment,acl):
-	print("deleting attachment from S3")
 	attachment_url=attachment.url
 	extension=os.path.splitext(attachment_url)[1]
 	filename=str(attachment.id)+extension
-	print (filename)
-
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
 	session = boto3.Session(
@@ -187,7 +171,6 @@ def validateSignin(meta):
 	else:
 		return False
 
-
 # Validating passwords
 def validatePassword(password):
 	message = ""
@@ -198,6 +181,7 @@ def validatePassword(password):
 	if (8 > len(password) or len(password) >= 16):
 		message += 'The password must be between 8 and 16 characters. : '
 	password_strength = {}
+
 	if not re.search(r'[A-Z]', password):
 		message += "Password must contain one upppercase : "
 	if not re.search(r'[a-z]', password):
@@ -394,16 +378,11 @@ def noteFromId(request, note_id=""):
 					note = NotesModel.objects.get(pk=note_id)
 					if(note.user==user):
 						try:
-							print("Function start-------------")
-							print("request.PUT :", request.PUT)
-							print("request.PUT.get('title') :",request.PUT.get('title'))
-							print("request.PUT.get('content') :", request.PUT.get('content'))
 							note.title = request.PUT.get('title')
 							note.content = request.PUT.get('content')
-							note.last_updated_on = datetime.datetime.now()		
+							note.last_updated_on = datetime.datetime.now()	
 							note.save()
 						except:
-							print("HERE $$$$$$$$$$")
 							return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
 							#----------------If attachment is sent as POST method while creating note--------#
 						try:
