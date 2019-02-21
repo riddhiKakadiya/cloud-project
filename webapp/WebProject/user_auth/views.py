@@ -17,6 +17,7 @@ import datetime
 from .models import *
 import sys
 import boto3
+#from boto3.s3.key import Key
 from django.conf import settings
 
 
@@ -46,14 +47,11 @@ def get_note_details(note):
 	return note_details
 
 def delete_attachment(attachment_id,attachment_url):
-
-#def delete_attachment(note_id,attachment_id):
-
-	# if (settings.PROFILE  == "dev"):
-	# 	response = delete_attachment_from_s3(attachment_id=attachment_id,acl="public-read")
-	# else:
-	 response = delete_attachment_from_local(attachment_id,attachment_url)
-	 return response
+	if (settings.PROFILE  == "dev"):
+		response = delete_attachment_from_s3(attachment_id=attachment_id,attachment_url=attachment_url,acl="public-read")
+	else:
+		response = delete_attachment_from_local(attachment_id,attachment_url)
+		return response
 
 
 #--------------------------------------------------------------------------------
@@ -117,31 +115,29 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 
 	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
 
-#def delete_attachment_from_s3(attachment_id,acl):
-	# print("Saving attachment to S3")
-	# AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
-	# AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
-	# session = boto3.Session(
-	#     aws_access_key_id = AWS_ACCESS_KEY_ID,
-	#     aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
-	# )
-	# bucketName = settings.S3_BUCKETNAME
-	# for key in bucketName.list():
- 	# 	if(str(attachment.id) in key.name.encode('utf-8'))
- 	#		print key.name.encode('utf-8')
- 	#		file_in_bucket = key
-
-	# 		s3 = session.client('s3')
-		# 	try:
-		#		bucketName.delete_key(key.key)
-		##or
-		# 		s3.delete_object(Bucket=bucketName,Key=key)
-
-	# 		except Exception as e:
-	# 	# This is a catch all exception, edit this part to fit your needs.
-		# 	print("Something Happened: ", e)
-		# 	return e
-
+def delete_attachment_from_s3(attachment_id,attachment_url,acl):
+	print("Saving attachment to S3")
+	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
+	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+	session = boto3.Session(
+	    aws_access_key_id = AWS_ACCESS_KEY_ID,
+	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
+	)
+	bucketName = settings.S3_BUCKETNAME
+	for key in bucketName.list():
+		attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+attachment_url[13:]
+		s3 = session.client('s3')
+		try:
+			object=s3.Object(bucketName,attachment_url[13:])
+			object.delete()
+			print("s3 attachment deleted")
+			#bucketName.delete_key(key.key)
+	#or
+			#s3.delete_object(Bucket=bucketName,Key=key)
+		except Exception as e:
+		# This is a catch all exception, edit this part to fit your needs.
+			print("Something Happened: ", e)
+			return e
 
 def delete_attachment_from_local(attachment_id,attachment_url):
 	filename=attachment_url[13:]
