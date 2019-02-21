@@ -1,0 +1,167 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CSYE 6225 - application cf stack
+
+Parameters:
+  ImageIdparam:
+    Default: "ami-0282cf077acf11412"
+    Description: ImageId parameter (eg ami-0282cf077acf11412)
+    Type: String
+  EC2Subnet:
+    Default: "subnet-08edd817a280766ff"
+    Description: subnet parameter (eg subnet-08edd817a280766ff)
+    Type: String
+  myVPC:
+    Default: "vpc-0b9b80e139f334558"
+    Description: VPC parameter (eg vpc-0b9b80e139f334558)
+    Type: String
+  RDSSubnet1:
+    Default: "subnet-054379b3f39cce09e"
+    Description: subnet parameter (eg subnet-08edd817a280766ff)
+    Type: String  
+  RDSSubnet2:
+    Default: "subnet-054379b3f39cce09e"
+    Description: subnet parameter (eg subnet-08edd817a280766ff)
+    Type: String
+  KeyPair:
+    Default: "test1-sree"
+    Description: Key Pair parameter (eg test1-sree)
+    Type: String
+
+Resources:
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http, SSH and SSL to client host
+      VpcId:
+        Ref: myVPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      # - IpProtocol: tcp
+      #   FromPort: 8000
+      #   ToPort: 8000
+      #   CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'sg']
+
+  MyEC2Instance: #Creation of EC2
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: {Ref: ImageIdparam} #Refrence to the custom AMI
+      InstanceType: t2.micro
+      KeyName: {Ref : "KeyPair"}
+      BlockDeviceMappings: 
+          - DeviceName: "/dev/sdm"
+            Ebs: 
+              VolumeType: "gp2"
+              DeleteOnTermination: "true"
+              VolumeSize: "20"
+          - DeviceName: "/dev/sdk"
+            NoDevice: {}
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet: 
+            - Ref: "InstanceSecurityGroup"
+          SubnetId: 
+            Ref: "EC2Subnet"
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'EC2']
+
+
+  MyDynamoDB: #creation of DynamoDB
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - 
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "csye6225"
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
+
+  MyRDSsubnetGroup: 
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: RDS subnet group
+      SubnetIds: 
+        - Ref: RDSSubnet1
+        - Ref: RDSSubnet2
+        - Ref: EC2Subnet
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds_subnet']
+
+  RDSSecurityGroup: 
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http, SSH and SSL to client host
+      VpcId:
+        Ref: myVPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 3306
+        ToPort: 3306
+        CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds_sg']  
+
+  MyRDSInstance: 
+    Type: AWS::RDS::DBInstance
+    Properties: 
+      AllocatedStorage: "20"
+      DBInstanceClass: "db.t2.medium"
+      Engine: "mysql"
+      EngineVersion: "5.6.34"
+      MultiAZ : false
+      MasterUsername: "csye6225master"
+      MasterUserPassword: "csye6225password"
+      PubliclyAccessible: true
+      DBName: "csye6225"
+      DBSubnetGroupName: 
+        Ref: "MyRDSsubnetGroup"
+      VPCSecurityGroups:
+        - {Ref : "RDSSecurityGroup"}
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']

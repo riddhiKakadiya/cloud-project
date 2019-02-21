@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: CSYE 6225 - Network cf stack
 
 #Defining paramaters Required for resources setup
 Parameters:
@@ -34,9 +35,9 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: {Ref: CidrBlock}
-      EnableDnsSupport: 'false'
-      EnableDnsHostnames: 'false'
-      InstanceTenancy: dedicated
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      InstanceTenancy: default
       Tags:
       - Key: Name
         Value:
