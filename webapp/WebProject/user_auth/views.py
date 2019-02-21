@@ -45,12 +45,15 @@ def get_note_details(note):
 	note_details['last_updated_on'] = note.last_updated_on
 	return note_details
 
+def delete_attachment(attachment_id,attachment_url):
+
 #def delete_attachment(note_id,attachment_id):
+
 	# if (settings.PROFILE  == "dev"):
 	# 	response = delete_attachment_from_s3(attachment_id=attachment_id,acl="public-read")
 	# else:
-	# 	response = delete_attachment_from_local(filename,note)
-	# return response
+	 response = delete_attachment_from_local(attachment_id,attachment_url)
+	 return response
 
 
 
@@ -132,15 +135,21 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 
 	# 		s3 = session.client('s3')
 		# 	try:
-		# 		s3.delete_object(Bucket=bucketName, Key=key, ExtraArgs={"ACL": acl})
+		#		bucketName.delete_key(key.key)
+		##or
+		# 		s3.delete_object(Bucket=bucketName,Key=key)
+
 	# 		except Exception as e:
 	# 	# This is a catch all exception, edit this part to fit your needs.
 		# 	print("Something Happened: ", e)
 		# 	return e
 
 
-#def delete_attachment_from_local(filename, note):
-
+def delete_attachment_from_local(attachment_id,attachment_url):
+	filename=attachment_url[13:]
+	path = os.path.join(settings.MEDIA_ROOT, filename)
+	default_storage.delete(path) 
+	return JsonResponse({'message': 'Attachment deleted from Local'}, status=200)
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -402,11 +411,11 @@ def noteFromId(request, note_id=""):
 				return JsonResponse({'Error': 'Invalid note ID'}, status=400)		
 			if(note):
 				if(user == note.user):
-					#delete attachments if any
-					# attachments = Attachment.objects.filter(note=note)
-					# if (attachments):
-					# 	for attachment in attachments:
-					# 		delete_attachment(note.id,attachment.id)
+					##delete attachments if any
+					attachments = Attachment.objects.filter(note=note)
+					if (attachments):
+						for attachment in attachments:
+							delete_attachment(attachment.id,attachment.url)
 					note.delete()
 					return JsonResponse({'message': 'Note deleted successfully'}, status=204)
 				else:
@@ -531,6 +540,7 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 			if(note.user == user):
 				if(attachment.note.id == note.id):
 					#-----------Primary Logic for deleting attachments-----------#
+					delete_attachment(attachment.id,attachment.url)
 					attachment.delete()
 					note.last_updated_on = datetime.datetime.now()
 					return JsonResponse({'message': 'Attachment Deleted'}, status=200)
