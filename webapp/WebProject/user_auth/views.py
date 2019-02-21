@@ -45,14 +45,14 @@ def get_note_details(note):
 	note_details['last_updated_on'] = note.last_updated_on
 	return note_details
 
-def delete_attachment(attachment_id,attachment_url):
+def delete_attachment(attachment):
 
 #def delete_attachment(note_id,attachment_id):
 
 	# if (settings.PROFILE  == "dev"):
 	# 	response = delete_attachment_from_s3(attachment_id=attachment_id,acl="public-read")
 	# else:
-	 response = delete_attachment_from_local(attachment_id,attachment_url)
+	 response = delete_attachment_from_local(attachment)
 	 return response
 
 
@@ -73,6 +73,14 @@ def save_attachment_to_local(file_to_upload,filename,note):
 	tmp_file = os.path.join(settings.MEDIA_ROOT, path)
 	
 	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
+
+def delete_attachment_from_local(attachment): 
+	attachment_url = attachment.url
+	filename=attachment_url[13:]
+	path = os.path.join(settings.MEDIA_ROOT, filename)
+	default_storage.delete(path) 
+	attachment.delete()
+	return JsonResponse({'message': 'Attachment deleted from Local'}, status=200)
 
 #--------------------------------------------------------------------------------
 # Function definitions for AWS S3 - dev profile
@@ -143,11 +151,7 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 		# 	return e
 
 
-def delete_attachment_from_local(attachment_id,attachment_url):
-	filename=attachment_url[13:]
-	path = os.path.join(settings.MEDIA_ROOT, filename)
-	default_storage.delete(path) 
-	return JsonResponse({'message': 'Attachment deleted from Local'}, status=200)
+
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -413,7 +417,7 @@ def noteFromId(request, note_id=""):
 					attachments = Attachment.objects.filter(note=note)
 					if (attachments):
 						for attachment in attachments:
-							delete_attachment(attachment.id,attachment.url)
+							delete_attachment(attachment)
 					note.delete()
 					return JsonResponse({'message': 'Note deleted successfully'}, status=204)
 				else:
@@ -537,8 +541,7 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 			if(note.user == user):
 				if(attachment.note.id == note.id):
 					#-----------Primary Logic for deleting attachments-----------#
-					delete_attachment(attachment.id,attachment.url)
-					attachment.delete()
+					delete_attachment(attachment)
 					note.last_updated_on = datetime.datetime.now()
 					return JsonResponse({'message': 'Attachment Deleted'}, status=200)
 				else:
