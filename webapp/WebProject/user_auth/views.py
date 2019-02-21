@@ -31,6 +31,26 @@ def save_attachments(file_to_upload,filename,note):
 		response = save_attachment_to_local(file_to_upload,filename,note)
 	return response
 
+def get_attachment_details(attachment):
+	note_attachment = {}
+	note_attachment['id'] = attachment.id
+	note_attachment['url'] = attachment.url
+	return note_attachment
+
+def get_note_details(note):
+	note_details = {}
+	note_details['id'] = note.id
+	note_details['title'] = note.title
+	note_details['content'] = note.content
+	note_details['created_on'] = note.created_on
+	note_details['last_updated_on'] = note.last_updated_on
+	return note_details
+
+# def update_attachments():
+# 	#krapali
+# def delete_attachments():
+# 	#Riddhi
+
 #--------------------------------------------------------------------------------
 # Function definitions for CRUD on local - default profile
 # --------------------------------------------------------------------------------
@@ -48,7 +68,6 @@ def save_attachment_to_local(file_to_upload,filename,note):
 	tmp_file = os.path.join(settings.MEDIA_ROOT, path)
 	
 	return JsonResponse({'message': 'Attachment saved to Local'}, status=200)
-
 
 #--------------------------------------------------------------------------------
 # Function definitions for AWS S3 - dev profile
@@ -75,8 +94,6 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
 	attachment.save()
 
-	
-
 	s3 = session.client('s3')
 	try:
 		s3.upload_fileobj(
@@ -94,6 +111,7 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 		return e
 
 	return JsonResponse({'message': 'Attachment saved to S3'}, status=200)
+
 #--------------------------------------------------------------------------------
 # Function definitions
 # --------------------------------------------------------------------------------
@@ -246,7 +264,7 @@ def signin(request):
 def createOrGetNotes(request):
 	# Post method to create new notes for authorized user
 	if request.method == 'POST':
-		if (request.body):
+		if (request.POST):
 			try:
 				title = request.POST.get('title')
 				content = request.POST.get('content')
@@ -255,33 +273,19 @@ def createOrGetNotes(request):
 				if (user):
 					note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
 									  user=user)
-					note.save() 
-					message = {}
-					attachment_list=[]
-					message['id'] = note.id
-					message['title'] = title
-					message['content'] = content
-					message['created_on'] = time_now
-					message['last_updated_on'] = time_now
-					#----------------If attachment is sent as POST method while creating note--------#
+					note.save()
+	#----------------If attachment is sent as POST method while creating note--------#
 					if (request.FILES):
-						data = request.FILES['attachment']
+						file = request.FILES['attachment']
 						#-----------Primary Logic for saving attachments-----------#
-						attachment = Attachment(url = data, note = note)
-						path = default_storage.save(data._get_name(), ContentFile(data.read()))
-						tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-						attachment.save()
-						attachment_list.append(attachment)
-						message['attachments'] = attachment_list
-
-					message['created_on'] = time_now
-					message['last_updated_on'] = time_now
-					return JsonResponse(message, status=201)
-
-				return JsonResponse({'message': 'Error : User not authorized'}, status=401)
-			except:
-				JsonResponse({'Error': 'Please use a post method with parameters title and content to create notes'}, status=400)
-		return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
+						save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+					else:
+						print("No Attachment added")
+					return JsonResponse({'message': 'Note Saved'}, status=200)
+				else:
+					return JsonResponse({'message': 'Error : User not authorized'}, status=401)
+			except: 
+				return JsonResponse({'message': 'Error : provide title(req), content(req) and attachment(optional) in form-data'}, status=400)
 	# Get method to retrive all notes for authorized user
 	elif request.method == 'GET':
 		user = validateSignin(request.META)
@@ -291,21 +295,12 @@ def createOrGetNotes(request):
 				message_list = []
 				for note in notes:
 					attachment_list = []
-					message = {}
-					message['id'] = note.id
-					message['title'] = note.title
-					message['content'] = note.content
-					message['created_on'] = note.created_on
-					message['last_updated_on'] = note.last_updated_on
+					message = get_note_details(note)
 					attachments = Attachment.objects.filter(note=note.id)
 					if (attachments):
 						for attachment in attachments:
-							note_attachment={}
-							note_attachment['id'] = attachment.id
-							note_attachment['url'] = attachment.url
-							attachment_list.append(note_attachment)
+							attachment_list.append(get_attachment_details(attachment))
 						message['attachments'] = attachment_list
-					print("Attachments:",attachments)
 					message_list.append(message)
 				return JsonResponse(message_list, status=200, safe=False)
 			else:
@@ -321,20 +316,12 @@ def noteFromId(request, note_id=""):
 			if (user):
 				note = NotesModel.objects.get(pk=note_id)
 				if (note.user==user):
-					message = {}
 					attachment_list = []
-					message['id'] = note.id
-					message['title'] = note.title
-					message['content'] = note.content
-					message['created_on'] = note.created_on
-					message['last_updated_on'] = note.last_updated_on
+					message = get_note_details(note)
 					attachments = Attachment.objects.filter(note=note.id)
 					if (attachments):
 						for attachment in attachments:
-							note_attachment={}
-							note_attachment['id'] = attachment.id
-							note_attachment['url'] = attachment.url
-							attachment_list.append(note_attachment)
+							attachment_list.append(get_attachment_details(attachment))
 						message['attachments'] = attachment_list
 					return JsonResponse(message, status=200)
 				else:
@@ -356,7 +343,7 @@ def noteFromId(request, note_id=""):
 						note.content = received_json_data['content']
 						note.last_updated_on = datetime.datetime.now()		
 						note.save()
-						return JsonResponse({'message':'note updated!'}, status=204)
+						# return JsonResponse({'message':'note updated!'}, status=204)
 					except:
 						return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
 						#----------------If attachment is sent as POST method while creating note--------#
@@ -436,10 +423,7 @@ def addAttachmentToNotes(request,note_id=""):
 				attachments = Attachment.objects.filter(note=note.id)
 				if (attachments.exists()):
 					for attachment in attachments:
-						note_attachment={}
-						note_attachment['id'] = attachment.id
-						note_attachment['url'] = attachment.url
-						attachment_list.append(note_attachment)
+						attachment_list.append(get_attachment_details(attachment))
 					message['attachments'] = attachment_list
 				else:
 					return JsonResponse({'message': 'No Attachments added to note'}, status=200)	
@@ -518,7 +502,5 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
 			else:
 				return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
-
-
 	return JsonResponse({'message': 'Error : Request method should be PUT or DELETE'}, status=400)
 
