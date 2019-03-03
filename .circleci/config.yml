@@ -41,4 +41,4 @@ jobs:
           command: cd webapp/WebProject && source djangoEnv/bin/activate && python3 manage.py migrate --settings=WebProject.settings_test
       - run:
           name: Migrate
-          command: cd webapp/WebProject && source djangoEnv/bin/activate  &&  python3 manage.py test
+          command: cd webapp/WebProject && source djangoEnv/bin/activate  &&  python3 manage.py test --settings=WebProject.settings_test
