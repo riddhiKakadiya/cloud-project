@@ -3,4 +3,4 @@ sudo yum install epel-release -y
 sudo yum makecache
 sudo yum search pip | grep python3
 sudo yum install python34-pip -y
-pip3 install virtualenv
+sudo pip3 install virtualenv
