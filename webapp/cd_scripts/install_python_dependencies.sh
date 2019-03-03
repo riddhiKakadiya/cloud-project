@@ -4,4 +4,4 @@ sudo chown centos:centos /home/centos/webapp
 virtualenv /home/centos/webapp/WebProject/djangoEnv
 sudo chown centos:centos /home/centos/webapp/WebProject/djangoEnv/*
 source /home/centos/webapp/WebProject/djangoEnv/bin/activate
-pip install -r /home/centos/webapp/WebProject/requirements.txt
+pip3 install -r /home/centos/webapp/WebProject/requirements.txt
