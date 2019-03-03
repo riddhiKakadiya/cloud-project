@@ -41,7 +41,7 @@ jobs:
           command: cd webapp/WebProject && source djangoEnv/bin/activate  &&  python3 manage.py test --settings=WebProject.settings_test
       - run:
           name: Zip Project 
-          command: cd webapp && zip -r ../webapp.zip *
+          command: cd webapp && zip -r ../../webapp.zip *
       - run:
           name: List directory
           command: cd ~/ && ls
