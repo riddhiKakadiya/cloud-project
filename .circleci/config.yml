@@ -9,10 +9,9 @@ jobs:
     working_directory: ~/webapp/WebProject
     steps:
       - checkout:
-          path: webapp/WebProject
       - run:
           name: List directory
-          command: ls
+          command: cd webapp/WebProject && ls
       # - run:
       #     name: List directory
       #     command: ls
