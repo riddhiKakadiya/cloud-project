@@ -1,5 +1,6 @@
 #!/bin/bash
-sudo scl enable rh-python36 bash
-sudo yum install python34-setuptools -y
-sudo easy_install-3.4 pip -y
+sudo yum install epel-release -y
+sudo yum makecache
+sudo yum search pip | grep python3
+sudo yum install python34-pip -y
 pip3 install virtualenv
