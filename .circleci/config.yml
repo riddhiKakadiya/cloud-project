@@ -13,9 +13,6 @@ jobs:
           name: List directory
           command: cd webapp/WebProject && ls
       - run:
-          name: List directory
-          command: ls
-      - run:
           name: Update packages
           command: sudo apt-get update && sudo apt-get install wget zip unzip -y
       - run:
@@ -47,4 +44,4 @@ jobs:
           command: zip -r webapp.zip webapp
       - run:
           name: Deploy to S3
-          command: aws s3 sync webapp.zip s3://code-deploy.csye6225-s19-mandakathils.me/ --delete
+          command: aws s3 sync ~/webapp.zip s3://code-deploy.csye6225-s19-mandakathils.me/ --delete
