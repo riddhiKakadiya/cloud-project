@@ -9,12 +9,12 @@ jobs:
     working_directory: ~/webapp/WebProject
     steps:
       - checkout:
-          path: ~/webapp/WebProject
+          path: ~/webapp/
       - run:
           name: List directory
           command: ls
       - run:
-          name: Install packages
+          name: Update packages
           command: sudo apt-get update && sudo apt-get install wget zip unzip -y
       - run:
           name: Install packages for project
@@ -24,19 +24,19 @@ jobs:
           command: sudo pip install awscli
       - run:
           name: Create Virtualenv
-          command: virtualenv -p python3 djangoEnv
+          command: cd ~/webapp/WebProject && virtualenv -p python3 djangoEnv
       - run:
           name: Enter Virtual env
-          command: source djangoEnv/bin/activate
+          command: cd ~/webapp/WebProject && source djangoEnv/bin/activate
       - run:
           name: Install Requirements
-          command: pip3 install -r requirements.txt
+          command:  cd ~/webapp/WebProject && pip3 install -r requirements.txt
       - run:
           name: Make Migrations
-          command: python3 manage.py makemigrations --settings=WebProject.settings_test
+          command: cd ~/webapp/WebProject && python3 manage.py makemigrations --settings=WebProject.settings_test
       - run:
           name: Migrate
-          command: python3 manage.py migrate --settings=WebProject.settings_test
+          command: cd ~/webapp/WebProject && python3 manage.py migrate --settings=WebProject.settings_test
       - run:
           name: Migrate
-          command: python3 manage.py test
+          command: cd ~/webapp/WebProject &&  python3 manage.py test
