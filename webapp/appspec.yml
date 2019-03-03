@@ -1,8 +1,9 @@
-version: 0.0
+version: 0.0pwd
+
 os: linux
 files:
   - source: /
-    destination: ~/home/centos/webapp
+    destination: /home/centos/webapp
 hooks:
   BeforeInstall:
     - location: startServer_centos.sh
@@ -20,4 +21,4 @@ hooks:
   # ApplicationStop:
   #   - location: scripts/stop_server.sh
   #     timeout: 300
-  #     runas: root
+  #     runas: rootpw
