@@ -5,7 +5,7 @@ files:
     destination: ~/home/centos/webapp
 hooks:
   BeforeInstall:
-    - location: webapp/WebProject/startServer_centos.sh
+    - location: startServer_centos.sh
       timeout: 300
       runas: root
   # AfterInstall:
