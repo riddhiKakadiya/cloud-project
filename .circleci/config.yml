@@ -9,34 +9,37 @@ jobs:
     working_directory: ~/webapp/WebProject
     steps:
       - checkout:
-          path: ~/webapp/
+          path: webapp/WebProject
       - run:
           name: List directory
           command: ls
-      - run:
-          name: Update packages
-          command: sudo apt-get update && sudo apt-get install wget zip unzip -y
-      - run:
-          name: Install packages for project
-          command: sudo apt-get install python3 virtualenv python3-pip mysql-server python3-dev libmysqlclient-dev -y
-      - run:
-          name: Install awscli
-          command: sudo pip install awscli
-      - run:
-          name: Create Virtualenv
-          command: cd ~/webapp/WebProject && virtualenv -p python3 djangoEnv
-      - run:
-          name: Enter Virtual env
-          command: cd ~/webapp/WebProject && source djangoEnv/bin/activate
-      - run:
-          name: Install Requirements
-          command:  cd ~/webapp/WebProject && pip3 install -r requirements.txt
-      - run:
-          name: Make Migrations
-          command: cd ~/webapp/WebProject && python3 manage.py makemigrations --settings=WebProject.settings_test
-      - run:
-          name: Migrate
-          command: cd ~/webapp/WebProject && python3 manage.py migrate --settings=WebProject.settings_test
-      - run:
-          name: Migrate
-          command: cd ~/webapp/WebProject &&  python3 manage.py test
+      # - run:
+      #     name: List directory
+      #     command: ls
+      # - run:
+      #     name: Update packages
+      #     command: sudo apt-get update && sudo apt-get install wget zip unzip -y
+      # - run:
+      #     name: Install packages for project
+      #     command: sudo apt-get install python3 virtualenv python3-pip mysql-server python3-dev libmysqlclient-dev -y
+      # - run:
+      #     name: Install awscli
+      #     command: sudo pip install awscli
+      # - run:
+      #     name: Create Virtualenv
+      #     command: cd ~/webapp/WebProject && virtualenv -p python3 djangoEnv
+      # - run:
+      #     name: Enter Virtual env
+      #     command: cd ~/webapp/WebProject && source djangoEnv/bin/activate
+      # - run:
+      #     name: Install Requirements
+      #     command:  cd ~/webapp/WebProject && pip3 install -r requirements.txt
+      # - run:
+      #     name: Make Migrations
+      #     command: cd ~/webapp/WebProject && python3 manage.py makemigrations --settings=WebProject.settings_test
+      # - run:
+      #     name: Migrate
+      #     command: cd ~/webapp/WebProject && python3 manage.py migrate --settings=WebProject.settings_test
+      # - run:
+      #     name: Migrate
+      #     command: cd ~/webapp/WebProject &&  python3 manage.py test
