@@ -6,9 +6,12 @@ jobs:
         - assignment5
     docker:
       - image: circleci/python:3.5-jessie
+    working_directory: ~/webapp/WebProject
     steps:
       - checkout:
-          path: ~/webapp/WebProject
+      - run:
+          name: List directory
+          command: ls
       - run:
           name: Install packages
           command: sudo apt-get update && sudo apt-get install wget zip unzip -y
