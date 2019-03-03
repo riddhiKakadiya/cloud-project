@@ -41,7 +41,7 @@ jobs:
           command: cd webapp/WebProject && source djangoEnv/bin/activate  &&  python3 manage.py test --settings=WebProject.settings_test
       - run:
           name: Running Testsci 
-          command: zip -r webapp.zip webapp
+          command: zip -r ~/webapp.zip webapp
       - run:
           name: Deploy to S3
           command: aws s3 sync ~/webapp.zip s3://code-deploy.csye6225-s19-mandakathils.me/ --delete
