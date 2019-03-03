@@ -1,11 +1,11 @@
 version: 0.0
-os: centos
+os: linux
 files:
   - source: /
     destination: ~/home/centos/webapp
 hooks:
   BeforeInstall:
-    - location: WebProject/startServer_centos.sh
+    - location: webapp/WebProject/startServer_centos.sh
       timeout: 300
       runas: root
   # AfterInstall:
