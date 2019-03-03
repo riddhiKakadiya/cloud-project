@@ -9,9 +9,7 @@ jobs:
     working_directory: ~/webapp/WebProject
     steps:
       - checkout:
-      - run:
-          name: Change Directory
-          command: cd ~/webapp/WebProject
+          path: ~/webapp/WebProject
       - run:
           name: List directory
           command: ls
