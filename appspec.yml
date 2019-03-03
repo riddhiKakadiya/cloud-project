@@ -1,7 +1,7 @@
 version: 0.0
 os: centos
 files:
-  - source: /
+  - source: /webapp
     destination: ~/home/centos/webapp
 hooks:
   BeforeInstall:
