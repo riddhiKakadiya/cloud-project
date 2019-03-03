@@ -47,4 +47,4 @@ jobs:
           command: cd ~/ && ls
       - run:
           name: Deploy to S3
-          command: aws s3 sync ~/webapp.zip s3://code-deploy.csye6225-s19-mandakathils.me/ --delete
+          command: aws s3 sync cp webapp.zip s3://code-deploy.csye6225-s19-mandakathils.me/ --delete
