@@ -37,7 +37,7 @@ jobs:
           name: Migrate
           command: cd webapp/WebProject && source djangoEnv/bin/activate && python3 manage.py migrate --settings=WebProject.settings_test
       - run:
-          name: Running Testsci 
+          name: Running Tests for webapp 
           command: cd webapp/WebProject && source djangoEnv/bin/activate  &&  python3 manage.py test --settings=WebProject.settings_test
       - run:
           name: Zip Project 
@@ -47,4 +47,4 @@ jobs:
           command: cd ~/ && ls
       - run:
           name: Deploy to S3
-          command: aws s3 cp webapp.zip s3://code-deploy.csye6225-s19-mandakathils.me/
+          command: aws s3 cp ~/webapp.zip s3://code-deploy.csye6225-s19-mandakathils.me/
