@@ -41,13 +41,17 @@ jobs:
           command: cd webapp/WebProject && source djangoEnv/bin/activate  &&  python3 manage.py test --settings=WebProject.settings_test
       - run:
           name: Zip Project 
-          command: zip -r ~/webapp.zip webapp/*
+          command: cd webapp && zip -r ~/webapp.zip *
       - run:
           name: List directory
           command: cd ~/ && ls
       - run:
           name: Deploy to S3
           command: aws s3 cp ~/webapp.zip s3://code-deploy.csye6225-spring2019-sonij.me/
-      - run:
-          name: Deploy to AWS EC2
-          command: aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=code-deploy.csye6225-spring2019-sonij.me,bundleType=zip,key=webapp.zip
+#       - run:
+#           name: Deploy to AWS EC2
+# <<<<<<< HEAD
+#           command: aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=code-deploy.csye6225-spring2019-sonij.me,bundleType=zip,key=webapp.zip
+# =======
+#           command: aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=code-deploy.csye6225-s19-mandakathils.me,bundleType=zip,key=webapp.zip
+# >>>>>>> 198e51770a288a75cdfe3769eabece326b253f3d

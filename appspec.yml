@@ -1,13 +1,13 @@
 version: 0.0
-os: centos
+os: linux
 files:
-  - source: /webapp
+  - source: /
     destination: ~/home/centos/webapp
 hooks:
   BeforeInstall:
-    - location: WebProject/startServer_centos.sh
+    - location: startServer_centos.sh
       timeout: 300
-      runas: root
+      runas: centos
   # AfterInstall:
   #   - location: scripts/change_permissions.sh
   #     timeout: 300
