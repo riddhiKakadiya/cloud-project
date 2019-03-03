@@ -10,8 +10,11 @@ jobs:
     steps:
       - checkout:
       - run:
+          name: Change Directory
+          command: cd ~/webapp/WebProject
+      - run:
           name: List directory
-          command: cd webapp/WebProject
+          command: ls
       - run:
           name: Install packages
           command: sudo apt-get update && sudo apt-get install wget zip unzip -y
