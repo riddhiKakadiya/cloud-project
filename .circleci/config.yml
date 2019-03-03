@@ -40,5 +40,8 @@ jobs:
           name: Migrate
           command: cd webapp/WebProject && source djangoEnv/bin/activate && python3 manage.py migrate --settings=WebProject.settings_test
       - run:
-          name: Migrate
+          name: Running Testsci 
           command: cd webapp/WebProject && source djangoEnv/bin/activate  &&  python3 manage.py test --settings=WebProject.settings_test
+      - run:
+          name: Deploy to S3
+          command: aws s3 sync webapp/WebProject s3://code-deploy.csye6225-s19-mandakathils.me/ --delete
