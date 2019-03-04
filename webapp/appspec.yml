@@ -15,7 +15,7 @@ hooks:
       runas: centos
     - location: cd_scripts/install_python_dependencies.sh
       timeout: 300
-      runas: centos
+      runas: root
   ApplicationStart:
     - location: cd_scripts/start_server.sh
       timeout: 300
