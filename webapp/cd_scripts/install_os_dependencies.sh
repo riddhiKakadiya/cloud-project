@@ -1,5 +1,6 @@
 #!/bin/bash
 sudo scl enable rh-python36 bash
+sudo yum install gcc
 sudo yum install epel-release -y
 sudo yum makecache
 sudo yum search pip | grep python3
