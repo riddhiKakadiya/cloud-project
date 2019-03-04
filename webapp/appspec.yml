@@ -12,7 +12,7 @@ hooks:
   AfterInstall:
     - location: cd_scripts/install_os_dependencies.sh
       timeout: 300
-      runas: centos
+      runas: root
     - location: cd_scripts/install_python_dependencies.sh
       timeout: 300
       runas: root
