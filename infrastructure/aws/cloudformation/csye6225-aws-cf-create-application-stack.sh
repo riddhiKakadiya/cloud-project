@@ -50,6 +50,7 @@ fi
 ##Creating Stack automation script
 echo "Creating Stack $1"
 
+AWS_USER_ID=$(aws iam get-user | jq -r '.User.UserId')
 
 
 NETWORK_STACK=$(aws cloudformation describe-stack-resources --stack-name $2| jq '.StackResources' )

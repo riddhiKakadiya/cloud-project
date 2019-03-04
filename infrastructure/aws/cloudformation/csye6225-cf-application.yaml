@@ -86,6 +86,8 @@ Resources:
           Fn::Join:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'EC2']
+      - Key: ec2-type
+        Value: csye-6225
 
 
   MyDynamoDB: #creation of DynamoDB
