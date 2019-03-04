@@ -18,7 +18,7 @@ if [ $# -lt 2 ]; then
 fi
 
 if [ $# -lt 3 ]; then
-  echo "Please provide ami id ! Try Again."
+  echo "Please provide Key Pair ! Try Again."
   echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <AMI_ID> <KEY_PAIR>"
   exit 1
 fi
@@ -27,4 +27,4 @@ IMAGE_ID=$(aws ec2 describe-images --owners self --query 'sort_by(Images, &Creat
 
 ./csye6225-aws-cf-create-stack.sh $1
 
-./csye6225-aws-cf-create-application-stack.sh $2 $1 $3 $IMAGE_ID
+./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3
