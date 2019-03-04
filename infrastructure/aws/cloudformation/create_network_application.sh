@@ -28,3 +28,5 @@ IMAGE_ID=$(aws ec2 describe-images --owners self --query 'sort_by(Images, &Creat
 ./csye6225-aws-cf-create-stack.sh $1
 
 ./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3
+
+# aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=code-deploy.csye6225-s19-mandakathils.me,bundleType=zip,key=webapp.zip

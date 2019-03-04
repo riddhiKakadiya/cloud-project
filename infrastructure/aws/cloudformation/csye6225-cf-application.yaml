@@ -58,11 +58,11 @@ Resources:
           Fn::Join:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'sg']
-  
+
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      Path: String
+      Path: "/"
       Roles:
         - CodeDeployEC2ServiceRole
   MyEC2Instance: #Creation of EC2

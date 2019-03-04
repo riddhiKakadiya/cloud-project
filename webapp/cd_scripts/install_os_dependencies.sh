@@ -1,7 +1,7 @@
 #!/bin/bash
+sudo scl enable rh-python36 bash
 sudo yum install epel-release -y
 sudo yum makecache
-scl enable rh-python36 bash
 sudo yum search pip | grep python3
 sudo yum install python36-setuptools -y
 sudo yum install python36-pip -y
