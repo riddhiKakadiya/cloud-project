@@ -2,8 +2,10 @@
 source /home/centos/webapp/WebProject/djangoEnv/bin/activate
 python3 /home/centos/webapp/WebProject/manage.py collectstatic
 cd /home/centos/webapp/WebProject
+deactivate
 sudo semanage permissive -a httpd_t
 sudo systemctl daemon-reload
+sudo systemctl start gunicorn
 sudo systemctl restart gunicorn
 sudo systemctl enable gunicorn
 sudo usermod -a -G centos nginx
