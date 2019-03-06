@@ -2,8 +2,6 @@
 
 #Exit immediately if a command exits with a non-zero exit status.
 set -e
-
-
 ##Check if enough arguements are passed
 if [ $# -lt 1 ]; then
   echo "Please provide network stack name ! Try Again."
