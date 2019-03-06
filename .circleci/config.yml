@@ -46,14 +46,11 @@ jobs:
           name: Zip Project 
           command: cd webapp && zip -r ~/webapp.zip *
       - run:
-          name: S3 Bucket name fetch
-          command: S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')
-      - run:
           name: List directory
           command: cd ~/ && ls
       - run:
           name: Deploy to S3
-          command: aws s3 cp ~/webapp.zip s3://${S3_BUCKET}
+          command: S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name') && aws s3 cp ~/webapp.zip s3://$S3_BUCKET
       - run:
           name: Deploy to AWS EC2
-          command: aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=${S3_BUCKET},bundleType=zip,key=webapp.zip
+          command: S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name') && aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=$S3_BUCKET,bundleType=zip,key=webapp.zip
