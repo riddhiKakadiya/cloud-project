@@ -5,6 +5,3 @@ sudo mkdir --parents /etc/systemd/system/nginx.service.d/; sudo mv /home/centos/
 sudo scl enable rh-python36 "virtualenv -p python3.6 /home/centos/webapp/WebProject/djangoEnv"
 sudo chown centos:centos /home/centos/webapp
 sudo chown -R centos:centos /home/centos/webapp/*
-sudo chown centos:centos /home/centos/webapp/WebProject/djangoEnv/
-sudo chown centos:centos /home/centos/webapp/WebProject/djangoEnv/*
-
