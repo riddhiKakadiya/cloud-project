@@ -46,6 +46,9 @@ jobs:
           name: Zip Project 
           command: cd webapp && zip -r ~/webapp.zip *
       - run:
+          name: S3 Bucket name fetch
+          command: S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')
+      - run:
           name: List directory
           command: cd ~/ && ls
       - run:
