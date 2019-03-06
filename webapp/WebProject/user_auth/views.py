@@ -299,7 +299,7 @@ def signin(request):
 						current_time = time.ctime()
 						return JsonResponse({"current time": current_time})
 		# otherwise ask for authentification
-		return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+		return JsonResponse({'message': 'Error : Incorrect user details entered'}, status=401)
 	else:
 		return JsonResponse({'Error': 'Please use a get method with user credentials'})
 

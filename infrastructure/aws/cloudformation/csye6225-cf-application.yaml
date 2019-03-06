@@ -59,9 +59,16 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'sg']
 
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - CodeDeployEC2ServiceRole
   MyEC2Instance: #Creation of EC2
     Type: "AWS::EC2::Instance"
     Properties: 
+      IamInstanceProfile : {Ref : InstanceProfile}
       ImageId: {Ref: ImageIdparam} #Refrence to the custom AMI
       InstanceType: t2.micro
       KeyName: {Ref : "KeyPair"}
@@ -86,6 +93,8 @@ Resources:
           Fn::Join:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'EC2']
+      - Key: ec2-type
+        Value: csye-6225
 
 
   MyDynamoDB: #creation of DynamoDB
