@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion": '2010-09-09'
+Description: Cloud Formation to build Continuos Integration and deployment stack
+
+  Parameters:
+    codedeployapplicationname:
+      Description: Code deploy application name
+      Type: String
+    S3bucketname:
+      Description: S3 bucket name
+      Type: String  
+    TagKey:
+      Description: TagKey
+      Type: String
+    TagValue:
+      Description: TagValue
+      Type: String  
