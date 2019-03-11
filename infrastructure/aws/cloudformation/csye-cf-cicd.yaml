@@ -14,3 +14,42 @@ Description: Cloud Formation to build Continuos Integration and deployment stack
     TagValue:
       Description: TagValue
       Type: String  
+
+Resources:
+  
+  CodeDeploy-EC2-S3-Role:
+  Type: AWS::IAM::Role
+  Properties: 
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement: 
+        -
+          Action: 
+            - s3:Get*
+            - s3:List*
+          Effect: Allow
+          Resource: *
+
+  CircleCI-Upload-To-S3-Role:        
+  Type: AWS::IAM::Role
+  Properties: 
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement: 
+        -
+          Action: 
+            - s3:PutObject
+          Effect: Allow
+          Resource: *  
+
+  CirlceCI-Code-Deploy-Role:
+  Type: AWS::IAM::Role
+  Properties: 
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement: 
+        -
+          Effect: Allow
+          Resource: *    
+          Action: 
+            - s3:PutObject               
