@@ -2,6 +2,9 @@ AWSTemplateFormatVersion": '2010-09-09'
 Description: Cloud Formation to build Continuos Integration and deployment stack
 
   Parameters:
+    Deploymentgroupname:
+      Description: Deployment group name
+      Type: String
     codedeployapplicationname:
       Description: Code deploy application name
       Type: String
