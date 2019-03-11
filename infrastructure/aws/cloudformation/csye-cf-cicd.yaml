@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion": '2010-09-09'
+Description: Cloud Formation to build Continuos Integration and deployment stack
+
+  Parameters:
+    Deploymentgroupname:
+      Description: Deployment group name
+      Type: String
+    codedeployapplicationname:
+      Description: Code deploy application name
+      Type: String
+    S3bucketname:
+      Description: S3 bucket name
+      Type: String  
+    TagKey:
+      Description: TagKey
+      Type: String
+    TagValue:
+      Description: TagValue
+      Type: String  
+
+Resources:
+  
+  CodeDeploy-EC2-S3-Role:
+  Type: AWS::IAM::Role
+  Properties: 
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement: 
+        -
+          Action: 
+            - s3:Get*
+            - s3:List*
+          Effect: Allow
+          Resource: *
+
+  CircleCI-Upload-To-S3-Role:        
+  Type: AWS::IAM::Role
+  Properties: 
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement: 
+        -
+          Action: 
+            - s3:PutObject
+          Effect: Allow
+          Resource: *  
+
+  CirlceCI-Code-Deploy-Role:
+  Type: AWS::IAM::Role
+  Properties: 
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement: 
+        -
+          Effect: Allow
+          Resource: *    
+          Action: 
+            - s3:PutObject               

@@ -1,0 +1,4 @@
+echo "Enter the stack name(cicd),Deployment group name, Code Deploy application name, S3 Bucket Name, Tag Key & Tag value of the ec2 instance you want to connect to deployment group."
+
+aws cloudformation create-stack 
+	--stack-name "$1" --template-body file://csye6225-cf-networking.yaml --capabilities CAPABILITY_NAMED_IAM --parameters  ParameterKey="Deploymentgroupname",ParameterValue="$2" ParameterKey="codedeployapplicationname",ParameterValue="$3" ParameterKey="S3bucketname",ParameterValue="$4" ParameterKey="TagKey",ParameterValue="$5" ParameterKey="TagValue",ParameterValue="$6" --disable-rollback

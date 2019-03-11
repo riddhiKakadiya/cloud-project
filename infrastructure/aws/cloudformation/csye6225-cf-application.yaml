@@ -170,3 +170,42 @@ Resources:
           Fn::Join:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
+
+  #connecting RDS to EC2 using IAM roles
+  # Role
+  # Type: AWS::IAM::Role
+  # Properties: 
+  #   AssumeRolePolicyDocument:
+  #     JSON object
+  #   ManagedPolicyArns:
+  #     - String
+  #   MaxSessionDuration: Integer
+  #   Path: String
+  #   PermissionsBoundary: String
+  #   Policies:
+  #     - Policies
+  #   RoleName: String
+      
+
+#   RDSaccessRole: 
+#   Type: AWS::IAM::Role
+#   Properties: 
+#     AssumeRolePolicyDocument:
+#       Version: "2012-10-17"
+#       Statement: 
+#         -
+#           Effect: "Allow"
+#           Principal: 
+#             Service: 
+#               - "ec2.amazonaws.com" 
+#           Action: 
+#             - "rds:*"  #or - "sts:AssumeRole"
+#            Resource": ["arn:aws:rds:region::"]
+#         },
+#         {
+#             "Effect": "Allow",
+#             "Action": ["rds:Describe*"],
+#             "Resource": ["*"]
+#         }
+#     ]
+# }     
