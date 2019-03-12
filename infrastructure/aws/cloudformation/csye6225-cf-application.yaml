@@ -26,6 +26,11 @@ Parameters:
     Default: "test1-sree"
     Description: Key Pair parameter (eg test1-sree)
     Type: String
+  S3BucketName:
+    Default: "code-deploy.raik.me.csye6225.com"
+    Description: S3 Bucket parameter (eg test1-sree)
+    Type: String
+
 
 Resources:
 
@@ -255,5 +260,11 @@ Resources:
             #   Action:
             #     - rds:*
             #   Resource: !Ref MyRDSInstance
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 's3roletest']
     DependsOn : MyRDSInstance
     
