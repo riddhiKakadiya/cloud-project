@@ -68,7 +68,7 @@ Resources:
         # - CodeDeployEC2ServiceRole
         - !Ref iamRole
     DependsOn: 
-      - MyRDSInstance
+      # - MyRDSInstance
       - iamRole
   MyEC2Instance: #Creation of EC2
     Type: "AWS::EC2::Instance"
@@ -216,7 +216,7 @@ Resources:
               Resource: 
                 Fn::Join:
                 - '.'
-                - ['arn:aws:s3:::code-deploy', {Ref: 'S3BucketName'}]
+                - ['arn:aws:s3:::code-deploy', {Ref: S3BucketName}]
             # - 
             #   Effect: "Allow"
             #   Action:
