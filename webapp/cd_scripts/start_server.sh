@@ -1,10 +1,14 @@
 #!/bin/bash
-export S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')
+sudo semanage permissive -a httpd_t 
 source /home/centos/webapp/WebProject/djangoEnv/bin/activate
-python3 /home/centos/webapp/WebProject/manage.py collectstatic
+export S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')
+export PROFILE=dev
+
+# python3 /home/centos/webapp/WebProject/manage.py collectstatic
+python3 /home/centos/webapp/WebProject/manage.py makemigrations
+python3 /home/centos/webapp/WebProject/manage.py migrate
 cd /home/centos/webapp/WebProject
 #Import must read !!
-sudo semanage permissive -a httpd_t 
 sudo systemctl daemon-reload
 sudo systemctl start gunicorn
 sudo systemctl restart gunicorn

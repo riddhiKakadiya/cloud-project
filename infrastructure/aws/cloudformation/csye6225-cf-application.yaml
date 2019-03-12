@@ -106,27 +106,27 @@ Resources:
       - iamRole
 
 
-  MyDynamoDB: #creation of DynamoDB
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - 
-          AttributeName: "id"
-          AttributeType: "S"
-      KeySchema:
-        - 
-          AttributeName: "id"
-          KeyType: "HASH"
-      ProvisionedThroughput: 
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
-      TableName: "csye6225"
-      Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-            - '-'
-            - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
+  # MyDynamoDB: #creation of DynamoDB
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     AttributeDefinitions:
+  #       - 
+  #         AttributeName: "id"
+  #         AttributeType: "S"
+  #     KeySchema:
+  #       - 
+  #         AttributeName: "id"
+  #         KeyType: "HASH"
+  #     ProvisionedThroughput: 
+  #       ReadCapacityUnits: "5"
+  #       WriteCapacityUnits: "5"
+  #     TableName: "csye6225"
+  #     Tags:
+  #     - Key: Name
+  #       Value:
+  #         Fn::Join:
+  #           - '-'
+  #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
 
   MyRDSsubnetGroup: 
     Type: AWS::RDS::DBSubnetGroup
@@ -210,13 +210,11 @@ Resources:
               Effect: "Allow"
               Action:
                 - s3:*
-                # - s3:Get*
-                # - s3:Delete*
-                # - s3:ListBucket*
               Resource: 
                 Fn::Join:
                 - ''
-                - ['arn:aws:s3:::', {Ref: S3BucketName},'/*']
+                - ['arn:aws:s3:::','*/*']
+                # - ['arn:aws:s3:::', {Ref: S3BucketName},'*/*']
             # - 
             #   Effect: "Allow"
             #   Action:
