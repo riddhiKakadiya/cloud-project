@@ -213,7 +213,7 @@ Resources:
               Resource: 
                 Fn::Join:
                 - ''
-                - ['arn:aws:s3:::','*/*']
+                - ['arn:aws:s3:::','*']
                 # - ['arn:aws:s3:::', {Ref: S3BucketName},'*/*']
             # - 
             #   Effect: "Allow"
