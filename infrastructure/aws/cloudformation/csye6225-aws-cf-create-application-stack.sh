@@ -60,7 +60,7 @@ SUBNET_ID3=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "S
 
 echo $VPC_ID $SUBNET_ID1
 
-response=$(aws cloudformation create-stack --stack-name $1 --capabilities CAPABILITY_IAM --template-body file://csye6225-cf-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=EC2Subnet,ParameterValue=$SUBNET_ID1 ParameterKey=RDSSubnet1,ParameterValue=$SUBNET_ID2 ParameterKey=RDSSubnet2,ParameterValue=$SUBNET_ID3 ParameterKey=KeyPair,ParameterValue=$4 ParameterKey=S3BucketName,ParameterValue=$S3_BUCKET)
+response=$(aws cloudformation create-stack --stack-name $1 --capabilities CAPABILITY_IAM --template-body file://csye6225-cf-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=EC2Subnet,ParameterValue=$SUBNET_ID1 ParameterKey=RDSSubnet1,ParameterValue=$SUBNET_ID2 ParameterKey=RDSSubnet2,ParameterValue=$SUBNET_ID3 ParameterKey=KeyPair,ParameterValue=$4 ParameterKey=S3BucketName,ParameterValue=$5)
 
 
 echo "Waiting for Stack $1 to be created"

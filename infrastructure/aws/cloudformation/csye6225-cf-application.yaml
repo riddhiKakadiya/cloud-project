@@ -215,8 +215,8 @@ Resources:
                 # - s3:ListBucket*
               Resource: 
                 Fn::Join:
-                - '.'
-                - ['arn:aws:s3:::code-deploy', {Ref: S3BucketName}]
+                - ''
+                - ['arn:aws:s3:::', {Ref: S3BucketName},'/*']
             # - 
             #   Effect: "Allow"
             #   Action:
