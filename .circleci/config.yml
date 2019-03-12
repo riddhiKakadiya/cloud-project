@@ -44,7 +44,7 @@ jobs:
           command: cd webapp/WebProject && rm -rf djangoEnv
       - run:
           name: Zip Project 
-          command: cd webapp && zip -r ~/webapp.zip *
+          command: cd webapp && zip -r ~/webapp.zip * 
       - run:
           name: List directory
           command: cd ~/ && ls
