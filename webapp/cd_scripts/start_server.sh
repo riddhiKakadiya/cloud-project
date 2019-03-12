@@ -1,4 +1,5 @@
 #!/bin/bash
+
 source /home/centos/webapp/WebProject/djangoEnv/bin/activate
 python3 /home/centos/webapp/WebProject/manage.py collectstatic
 cd /home/centos/webapp/WebProject
@@ -14,4 +15,3 @@ sudo nginx -t
 sudo systemctl daemon-reload
 sudo systemctl restart nginx
 sudo systemctl enable nginx
-export S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')
