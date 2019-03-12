@@ -11,8 +11,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-if (!os.environ['PROFILE']):
-	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_test')
+if (os.environ['PROFILE']=="dev"):
+	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_dev')
 elif (os.environ['PROFILE']=="default"):
 	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.setting_default')
 else:
