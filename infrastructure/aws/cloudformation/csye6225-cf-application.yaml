@@ -260,11 +260,5 @@ Resources:
             #   Action:
             #     - rds:*
             #   Resource: !Ref MyRDSInstance
-      Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-            - '-'
-            - [{Ref: 'AWS::StackName'}, 'csye6225', 's3roletest']
     DependsOn : MyRDSInstance
     
