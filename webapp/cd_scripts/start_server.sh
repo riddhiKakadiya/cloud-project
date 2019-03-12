@@ -14,3 +14,4 @@ sudo nginx -t
 sudo systemctl daemon-reload
 sudo systemctl restart nginx
 sudo systemctl enable nginx
+export S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')

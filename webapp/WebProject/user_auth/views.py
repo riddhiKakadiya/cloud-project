@@ -101,10 +101,7 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	print("Saving attachment to S3")
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
-	session = boto3.Session(
-	    aws_access_key_id = AWS_ACCESS_KEY_ID,
-	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
-	)
+	session = boto3.Session()
 	bucketName = settings.S3_BUCKETNAME
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
