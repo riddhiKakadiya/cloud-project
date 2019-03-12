@@ -19,6 +19,7 @@ The architecture contains networking resources such as Virtual Private Cloud (VP
 ### Executing the scripts
 #### To Create a Network Stack
 
+
 ```bash
 cd csye6225-spring2019/infrastructure/aws/cloudformation/
 ./csye6225-aws-cf-create-stack.sh <STACK_NAME>
