@@ -225,7 +225,6 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
 
-<<<<<<< HEAD
   iamRole:
     Type: AWS::IAM::Role
     Properties:
@@ -262,8 +261,7 @@ Resources:
             #     - rds:*
             #   Resource: !Ref MyRDSInstance
     DependsOn : MyRDSInstance
-    
-=======
+
   #connecting RDS to EC2 using IAM roles
   # Role
   # Type: AWS::IAM::Role
@@ -302,4 +300,3 @@ Resources:
 #         }
 #     ]
 # }     
->>>>>>> 93648381f2519fc841278c05d7f6314e80275b9b
