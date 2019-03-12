@@ -46,7 +46,7 @@ DEBUG = False
 # HOSTNAME1 = config['django_settings']['host1']
 # HOSTNAME2 = config['django_settings']['host2']
 
-ALLOWED_HOSTS = ['*' ]
+ALLOWED_HOSTS = ['*']
 
 # Define whether to run in dev environment or default(local) environment
 PROFILE = 'dev'
@@ -99,28 +99,6 @@ WSGI_APPLICATION = 'WebProject.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-# DATABASES = {}
-
-# if PROFILE == "default":
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.mysql',
-#             'NAME': config['local_db']['database'],
-#             'USER': config['local_db']['user'],
-#             'PASSWORD': config['local_db']['password']
-#         }
-#     }
-# else:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.mysql',
-#             'NAME': config['aws_rds']['database'],
-#             'USER': config['aws_rds']['user'],
-#             'PASSWORD': config['aws_rds']['password'],
-#             'HOST': config['aws_rds']['host'],
-#             'PORT': config['aws_rds']['port'],
-#         }
-#     }
 
 DATABASES = {
     'default': {

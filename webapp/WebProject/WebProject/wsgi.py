@@ -10,8 +10,12 @@ https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
-
-# if(!os.environ['DJANGO_SETTINGS_MODULE']):
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_test')
+if(os.environ['PROFILE']):
+	if (os.environ['PROFILE']=="dev"):
+		os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_dev')
+	elif (os.environ['PROFILE']=="test"):
+		os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_test')	
+else:
+	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_default')
 
 application = get_wsgi_application()
