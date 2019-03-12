@@ -254,7 +254,10 @@ Resources:
                 - s3:Get*
                 - s3:Delete*
                 - s3:ListBucket*
-              Resource: "arn:aws:s3:::code-deploy.raik.me.csye6225.com" 
+              Resource: 
+                Fn::Join:
+                - '.'
+                - ['arn:aws:s3:::code-deploy', {Ref: 'S3BucketName'}]
             # - 
             #   Effect: "Allow"
             #   Action:
