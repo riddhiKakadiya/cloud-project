@@ -27,7 +27,7 @@ S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswi
 
 ./csye6225-aws-cf-create-stack.sh $1
 
-./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3
+./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3 $S3_BUCKET
 
 cd ../../../webapp
 zip -r --exclude=*djangoEnv* ../webapp.zip *
