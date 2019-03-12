@@ -3,12 +3,12 @@ import os
 import sys
 
 if __name__ == '__main__':
-	if(os.environ['PROFILE']):
+	try:
 		if (os.environ['PROFILE']=="dev"):
 			os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_dev')
 		elif (os.environ['PROFILE']=="test"):
 			os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_test')	
-	else:
+	except:
 		os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_default')
 	try:
 		from django.core.management import execute_from_command_line
