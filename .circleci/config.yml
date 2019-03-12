@@ -3,7 +3,7 @@ jobs:
   build:
     branches:
       only:
-        - master
+        - assignment5
     docker:
       - image: circleci/python:3.5-jessie
     working_directory: ~/webapp/WebProject
