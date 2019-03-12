@@ -102,50 +102,9 @@ Resources:
       - Key: ec2-type
         Value: csye-6225
     DependsOn: 
-      - MyRDSInstance
+      # - MyRDSInstance
       - iamRole
 
-  # ListS3BucketsInstanceProfile: #S3 Bucket instance added
-  #   Type: AWS::IAM::InstanceProfile
-  #   Properties:
-  #     Path: "/"
-  #     Roles: { Ref: ListS3BucketsRole }
-
-  # ListS3BucketsPolicy:
-  #   Type: AWS::IAM::Policy
-  #   Properties:
-  #     PolicyName: ListS3BucketsPolicy
-  #     PolicyDocument:
-  #       Statement:
-  #       - Effect: Allow
-  #         Action:
-  #         - s3:List*
-  #         Resource: "*"
-  #     Roles: { Ref: ListS3BucketsRole }
-
-  # ListS3BucketsRole:
-  # Type: AWS::IAM::Role
-  # Properties:
-  #   AssumeRolePolicyDocument:
-  #     Version: '2012-10-17'
-  #     Statement:
-  #     - Effect: Allow
-  #       Principal:
-  #         Service:
-  #         - ec2.amazonaws.com
-  #       Action:
-  #       - sts:AssumeRole
-  #   Path: "/"
-  # Policies: 
-  #       - 
-  #         PolicyName: "root"
-  #         PolicyDocument: 
-  #           Version: "2012-10-17"
-  #           Statement: 
-  #             - 
-  #               Effect: "Allow"
-  #               Action: "*"
-  #               Resource: "*"
 
   MyDynamoDB: #creation of DynamoDB
     Type: AWS::DynamoDB::Table
@@ -202,28 +161,28 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds_sg']  
 
-  MyRDSInstance: 
-    Type: AWS::RDS::DBInstance
-    Properties: 
-      AllocatedStorage: "20"
-      DBInstanceClass: "db.t2.medium"
-      Engine: "mysql"
-      EngineVersion: "5.6.34"
-      MultiAZ : false
-      MasterUsername: "csye6225master"
-      MasterUserPassword: "csye6225password"
-      PubliclyAccessible: true
-      DBName: "csye6225"
-      DBSubnetGroupName: 
-        Ref: "MyRDSsubnetGroup"
-      VPCSecurityGroups:
-        - {Ref : "RDSSecurityGroup"}
-      Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-            - '-'
-            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
+  # MyRDSInstance: 
+  #   Type: AWS::RDS::DBInstance
+  #   Properties: 
+  #     AllocatedStorage: "20"
+  #     DBInstanceClass: "db.t2.medium"
+  #     Engine: "mysql"
+  #     EngineVersion: "5.6.34"
+  #     MultiAZ : false
+  #     MasterUsername: "csye6225master"
+  #     MasterUserPassword: "csye6225password"
+  #     PubliclyAccessible: true
+  #     DBName: "csye6225"
+  #     DBSubnetGroupName: 
+  #       Ref: "MyRDSsubnetGroup"
+  #     VPCSecurityGroups:
+  #       - {Ref : "RDSSecurityGroup"}
+  #     Tags:
+  #     - Key: Name
+  #       Value:
+  #         Fn::Join:
+  #           - '-'
+  #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
 
   iamRole:
     Type: AWS::IAM::Role
@@ -250,10 +209,10 @@ Resources:
             - 
               Effect: "Allow"
               Action:
-                - s3:Put*
-                - s3:Get*
-                - s3:Delete*
-                - s3:ListBucket*
+                - s3:*
+                # - s3:Get*
+                # - s3:Delete*
+                # - s3:ListBucket*
               Resource: 
                 Fn::Join:
                 - '.'
@@ -263,7 +222,7 @@ Resources:
             #   Action:
             #     - rds:*
             #   Resource: !Ref MyRDSInstance
-    DependsOn : MyRDSInstance
+    # DependsOn : MyRDSInstance
 
   #connecting RDS to EC2 using IAM roles
   # Role

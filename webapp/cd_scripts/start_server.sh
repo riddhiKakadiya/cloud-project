@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')
 source /home/centos/webapp/WebProject/djangoEnv/bin/activate
 python3 /home/centos/webapp/WebProject/manage.py collectstatic
 cd /home/centos/webapp/WebProject
