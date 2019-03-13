@@ -77,6 +77,22 @@ Resources:
       ImageId: {Ref: ImageIdparam} #Refrence to the custom AMI
       InstanceType: t2.micro
       KeyName: {Ref : "KeyPair"}
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - "\n"
+            - [ "#!/bin/bash -xe",
+                "sudo bash",
+                "cd /home/centos",
+                "cat > my.cnf << EOF",
+                "[Config]",
+                !Join ["",["RDS_HOST=",!GetAtt MyRDSInstance.Endpoint.Address]],
+                "RDS_UN=csye6225master",
+                "RDS_PASSWORD=csye6225password",
+                "RDS_DB=csye6225",
+                !Join ["",["S3_BUCKET=",!Ref S3BucketName]],
+                "EOF",
+              ]
       # IamInstanceProfile: {Ref: ListS3BucketsInstanceProfile} #reference to S3 bucket added
       BlockDeviceMappings: 
           - DeviceName: "/dev/sdm"
@@ -102,7 +118,7 @@ Resources:
       - Key: ec2-type
         Value: csye-6225
     DependsOn: 
-      # - MyRDSInstance
+      - MyRDSInstance
       - iamRole
 
 
@@ -161,28 +177,28 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds_sg']  
 
-  # MyRDSInstance: 
-  #   Type: AWS::RDS::DBInstance
-  #   Properties: 
-  #     AllocatedStorage: "20"
-  #     DBInstanceClass: "db.t2.medium"
-  #     Engine: "mysql"
-  #     EngineVersion: "5.6.34"
-  #     MultiAZ : false
-  #     MasterUsername: "csye6225master"
-  #     MasterUserPassword: "csye6225password"
-  #     PubliclyAccessible: true
-  #     DBName: "csye6225"
-  #     DBSubnetGroupName: 
-  #       Ref: "MyRDSsubnetGroup"
-  #     VPCSecurityGroups:
-  #       - {Ref : "RDSSecurityGroup"}
-  #     Tags:
-  #     - Key: Name
-  #       Value:
-  #         Fn::Join:
-  #           - '-'
-  #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
+  MyRDSInstance: 
+    Type: AWS::RDS::DBInstance
+    Properties: 
+      AllocatedStorage: "20"
+      DBInstanceClass: "db.t2.medium"
+      Engine: "mysql"
+      EngineVersion: "5.6.34"
+      MultiAZ : false
+      MasterUsername: "csye6225master"
+      MasterUserPassword: "csye6225password"
+      PubliclyAccessible: true
+      DBName: "csye6225"
+      DBSubnetGroupName: 
+        Ref: "MyRDSsubnetGroup"
+      VPCSecurityGroups:
+        - {Ref : "RDSSecurityGroup"}
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
 
   iamRole:
     Type: AWS::IAM::Role

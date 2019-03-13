@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import configparser
-import boto3
 
 try:
     HOSTNAME = socket.gethostname()
@@ -21,7 +20,14 @@ except:
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+#Get configuration from my.cnf
+#Open and parse the file
+config = configparser.ConfigParser()
+pathToConfig = os.path.join(BASE_DIR, 'WebProject/config/my.cnf')
+config.read(pathToConfig)
 
 #Get configuration from my.cnf
 #Open and parse the file
@@ -49,12 +55,7 @@ ALLOWED_HOSTS = ['*']
 # Define whether to run in dev environment or default(local) environment
 PROFILE = 'dev'
 
-s3 = boto3.resource('s3')
-
-S3_BUCKETNAME = ''
-for bucket in s3.buckets.all():
-    if('code-deploy' in bucket.name):
-        S3_BUCKETNAME=bucket.name
+S3_BUCKETNAME = config['Config']['S3_BUCKET']
 
 # Application definition
 
@@ -107,8 +108,12 @@ WSGI_APPLICATION = 'WebProject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config['Config']['RDS_DB'],
+        'USER': config['Config']['RDS_UN'],
+        'PASSWORD': config['Config']['RDS_UN'],
+        'HOST': config['Config']['RDS_HOST'],
+        'PORT': 3306,
     }
 }
 
