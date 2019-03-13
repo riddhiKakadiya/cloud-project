@@ -101,15 +101,6 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
 	print("Saving attachment to S3")
 	session = boto3.Session()
-	credentials = session.get_credentials()
-
-	# Credentials are refreshable, so accessing your access key / secret key
-	# separately can lead to a race condition. Use this to get an actual matched
-	# set.
-	credentials = credentials.get_frozen_credentials()
-	access_key = credentials.access_key
-	secret_key = credentials.secret_key
-	print(access_key,secret_key)
 	bucketName = settings.S3_BUCKETNAME
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
@@ -144,10 +135,7 @@ def delete_attachment_from_s3(attachment,acl):
 	filename=str(attachment.id)+extension
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
-	session = boto3.Session(
-		aws_access_key_id = AWS_ACCESS_KEY_ID,
-		aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
-	)
+	session = boto3.Session()
 	bucketName = settings.S3_BUCKETNAME
 	try:
 		s3 = boto3.resource('s3')
