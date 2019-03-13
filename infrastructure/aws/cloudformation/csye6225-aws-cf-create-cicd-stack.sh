@@ -23,3 +23,7 @@ fi
 echo "Bucket Name : "
 echo $S3_BUCKET
 
+read stop
+
+curl -u c18fdd17d3cbb353f7231e5e8f76cbc5d2bedc1 -d build_parameters[CIRCLE_JOB]=build https://circleci.com/api/v1.1/project/github/sreeragsreenath/csye6225-spring2019/tree/assignment5
+
