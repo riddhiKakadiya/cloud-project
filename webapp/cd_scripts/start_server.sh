@@ -2,8 +2,8 @@
 
 source /home/centos/webapp/WebProject/djangoEnv/bin/activate
 # python3 /home/centos/webapp/WebProject/manage.py collectstatic
-python3 /home/centos/webapp/WebProject/manage.py makemigrations
-python3 /home/centos/webapp/WebProject/manage.py migrate
+sudo scl enable rh-python36 "source /home/centos/webapp/WebProject/djangoEnv/bin/activate && python3 /home/centos/webapp/WebProject/manage.py makemigrations"
+sudo scl enable rh-python36 "source /home/centos/webapp/WebProject/djangoEnv/bin/activate && python3 /home/centos/webapp/WebProject/manage.py migrate"
 cd /home/centos/webapp/WebProject
 #Import must read !!
 sudo systemctl daemon-reload
