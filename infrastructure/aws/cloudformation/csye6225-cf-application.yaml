@@ -30,7 +30,7 @@ Parameters:
     Default: "code-deploy.raik.me.csye6225.com"
     Description: S3 Bucket parameter (eg test1-sree)
     Type: String
-  S3BucketName_CD:
+  S3BucketNameCD:
     Default: "code-deploy.raik.me.csye6225.com"
     Description: S3 Bucket parameter (eg test1-sree)
     Type: String
@@ -257,7 +257,7 @@ Resources:
   csye6225Webapp:
     Type: AWS::CodeDeploy::Application
     Properties: 
-      ComputePlatform : on-premises
+      ComputePlatform : Server
 
   DeploymentGroup:
     Type: AWS::CodeDeploy::DeploymentGroup
@@ -275,6 +275,7 @@ Resources:
         Enabled: true
         Events: DEPLOYMENT_FAILURE
       ServiceRoleArn: !GetAtt CodeDeployServiceRoleArn
+
 
 
                 

@@ -30,8 +30,3 @@ echo "Input Circle CI URL: "
 read URL
 
 curl -u $TOKEN -d build_parameters[CIRCLE_JOB]=build $URL
-
-#create code deploy application and group
-aws deploy create-application --application-name CodeDeployGitHubDemo-App
-
-aws deploy create-deployment-group --application-name csye6225-webapp --ec2-tag-filters Key=ec2-tag-key,Type=KEY_AND_VALUE,Value=ec2-tag-value --on-premises-tag-filters Key=on-premises-tag-key,Type=KEY_AND_VALUE,Value=on-premises-tag-value --deployment-group-name csye6225-webapp-deployment --service-role-arn service-role-arn
