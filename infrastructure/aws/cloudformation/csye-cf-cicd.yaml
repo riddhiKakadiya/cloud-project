@@ -8,8 +8,8 @@ Description: Cloud Formation to build Continuos Integration and deployment stack
     codedeployapplicationname:
       Description: Code deploy application name
       Type: String
-    S3bucketname:
-      Description: S3 bucket name
+    aws_account_id:
+      Description: aws account id
       Type: String  
     TagKey:
       Description: TagKey
@@ -58,7 +58,7 @@ Resources:
             - s3:PutObject               
         -
           Effect: Allow
-          Resource: arn:aws:codedeploy:us-east-1:AWS_ACCOUNT_ID:application:codedeployapplicationname
+          Resource: arn:aws:codedeploy:us-east-1:aws_account_id:application:codedeployapplicationname
           Action: 
             - codedeploy:RegisterApplicationRevision
             - codedeploy:GetApplicationRevision
@@ -68,6 +68,14 @@ Resources:
           Action: 
             - codedeploy:RegisterApplicationRevision
             - codedeploy:GetApplicationRevision
+        -
+          Effect: Allow
+          Resource: *
+          Action: codedeploy:GetDeploymentConfig
+          Resource:
+            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.OneAtATime
+            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.HalfAtATime
+            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.AllAtOnce
 
   CircleCiUser: 
     Type: AWS::IAM::User
@@ -81,19 +89,6 @@ Resources:
   Properties: 
     ApplicationName : {Ref: codedeployapplicationname}
     ComputePlatform : Server
-
-#       "Effect": "Allow",
-#       "Action": [
-#         "codedeploy:GetDeploymentConfig"
-#       ],
-#       "Resource": [
-#         "arn:aws:codedeploy:AWS_REGION:AWS_ACCOUNT_ID:deploymentconfig:CodeDeployDefault.OneAtATime",
-#         "arn:aws:codedeploy:AWS_REGION:AWS_ACCOUNT_ID:deploymentconfig:CodeDeployDefault.HalfAtATime",
-#         "arn:aws:codedeploy:AWS_REGION:AWS_ACCOUNT_ID:deploymentconfig:CodeDeployDefault.AllAtOnce"
-#       ]
-#     }
-#   ]
-# }
 
 
    
