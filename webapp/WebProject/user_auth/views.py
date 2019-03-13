@@ -99,8 +99,6 @@ def update_attachment_to_local(file_to_upload,filename,note,attachment):
 def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
 	print("Saving attachment to S3")
-	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
-	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
 	session = boto3.Session()
 	bucketName = settings.S3_BUCKETNAME
 	url = "dummy"
