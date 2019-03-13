@@ -21,7 +21,8 @@ from django.conf import settings
 #--------------------------------------------------------------------------------
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
-def save_attachments(file_to_upload,filename,note):
+def save_attachments(file_to_upload,filename,	note):
+	print("settings.PROFILE :", settings.PROFILE)
 	if (settings.PROFILE  == "dev"):
 		attachment = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
@@ -99,13 +100,51 @@ def update_attachment_to_local(file_to_upload,filename,note,attachment):
 def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
 	print("Saving attachment to S3")
-	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
-	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+	# AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
+	# AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+	# try:
+	# 	# client = boto3.client('sts')
+	# 	# response = client.assume_role(
+	# 	# 	RoleArn='arn:aws:iam::458078667552:role/CodeDeployEC2ServiceRole',
+	# 	# 	RoleSessionName='ExampleSessionName')
+	# 	# session =  boto3.Session(
+ #  #       aws_access_key_id=response['Credentials']['AccessKeyId'],
+ #  #       aws_secret_access_key=response['Credentials']['SecretAccessKey'],
+ #  #       aws_session_token=response['Credentials']['SessionToken'])
+	# 	# print("Credentials :", response['AccessKeyId'], response['SecretAccessKey'])
+
+	# 	# sts_client = boto3.client('sts')
+	# 	# # Call the assume_role method of the STSConnection object and pass the role
+	# 	# # ARN and a role session name.
+	# 	# assumed_role_object=sts_client.assume_role(
+	# 	#     RoleArn="arn:aws:iam::458078667552:role/CodeDeployEC2ServiceRole",
+	# 	#     RoleSessionName="AssumeRoleSession1"
+	# 	# )
+	# 	# credentials=assumed_role_object['Credentials']
+	# 	# print("Credentials :", credentials['AccessKeyId'], credentials['SecretAccessKey'])
+	# 	# s3_resource=boto3.resource(
+	# 	# 's3',
+	# 	# aws_access_key_id=credentials['AccessKeyId'],
+	# 	# aws_secret_access_key=credentials['SecretAccessKey'],
+	# 	# aws_session_token=credentials['SessionToken'],
+	# 	# )
+	# 	# # Use the Amazon S3 resource object that is now configured with the 
+	# 	# # credentials to access your S3 buckets. 
+	# 	# print("Bucket Names")
+	# 	# for bucket in s3_resource.buckets.all():
+	# 	# 	print("------------")
+	# 	# 	print(bucket.name)
+	# 	# cf = boto3.client('cloudformation')
+	# 	# s3 = boto3.client('waf')
+
+	# except Exception as e:
+	# 	print("Something Happend", e)
+
 	session = boto3.Session()
-	bucketName = settings.S3_BUCKETNAME
+	bucketName = "csye6225-spring2019-sonij.me.csye6225.com"#settings.S3_BUCKETNAME
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
-	attachment.save()
+	attachment.save()	
 	filename, file_extension = os.path.splitext(filename)
 	filename = str(attachment.id) + file_extension
 	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
