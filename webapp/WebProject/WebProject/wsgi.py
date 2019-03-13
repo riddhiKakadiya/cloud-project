@@ -11,7 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 try:
-	if (os.environ['DEPLOYMENT_GROUP_NAME']=="csye6225-webapp-deployment"):
+	if (os.environ['PROFILE']=="dev"):
 		os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_dev')
 	else:
 		os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_test')	

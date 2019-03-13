@@ -4,7 +4,7 @@ import sys
 
 if __name__ == '__main__':
 	try:
-		if (os.environ['DEPLOYMENT_GROUP_NAME']=="csye6225-webapp-deployment"):
+		if (os.environ['PROFILE']=="dev"):
 			os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_dev')
 		else:
 			os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebProject.settings_test')	

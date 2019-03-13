@@ -6,7 +6,7 @@ After=network.target
 User=centos
 Group=nginx
 WorkingDirectory=/home/centos/webapp/WebProject
-ExecStart=PROFILE=dev /home/centos/webapp/WebProject/djangoEnv/bin/gunicorn --workers 3 --bind unix:/home/centos/webapp/WebProject.sock WebProject.wsgi:application
+ExecStart=/home/centos/webapp/WebProject/djangoEnv/bin/gunicorn --workers 3 --bind unix:/home/centos/webapp/WebProject.sock WebProject.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
