@@ -23,7 +23,7 @@ from django.conf import settings
 # --------------------------------------------------------------------------------
 def save_attachments(file_to_upload,filename,	note):
 	print("settings.PROFILE :", settings.PROFILE)
-	if (settings.PROFILE  == "default"):
+	if (settings.PROFILE  == "dev"):
 		attachment = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
 		attachment = save_attachment_to_local(file_to_upload,filename,note)
