@@ -200,7 +200,33 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
 
+  csye6225-webapp:
+    Type: AWS::CodeDeploy::Application
+    Properties: 
+      ComputePlatform : on-premises
 
+  DeploymentGroup:
+  Type: AWS::CodeDeploy::DeploymentGroup
+  Properties:
+    ApplicationName: !Ref: csye6225-webapp 
+    DeploymentGroupName: !Ref csye6225-webapp-deployment
+    Ec2TagFilters:
+      - 
+        Key: !Ref ec2TagFilter
+        Value: !Ref ec2TagFilter
+        Type: KEY_AND_VALUE
+    LoadBalancerInfo:
+      ElbInfoList:
+        - Name: !Ref myELB
+    DeploymentStyle:
+      DeploymentOption: In-place
+    ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
+    TriggerConfigurations:
+      - TriggerEvents:
+          - DeploymentSuccess
+          - DeploymentFailure
+        TriggerName: MyTarget
+        TriggerTargetArn: !Ref mySNSTopic
 
   iamRole:
     Type: AWS::IAM::Role
