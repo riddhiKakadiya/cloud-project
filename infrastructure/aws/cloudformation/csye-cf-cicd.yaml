@@ -1,94 +1,31 @@
-AWSTemplateFormatVersion": '2010-09-09'
-Description: Cloud Formation to build Continuos Integration and deployment stack
 
-  Parameters:
-    Deploymentgroupname:
-      Description: Deployment group name
-      Type: String
-    codedeployapplicationname:
-      Description: Code deploy application name
-      Type: String
-    aws_account_id:
-      Description: aws account id
-      Type: String  
-    TagKey:
-      Description: TagKey
-      Type: String
-    TagValue:
-      Description: TagValue
-      Type: String  
+    
+  csye6225-webapp:
+    Type: AWS::CodeDeploy::Application
+    Properties: 
+      ComputePlatform : on-premises
 
-Resources:
-  
-  CodeDeploy-EC2-S3-Role:
-  Type: AWS::IAM::Role
-  Properties: 
-    AssumeRolePolicyDocument:
-      Version: "2012-10-17"
-      Statement: 
-        -
-          Action: 
-            - s3:Get*
-            - s3:List*
-          Effect: Allow
-          Resource: *
-
-  CircleCI-Upload-To-S3-Role:        
-  Type: AWS::IAM::Role
-  Properties: 
-    AssumeRolePolicyDocument:
-      Version: "2012-10-17"
-      Statement: 
-        -
-          Action: 
-            - s3:PutObject
-          Effect: Allow
-          Resource: *  
-
-  CirlceCI-Code-Deploy-Role:
-  Type: AWS::IAM::Role
-  Properties: 
-    AssumeRolePolicyDocument:
-      Version: "2012-10-17"
-      Statement: 
-        -
-          Effect: Allow
-          Resource: *    
-          Action: 
-            - s3:PutObject               
-        -
-          Effect: Allow
-          Resource: arn:aws:codedeploy:us-east-1:aws_account_id:application:codedeployapplicationname
-          Action: 
-            - codedeploy:RegisterApplicationRevision
-            - codedeploy:GetApplicationRevision
-        -
-          Effect: Allow
-          Resource: *
-          Action: 
-            - codedeploy:RegisterApplicationRevision
-            - codedeploy:GetApplicationRevision
-        -
-          Effect: Allow
-          Resource: *
-          Action: codedeploy:GetDeploymentConfig
-          Resource:
-            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.OneAtATime
-            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.HalfAtATime
-            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.AllAtOnce
-
-  CircleCiUser: 
-    Type: AWS::IAM::User
-    Properties : 
-      -
-      Path: /
-      UserName: CircleCiUser
-
-  codedeployapplication:
-  Type: AWS::CodeDeploy::Application
-  Properties: 
-    ApplicationName : {Ref: codedeployapplicationname}
-    ComputePlatform : Server
-
+  DeploymentGroup:
+  Type: AWS::CodeDeploy::DeploymentGroup
+  Properties:
+    ApplicationName: !Ref: csye6225-webapp 
+    DeploymentGroupName: !Ref csye6225-webapp-deployment
+    Ec2TagFilters:
+      - 
+        Key: !Ref ec2TagFilter
+        Value: !Ref ec2TagFilter
+        Type: KEY_AND_VALUE
+    LoadBalancerInfo:
+      ElbInfoList:
+        - Name: !Ref myELB
+    DeploymentStyle:
+      DeploymentOption: In-place
+    ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
+    TriggerConfigurations:
+      - TriggerEvents:
+          - DeploymentSuccess
+          - DeploymentFailure
+        TriggerName: MyTarget
+        TriggerTargetArn: !Ref mySNSTopic
 
    
