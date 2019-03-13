@@ -30,6 +30,10 @@ Parameters:
     Default: "code-deploy.raik.me.csye6225.com"
     Description: S3 Bucket parameter (eg test1-sree)
     Type: String
+  S3BucketName_CD:
+    Default: "code-deploy.raik.me.csye6225.com"
+    Description: S3 Bucket parameter (eg test1-sree)
+    Type: String
 
 
 Resources:
@@ -229,7 +233,7 @@ Resources:
               Resource: 
                 Fn::Join:
                 - ''
-                - ['arn:aws:s3:::','*']
+                - ['arn:aws:s3:::',!Ref S3BucketName_CD,'/*']
 
   CodeDeployServiceRole:
   Type: AWS::IAM::Role
@@ -278,3 +282,5 @@ Resources:
 
                 
   
+
+                
