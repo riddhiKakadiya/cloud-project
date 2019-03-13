@@ -262,7 +262,7 @@ Resources:
   DeploymentGroup:
     Type: AWS::CodeDeploy::DeploymentGroup
     Properties:
-      ApplicationName: !Ref: csye6225Webapp 
+      ApplicationName: !Ref csye6225Webapp 
       DeploymentGroupName: csye6225-webapp-deployment
       Ec2TagFilters: 
         Type: KEY_AND_VALUE
@@ -274,7 +274,7 @@ Resources:
       AutoRollbackConfiguration:
         Enabled: true
         Events: DEPLOYMENT_FAILURE
-      ServiceRoleArn: !GetAtt CodeDeployServiceRoleArn
+      ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
 
 
 
