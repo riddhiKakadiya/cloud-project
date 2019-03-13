@@ -30,6 +30,10 @@ Parameters:
     Default: "code-deploy.raik.me.csye6225.com"
     Description: S3 Bucket parameter (eg test1-sree)
     Type: String
+  S3BucketName_CD:
+    Default: "code-deploy.raik.me.csye6225.com"
+    Description: S3 Bucket parameter (eg test1-sree)
+    Type: String
 
 
 Resources:
@@ -229,50 +233,4 @@ Resources:
               Resource: 
                 Fn::Join:
                 - ''
-                - ['arn:aws:s3:::','*']
-                # - ['arn:aws:s3:::', {Ref: S3BucketName},'*/*']
-            # - 
-            #   Effect: "Allow"
-            #   Action:
-            #     - rds:*
-            #   Resource: !Ref MyRDSInstance
-    # DependsOn : MyRDSInstance
-
-  #connecting RDS to EC2 using IAM roles
-  # Role
-  # Type: AWS::IAM::Role
-  # Properties: 
-  #   AssumeRolePolicyDocument:
-  #     JSON object
-  #   ManagedPolicyArns:
-  #     - String
-  #   MaxSessionDuration: Integer
-  #   Path: String
-  #   PermissionsBoundary: String
-  #   Policies:
-  #     - Policies
-  #   RoleName: String
-      
-
-#   RDSaccessRole: 
-#   Type: AWS::IAM::Role
-#   Properties: 
-#     AssumeRolePolicyDocument:
-#       Version: "2012-10-17"
-#       Statement: 
-#         -
-#           Effect: "Allow"
-#           Principal: 
-#             Service: 
-#               - "ec2.amazonaws.com" 
-#           Action: 
-#             - "rds:*"  #or - "sts:AssumeRole"
-#            Resource": ["arn:aws:rds:region::"]
-#         },
-#         {
-#             "Effect": "Allow",
-#             "Action": ["rds:Describe*"],
-#             "Resource": ["*"]
-#         }
-#     ]
-# }     
+                - ['arn:aws:s3:::',!Ref S3BucketName_CD,'/*']

@@ -29,6 +29,6 @@ S3_BUCKET_CD=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | start
 
 ./csye6225-aws-cf-create-stack.sh $1
 
-./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3 $S3_BUCKET
+./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3 $S3_BUCKET $S3_BUCKET_CD
 
 ./csye6225-aws-cf-create-cicd-stack.sh cicd
