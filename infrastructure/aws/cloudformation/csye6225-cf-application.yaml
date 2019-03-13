@@ -137,9 +137,6 @@ Resources:
   #           - '-'
   #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'S3']
 
-
-
-
   # MyDynamoDB: #creation of DynamoDB
   #   Type: AWS::DynamoDB::Table
   #   Properties:
