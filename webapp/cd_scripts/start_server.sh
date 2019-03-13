@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+source /home/centos/webapp/WebProject/djangoEnv/bin/activate
 # python3 /home/centos/webapp/WebProject/manage.py collectstatic
 python3 /home/centos/webapp/WebProject/manage.py makemigrations
 python3 /home/centos/webapp/WebProject/manage.py migrate

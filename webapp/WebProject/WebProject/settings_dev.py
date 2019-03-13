@@ -111,7 +111,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': config['Config']['RDS_DB'],
         'USER': config['Config']['RDS_UN'],
-        'PASSWORD': config['Config']['RDS_UN'],
+        'PASSWORD': config['Config']['RDS_PASSWORD'],
         'HOST': config['Config']['RDS_HOST'],
         'PORT': 3306,
     }
