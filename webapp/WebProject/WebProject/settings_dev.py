@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import configparser
+import boto3
 
 try:
     HOSTNAME = socket.gethostname()
@@ -48,7 +49,12 @@ ALLOWED_HOSTS = ['*']
 # Define whether to run in dev environment or default(local) environment
 PROFILE = 'dev'
 
-S3_BUCKETNAME=os.environ['S3_BUCKET']
+s3 = boto3.resource('s3')
+
+S3_BUCKETNAME = ''
+for bucket in s3.buckets.all():
+    if('code-deploy' in bucket.name):
+        S3_BUCKETNAME=bucket.name
 
 # Application definition
 
