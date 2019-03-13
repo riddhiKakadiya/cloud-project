@@ -100,44 +100,6 @@ def update_attachment_to_local(file_to_upload,filename,note,attachment):
 def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
 	print("Saving attachment to S3")
-<<<<<<< HEAD
-
-	try:
-		sts_client = boto3.client('sts')
-
-		# Call the assume_role method of the STSConnection object and pass the role
-		# ARN and a role session name.
-
-		assumed_role_object=sts_client.assume_role(
-			RoleArn="arn:aws:iam::458078667552:role/CodeDeployServiceRole",
-			RoleSessionName="AssumeRoleSession1"
-		)
-
-		# From the response that contains the assumed role, get the temporary 
-		# credentials that can be used to make subsequent API calls
-		credentials=assumed_role_object['Credentials']
-		print("Credentials :",credentials['AccessKeyId'],credentials['SecretAccessKey'])
-		# Use the temporary credentials that AssumeRole returns to make a 
-		# connection to Amazon S3  
-		s3_resource=boto3.resource(
-			's3',
-			aws_access_key_id=credentials['AccessKeyId'],
-			aws_secret_access_key=credentials['SecretAccessKey'],
-			aws_session_token=credentials['SessionToken'],
-		)
-
-		# Use the Amazon S3 resource object that is now configured with the 
-		# credentials to access your S3 buckets. 
-		for bucket in s3_resource.buckets.all():
-			print(bucket.name)
-	except Exception as e:
-		# This is a catch all exception, edit this part to fit your needs.
-		print("Something Happened: ", e)
-		return e
-
-	session = boto3.Session()
-	bucketName = "csye6225-spring2019-sonij.me.csye6225.com"#settings.S3_BUCKETNAME
-=======
 	session = boto3.Session()
 	credentials = session.get_credentials()
 
@@ -149,7 +111,6 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	secret_key = credentials.secret_key
 	print(access_key,secret_key)
 	bucketName = settings.S3_BUCKETNAME
->>>>>>> afc83e2960ba225c74a3c26bd0f1d50bf93438a0
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
 	attachment.save()	
