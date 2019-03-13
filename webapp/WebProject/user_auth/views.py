@@ -256,36 +256,34 @@ def is_valid_uuid(uuid_to_test, version=4):
 def registerPage(request):
 	# check if method is post
 	if request.method == 'POST':
-		# check if body is not empty
-		if (request.body):
-			try:
-				username = request.POST.get('username')
-				password = request.POST.get('password')
-				if (username == "" or password == "" or username == None or password == None):
-					return JsonResponse({'message': 'Username or password cant be empty'})
-				username_status = validateUserName(username)
-				password_status = validatePassword(password)
-				if (username_status == True and password_status == True):
-					email = username
-					if not User.objects.filter(username=username).exists():
-						user = User.objects.create_user(username, email, password)
-						user.is_staff = True
-						user.save()
+		try:
+			username = request.POST.get('username')
+			password = request.POST.get('password')
+			if (username == "" or password == "" or username == None or password == None):
+				return JsonResponse({'message': 'Username or password cant be empty'})
+			username_status = validateUserName(username)
+			password_status = validatePassword(password)
+			if (username_status == True and password_status == True):
+				email = username
+				if not User.objects.filter(username=username).exists():
+					user = User.objects.create_user(username, email, password)
+					user.is_staff = True
+					user.save()
 
-						return JsonResponse({"message": " : User created"})
-					else:
-						return JsonResponse({'Error': "User already exists"})
-
+					return JsonResponse({"message": " : User created"})
 				else:
-					if (password_status == True):
-						return JsonResponse({"message": username_status})
-					elif (username_status == True):
-						return JsonResponse({"message": password_status})
-					else:
-						return JsonResponse({'message': username_status + " " + password_status})
-			except:
+					return JsonResponse({'Error': "User already exists"})
 
-				JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
+			else:
+				if (password_status == True):
+					return JsonResponse({"message": username_status})
+				elif (username_status == True):
+					return JsonResponse({"message": password_status})
+				else:
+					return JsonResponse({'message': username_status + " " + password_status})
+		except:
+
+			JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
 
 	# If all the cases fail then return error message
 	return JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
