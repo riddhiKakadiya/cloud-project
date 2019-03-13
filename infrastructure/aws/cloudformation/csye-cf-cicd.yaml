@@ -1,22 +1,22 @@
 AWSTemplateFormatVersion": '2010-09-09'
 Description: Cloud Formation to build Continuos Integration and deployment stack
 
-  Parameters:
-    Deploymentgroupname:
-      Description: Deployment group name
-      Type: String
-    codedeployapplicationname:
-      Description: Code deploy application name
-      Type: String
-    aws_account_id:
-      Description: aws account id
-      Type: String  
-    TagKey:
-      Description: TagKey
-      Type: String
-    TagValue:
-      Description: TagValue
-      Type: String  
+Parameters:
+  Deploymentgroupname:
+    Description: Deployment group name
+    Type: String
+  codedeployapplicationname:
+    Description: Code deploy application name
+    Type: String
+  aws_account_id:
+    Description: aws account id
+    Type: String  
+  TagKey:
+    Description: TagKey
+    Type: String
+  TagValue:
+    Description: TagValue
+    Type: String  
 
 Resources:
   
@@ -58,7 +58,7 @@ Resources:
             - s3:PutObject               
         -
           Effect: Allow
-          Resource: arn:aws:codedeploy:us-east-1:aws_account_id:application:codedeployapplicationname
+          Resource: arn:aws:codedeploy:us-east-1:362989020786 :application:codedeployapplicationname
           Action: 
             - codedeploy:RegisterApplicationRevision
             - codedeploy:GetApplicationRevision
@@ -70,25 +70,29 @@ Resources:
             - codedeploy:GetApplicationRevision
         -
           Effect: Allow
-          Resource: *
-          Action: codedeploy:GetDeploymentConfig
           Resource:
-            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.OneAtATime
-            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.HalfAtATime
-            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.AllAtOnce
+            - arn:aws:codedeploy:us-east-1:362989020786 :deploymentconfig:CodeDeployDefault.OneAtATime
+            - arn:aws:codedeploy:us-east-1:362989020786 :deploymentconfig:CodeDeployDefault.HalfAtATime
+            - arn:aws:codedeploy:us-east-1:362989020786 :deploymentconfig:CodeDeployDefault.AllAtOnce
+          Action: codedeploy:GetDeploymentConfig
 
-  CircleCiUser: 
-    Type: AWS::IAM::User
-    Properties : 
-      -
-      Path: /
-      UserName: CircleCiUser
 
-  codedeployapplication:
-  Type: AWS::CodeDeploy::Application
-  Properties: 
-    ApplicationName : {Ref: codedeployapplicationname}
-    ComputePlatform : Server
+  # CircleCiUser: 
+  #   Type: AWS::IAM::User
+  #   Properties : 
+  #     -
+  #     Path: /
+  #     UserName: CircleCiUser
+
+  # codedeployapplication:
+  # Type: AWS::CodeDeploy::Application
+  # Properties: 
+  #   ApplicationName : {Ref: codedeployapplicationname}
+  #   ComputePlatform : Server
+
+
+
+  
 
 
    

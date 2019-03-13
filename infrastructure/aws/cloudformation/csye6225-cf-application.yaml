@@ -238,6 +238,24 @@ Resources:
             #   Resource: !Ref MyRDSInstance
     # DependsOn : MyRDSInstance
 
+  CodeDeployServiceRole:
+  Type: AWS::IAM::Role
+  Properties:
+    Path: "/"
+    AssumeRolePolicyDocument: 
+      Version: "2012-10-17" 
+      Statement:
+         - 
+          Effect: "Allow" 
+          Principal:
+            Service: 
+              - "ec2.amazonaws.com" 
+          Action: 
+            - "sts:AssumeRole" 
+    ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole         
+    
+
   #connecting RDS to EC2 using IAM roles
   # Role
   # Type: AWS::IAM::Role
