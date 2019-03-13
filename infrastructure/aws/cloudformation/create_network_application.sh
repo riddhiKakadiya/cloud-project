@@ -5,19 +5,19 @@ set -e
 ##Check if enough arguements are passed
 if [ $# -lt 1 ]; then
   echo "Please provide network stack name ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <AMI_ID> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <KEY_PAIR>"
   exit 1
 fi
 
 if [ $# -lt 2 ]; then
   echo "Please provide application stack name ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <AMI_ID> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <KEY_PAIR>"
   exit 1
 fi
 
 if [ $# -lt 3 ]; then
   echo "Please provide Key Pair ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <AMI_ID> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <STACK_NAME> <NETWORK_STACK> <KEY_PAIR>"
   exit 1
 fi
 
@@ -28,6 +28,8 @@ S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswi
 ./csye6225-aws-cf-create-stack.sh $1
 
 ./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3 $S3_BUCKET
+
+# curl -u c18fdd17d3cbb353f7231e5e8f76cbc5d2bebdc1 -d build_parameters[CIRCLE_JOB]=build https://circleci.com/api/v1.1/project/github/sreeragsreenath/csye6225-spring2019/tree/assignment5
 
 cd ../../../webapp
 zip -r --exclude=*djangoEnv* ../webapp.zip *
