@@ -30,6 +30,10 @@ Parameters:
     Default: "code-deploy.raik.me.csye6225.com"
     Description: S3 Bucket parameter (eg test1-sree)
     Type: String
+  S3BucketNameCD:
+    Default: "code-deploy.raik.me.csye6225.com"
+    Description: S3 Bucket parameter (eg test1-sree)
+    Type: String
 
 
 Resources:
@@ -243,14 +247,48 @@ Resources:
               Resource: 
                 Fn::Join:
                 - ''
-                - ['arn:aws:s3:::','*']
-                # - ['arn:aws:s3:::', {Ref: S3BucketName},'*/*']
-            # - 
-            #   Effect: "Allow"
-            #   Action:
-            #     - rds:*
-            #   Resource: !Ref MyRDSInstance
-    # DependsOn : MyRDSInstance
+                - ['arn:aws:s3:::',!Ref S3BucketName_CD,'/*']
+
+  CodeDeployServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17" 
+        Statement:
+           - 
+            Effect: "Allow" 
+            Principal:
+              Service: 
+                - "ec2.amazonaws.com" 
+            Action: 
+              - "sts:AssumeRole" 
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole 
+      Path: "/"
+      RoleName: "CodeDeployServiceRole"           
+
+  csye6225Webapp:
+    Type: AWS::CodeDeploy::Application
+    Properties: 
+      ComputePlatform : Server
+
+  DeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      ApplicationName: !Ref csye6225Webapp 
+      DeploymentGroupName: csye6225-webapp-deployment
+      Ec2TagFilters: 
+        Type: KEY_AND_VALUE
+        Key: ec2-type
+        Value: csye-6225
+      DeploymentStyle:
+        DeploymentOption: IN_PLACE
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce  
+      AutoRollbackConfiguration:
+        Enabled: true
+        Events: DEPLOYMENT_FAILURE
+      ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
 
   CodeDeployServiceRole:
   Type: AWS::IAM::Role
@@ -267,44 +305,4 @@ Resources:
           Action: 
             - "sts:AssumeRole" 
     ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole         
-    
-
-  #connecting RDS to EC2 using IAM roles
-  # Role
-  # Type: AWS::IAM::Role
-  # Properties: 
-  #   AssumeRolePolicyDocument:
-  #     JSON object
-  #   ManagedPolicyArns:
-  #     - String
-  #   MaxSessionDuration: Integer
-  #   Path: String
-  #   PermissionsBoundary: String
-  #   Policies:
-  #     - Policies
-  #   RoleName: String
-      
-
-#   RDSaccessRole: 
-#   Type: AWS::IAM::Role
-#   Properties: 
-#     AssumeRolePolicyDocument:
-#       Version: "2012-10-17"
-#       Statement: 
-#         -
-#           Effect: "Allow"
-#           Principal: 
-#             Service: 
-#               - "ec2.amazonaws.com" 
-#           Action: 
-#             - "rds:*"  #or - "sts:AssumeRole"
-#            Resource": ["arn:aws:rds:region::"]
-#         },
-#         {
-#             "Effect": "Allow",
-#             "Action": ["rds:Describe*"],
-#             "Resource": ["*"]
-#         }
-#     ]
-# }     
+      - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole                   
