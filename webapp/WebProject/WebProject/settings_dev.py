@@ -20,7 +20,14 @@ except:
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+#Get configuration from my.cnf
+#Open and parse the file
+config = configparser.ConfigParser()
+pathToConfig = os.path.join(BASE_DIR, 'WebProject/config/my.cnf')
+config.read(pathToConfig)
 
 #Get configuration from my.cnf
 #Open and parse the file
@@ -41,15 +48,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'l_k3zyn7$2j*vsvk&m3t5&*bp++r*=v*$c9gmoiy9z0xk5u_6m'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-# HOSTNAME1 = config['django_settings']['host1']
-# HOSTNAME2 = config['django_settings']['host2']
-
-ALLOWED_HOSTS = ['*' ]
+ALLOWED_HOSTS = ['*']
 
 # Define whether to run in dev environment or default(local) environment
 PROFILE = 'dev'
+
+S3_BUCKETNAME = config['Config']['S3_BUCKET']
 
 # Application definition
 
@@ -99,33 +105,15 @@ WSGI_APPLICATION = 'WebProject.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-# DATABASES = {}
-
-# if PROFILE == "default":
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.mysql',
-#             'NAME': config['local_db']['database'],
-#             'USER': config['local_db']['user'],
-#             'PASSWORD': config['local_db']['password']
-#         }
-#     }
-# else:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.mysql',
-#             'NAME': config['aws_rds']['database'],
-#             'USER': config['aws_rds']['user'],
-#             'PASSWORD': config['aws_rds']['password'],
-#             'HOST': config['aws_rds']['host'],
-#             'PORT': config['aws_rds']['port'],
-#         }
-#     }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config['Config']['RDS_DB'],
+        'USER': config['Config']['RDS_UN'],
+        'PASSWORD': config['Config']['RDS_PASSWORD'],
+        'HOST': config['Config']['RDS_HOST'],
+        'PORT': 3306,
     }
 }
 

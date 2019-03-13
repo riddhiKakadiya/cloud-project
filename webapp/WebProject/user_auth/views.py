@@ -99,12 +99,16 @@ def update_attachment_to_local(file_to_upload,filename,note,attachment):
 def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
 	print("Saving attachment to S3")
-	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
-	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
-	session = boto3.Session(
-	    aws_access_key_id = AWS_ACCESS_KEY_ID,
-	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
-	)
+	session = boto3.Session()
+	credentials = session.get_credentials()
+
+	# Credentials are refreshable, so accessing your access key / secret key
+	# separately can lead to a race condition. Use this to get an actual matched
+	# set.
+	credentials = credentials.get_frozen_credentials()
+	access_key = credentials.access_key
+	secret_key = credentials.secret_key
+	print(access_key,secret_key)
 	bucketName = settings.S3_BUCKETNAME
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
@@ -252,37 +256,34 @@ def is_valid_uuid(uuid_to_test, version=4):
 def registerPage(request):
 	# check if method is post
 	if request.method == 'POST':
-		# check if body is not empty
-		if (request.body):
-			received_json_data = json.loads(request.body.decode("utf-8"))
-			try:
-				username = received_json_data['username']
-				password = received_json_data['password']
-				if (username == "" or password == "" or username == None or password == None):
-					return JsonResponse({'message': 'Username or password cant be empty'})
-				username_status = validateUserName(username)
-				password_status = validatePassword(password)
-				if (username_status == True and password_status == True):
-					email = username
-					if not User.objects.filter(username=username).exists():
-						user = User.objects.create_user(username, email, password)
-						user.is_staff = True
-						user.save()
+		try:
+			username = request.POST.get('username')
+			password = request.POST.get('password')
+			if (username == "" or password == "" or username == None or password == None):
+				return JsonResponse({'message': 'Username or password cant be empty'})
+			username_status = validateUserName(username)
+			password_status = validatePassword(password)
+			if (username_status == True and password_status == True):
+				email = username
+				if not User.objects.filter(username=username).exists():
+					user = User.objects.create_user(username, email, password)
+					user.is_staff = True
+					user.save()
 
-						return JsonResponse({"message": " : User created"})
-					else:
-						return JsonResponse({'Error': "User already exists"})
-
+					return JsonResponse({"message": " : User created"})
 				else:
-					if (password_status == True):
-						return JsonResponse({"message": username_status})
-					elif (username_status == True):
-						return JsonResponse({"message": password_status})
-					else:
-						return JsonResponse({'message': username_status + " " + password_status})
-			except:
+					return JsonResponse({'Error': "User already exists"})
 
-				JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
+			else:
+				if (password_status == True):
+					return JsonResponse({"message": username_status})
+				elif (username_status == True):
+					return JsonResponse({"message": password_status})
+				else:
+					return JsonResponse({'message': username_status + " " + password_status})
+		except:
+
+			JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
 
 	# If all the cases fail then return error message
 	return JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})

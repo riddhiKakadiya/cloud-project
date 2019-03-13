@@ -58,7 +58,45 @@ Resources:
             - s3:PutObject               
         -
           Effect: Allow
-          Resource: arn:aws:codedeploy:AWS_REGION:AWS_ACCOUNT_ID:application:codedeployapplicationname
+          Resource: arn:aws:codedeploy:us-east-1:AWS_ACCOUNT_ID:application:codedeployapplicationname
           Action: 
             - codedeploy:RegisterApplicationRevision
             - codedeploy:GetApplicationRevision
+        -
+          Effect: Allow
+          Resource: *
+          Action: 
+            - codedeploy:RegisterApplicationRevision
+            - codedeploy:GetApplicationRevision
+
+
+
+  codedeployapplication:
+  Type: AWS::CodeDeploy::Application
+  Properties: 
+    ApplicationName : {Ref: codedeployapplicationname}
+    ComputePlatform : Server
+
+#       "Effect": "Allow",
+#       "Action": [
+#         "codedeploy:GetDeploymentConfig"
+#       ],
+#       "Resource": [
+#         "arn:aws:codedeploy:AWS_REGION:AWS_ACCOUNT_ID:deploymentconfig:CodeDeployDefault.OneAtATime",
+#         "arn:aws:codedeploy:AWS_REGION:AWS_ACCOUNT_ID:deploymentconfig:CodeDeployDefault.HalfAtATime",
+#         "arn:aws:codedeploy:AWS_REGION:AWS_ACCOUNT_ID:deploymentconfig:CodeDeployDefault.AllAtOnce"
+#       ]
+#     }
+#   ]
+# }
+
+
+
+
+# CircleCiUser: 
+#             Type: AWS::IAM::User
+#             Properties : 
+#               -
+#               Path: /
+#               UserName: CircleCiUser
+   
