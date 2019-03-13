@@ -56,3 +56,9 @@ Resources:
           Resource: *    
           Action: 
             - s3:PutObject               
+        -
+          Effect: Allow
+          Resource: arn:aws:codedeploy:AWS_REGION:AWS_ACCOUNT_ID:application:codedeployapplicationname
+          Action: 
+            - codedeploy:RegisterApplicationRevision
+            - codedeploy:GetApplicationRevision
