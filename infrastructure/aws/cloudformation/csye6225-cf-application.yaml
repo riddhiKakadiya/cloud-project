@@ -255,29 +255,29 @@ Resources:
   csye6225-webapp:
     Type: AWS::CodeDeploy::Application
     Properties: 
-      ComputePlatform : on-premises
+      ComputePlatform : Server
 
-  DeploymentGroup:
-  Type: AWS::CodeDeploy::DeploymentGroup
-  Properties:
-    ApplicationName: !Ref: csye6225-webapp 
-    DeploymentGroupName: !Ref csye6225-webapp-deployment
-    Ec2TagFilters: 
-      Type: KEY_AND_VALUE
-      Key: ec2-type
-      Value: csye-6225
-    DeploymentStyle:
-      DeploymentOption: IN_PLACE
-    AutoRollbackConfiguration:
-      Enabled: true
-      Events: DEPLOYMENT_FAILURE
-    ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
-    TriggerConfigurations:
-      - TriggerEvents:
-          - DeploymentSuccess
-          - DeploymentFailure
-        TriggerName: MyTarget
-        TriggerTargetArn: !Ref mySNSTopic
+  # DeploymentGroup:
+  # Type: AWS::CodeDeploy::DeploymentGroup
+  # Properties:
+  #   ApplicationName: !Ref: csye6225-webapp 
+  #   DeploymentGroupName: csye6225-webapp-deployment
+  #   Ec2TagFilters: 
+  #     Type: KEY_AND_VALUE
+  #     Key: ec2-type
+  #     Value: csye-6225
+  #   DeploymentStyle:
+  #     DeploymentOption: IN_PLACE
+  #   AutoRollbackConfiguration:
+  #     Enabled: true
+  #     Events: DEPLOYMENT_FAILURE
+  #   ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
+  #   TriggerConfigurations:
+  #     - TriggerEvents:
+  #         - DeploymentSuccess
+  #         - DeploymentFailure
+  #       TriggerName: MyTarget
+  #       TriggerTargetArn: !Ref mySNSTopic
 
 
                 
