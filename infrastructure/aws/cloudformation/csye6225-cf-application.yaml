@@ -236,48 +236,46 @@ Resources:
                 - ['arn:aws:s3:::',!Ref S3BucketName_CD,'/*']
 
   CodeDeployServiceRole:
-  Type: AWS::IAM::Role
-  Properties:
-    Path: "/"
-    AssumeRolePolicyDocument: 
-      Version: "2012-10-17" 
-      Statement:
-         - 
-          Effect: "Allow" 
-          Principal:
-            Service: 
-              - "ec2.amazonaws.com" 
-          Action: 
-            - "sts:AssumeRole" 
-    ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole          
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17" 
+        Statement:
+           - 
+            Effect: "Allow" 
+            Principal:
+              Service: 
+                - "ec2.amazonaws.com" 
+            Action: 
+              - "sts:AssumeRole" 
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole 
+      Path: "/"
+      RoleName: "CodeDeployServiceRole"           
 
-  csye6225-webapp:
+  csye6225Webapp:
     Type: AWS::CodeDeploy::Application
     Properties: 
       ComputePlatform : Server
 
-  # DeploymentGroup:
-  # Type: AWS::CodeDeploy::DeploymentGroup
-  # Properties:
-  #   ApplicationName: !Ref: csye6225-webapp 
-  #   DeploymentGroupName: csye6225-webapp-deployment
-  #   Ec2TagFilters: 
-  #     Type: KEY_AND_VALUE
-  #     Key: ec2-type
-  #     Value: csye-6225
-  #   DeploymentStyle:
-  #     DeploymentOption: IN_PLACE
-  #   AutoRollbackConfiguration:
-  #     Enabled: true
-  #     Events: DEPLOYMENT_FAILURE
-  #   ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
-  #   TriggerConfigurations:
-  #     - TriggerEvents:
-  #         - DeploymentSuccess
-  #         - DeploymentFailure
-  #       TriggerName: MyTarget
-  #       TriggerTargetArn: !Ref mySNSTopic
+  DeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      ApplicationName: !Ref csye6225Webapp 
+      DeploymentGroupName: csye6225-webapp-deployment
+      Ec2TagFilters: 
+        Type: KEY_AND_VALUE
+        Key: ec2-type
+        Value: csye-6225
+      DeploymentStyle:
+        DeploymentOption: IN_PLACE
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce  
+      AutoRollbackConfiguration:
+        Enabled: true
+        Events: DEPLOYMENT_FAILURE
+      ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
+
 
 
                 
