@@ -8,8 +8,8 @@ Description: Cloud Formation to build Continuos Integration and deployment stack
     codedeployapplicationname:
       Description: Code deploy application name
       Type: String
-    S3bucketname:
-      Description: S3 bucket name
+    aws_account_id:
+      Description: aws account id
       Type: String  
     TagKey:
       Description: TagKey
@@ -56,3 +56,39 @@ Resources:
           Resource: *    
           Action: 
             - s3:PutObject               
+        -
+          Effect: Allow
+          Resource: arn:aws:codedeploy:us-east-1:aws_account_id:application:codedeployapplicationname
+          Action: 
+            - codedeploy:RegisterApplicationRevision
+            - codedeploy:GetApplicationRevision
+        -
+          Effect: Allow
+          Resource: *
+          Action: 
+            - codedeploy:RegisterApplicationRevision
+            - codedeploy:GetApplicationRevision
+        -
+          Effect: Allow
+          Resource: *
+          Action: codedeploy:GetDeploymentConfig
+          Resource:
+            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.OneAtATime
+            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.HalfAtATime
+            - arn:aws:codedeploy:us-east-1:aws_account_id:deploymentconfig:CodeDeployDefault.AllAtOnce
+
+  CircleCiUser: 
+    Type: AWS::IAM::User
+    Properties : 
+      -
+      Path: /
+      UserName: CircleCiUser
+
+  codedeployapplication:
+  Type: AWS::CodeDeploy::Application
+  Properties: 
+    ApplicationName : {Ref: codedeployapplicationname}
+    ComputePlatform : Server
+
+
+   
