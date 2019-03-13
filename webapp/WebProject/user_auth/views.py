@@ -258,10 +258,9 @@ def registerPage(request):
 	if request.method == 'POST':
 		# check if body is not empty
 		if (request.body):
-			received_json_data = json.loads(request.body.decode("utf-8"))
 			try:
-				username = received_json_data['username']
-				password = received_json_data['password']
+				username = request.POST.get('username')
+				password = request.POST.get('password')
 				if (username == "" or password == "" or username == None or password == None):
 					return JsonResponse({'message': 'Username or password cant be empty'})
 				username_status = validateUserName(username)
