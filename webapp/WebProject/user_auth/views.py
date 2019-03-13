@@ -23,7 +23,7 @@ from django.conf import settings
 # --------------------------------------------------------------------------------
 def save_attachments(file_to_upload,filename,	note):
 	print("settings.PROFILE :", settings.PROFILE)
-	if (settings.PROFILE  == "dev"):
+	if (settings.PROFILE  == "default"):
 		attachment = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
 		attachment = save_attachment_to_local(file_to_upload,filename,note)
@@ -101,6 +101,39 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
 	print("Saving attachment to S3")
 
+	try:
+		sts_client = boto3.client('sts')
+
+		# Call the assume_role method of the STSConnection object and pass the role
+		# ARN and a role session name.
+
+		assumed_role_object=sts_client.assume_role(
+			RoleArn="arn:aws:iam::458078667552:role/CodeDeployServiceRole",
+			RoleSessionName="AssumeRoleSession1"
+		)
+
+		# From the response that contains the assumed role, get the temporary 
+		# credentials that can be used to make subsequent API calls
+		credentials=assumed_role_object['Credentials']
+		print("Credentials :",credentials['AccessKeyId'],credentials['SecretAccessKey'])
+		# Use the temporary credentials that AssumeRole returns to make a 
+		# connection to Amazon S3  
+		s3_resource=boto3.resource(
+			's3',
+			aws_access_key_id=credentials['AccessKeyId'],
+			aws_secret_access_key=credentials['SecretAccessKey'],
+			aws_session_token=credentials['SessionToken'],
+		)
+
+		# Use the Amazon S3 resource object that is now configured with the 
+		# credentials to access your S3 buckets. 
+		for bucket in s3_resource.buckets.all():
+			print(bucket.name)
+	except Exception as e:
+		# This is a catch all exception, edit this part to fit your needs.
+		print("Something Happened: ", e)
+		return e
+
 	session = boto3.Session()
 	bucketName = "csye6225-spring2019-sonij.me.csye6225.com"#settings.S3_BUCKETNAME
 	url = "dummy"
@@ -137,8 +170,8 @@ def delete_attachment_from_s3(attachment,acl):
 	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
 	session = boto3.Session(
-	    aws_access_key_id = AWS_ACCESS_KEY_ID,
-	    aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
+		aws_access_key_id = AWS_ACCESS_KEY_ID,
+		aws_secret_access_key = AWS_SECRET_ACCESS_KEY,
 	)
 	bucketName = settings.S3_BUCKETNAME
 	try:
