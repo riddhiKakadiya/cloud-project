@@ -70,7 +70,12 @@ def delete_attachment(attachment):
 # --------------------------------------------------------------------------------
 def save_attachment_to_local(file_to_upload,filename,note):
 	url = os.path.join(settings.MEDIA_ROOT, filename)
-	attachment = Attachment(url = url, note = note)
+	meta={}
+	meta['note_id'] = str(note.id)
+	meta['user_id'] = str(note.user)
+	meta['filename'] = str(filename)
+	metadata = str(meta)
+	attachment = Attachment(url = url, note = note,metadata = metadata)
 	attachment.save()
 	filename, file_extension = os.path.splitext(filename)
 	filename = str(attachment.id) + file_extension
@@ -105,6 +110,7 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
 	attachment.save()	
+	orignal_filename = filename
 	filename, file_extension = os.path.splitext(filename)
 	filename = str(attachment.id) + file_extension
 	attachment.url = 'https://s3.amazonaws.com/'+bucketName+'/'+filename
@@ -113,6 +119,7 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 		meta = {}
 		meta['note_id'] = str(note.id)
 		meta['user_id'] = str(note.user)
+		meta['filename'] = str(orignal_filename)
 		s3 = session.client('s3')
 		s3.upload_fileobj(
 			file_to_upload,
