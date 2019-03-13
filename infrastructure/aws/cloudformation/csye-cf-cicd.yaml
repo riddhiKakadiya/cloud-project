@@ -69,7 +69,12 @@ Resources:
             - codedeploy:RegisterApplicationRevision
             - codedeploy:GetApplicationRevision
 
-
+  CircleCiUser: 
+    Type: AWS::IAM::User
+    Properties : 
+      -
+      Path: /
+      UserName: CircleCiUser
 
   codedeployapplication:
   Type: AWS::CodeDeploy::Application
@@ -91,12 +96,4 @@ Resources:
 # }
 
 
-
-
-# CircleCiUser: 
-#             Type: AWS::IAM::User
-#             Properties : 
-#               -
-#               Path: /
-#               UserName: CircleCiUser
    
