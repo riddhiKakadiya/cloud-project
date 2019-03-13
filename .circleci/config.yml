@@ -1,14 +1,11 @@
 version: 2
 jobs:
   build:
-    branches:
-      only:
-        - assignment5
+    working_directory: ~/webapp/WebProject
     docker:
       - image: circleci/python:3.5-jessie
-    working_directory: ~/webapp/WebProject
     steps:
-      - checkout:
+      - checkout
       - run:
           name: List directory
           command: cd webapp/WebProject && ls
@@ -53,6 +50,7 @@ jobs:
           command: aws s3 cp ~/webapp.zip s3://$S3_BUCKET
       - run: 
           name: Deploy to AWS EC2
+<<<<<<< HEAD
           command: aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=$S3_BUCKET,bundleType=zip,key=webapp.zip 
 #   deploy:
 #     steps:
@@ -71,3 +69,14 @@ jobs:
 #       - deploy:
 #           requires:
 #             - build
+=======
+          command: S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name') && aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=$S3_BUCKET,bundleType=zip,key=webapp.zip
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build:
+          filters:
+              branches:
+                only: assignment5
+>>>>>>> afc83e2960ba225c74a3c26bd0f1d50bf93438a0

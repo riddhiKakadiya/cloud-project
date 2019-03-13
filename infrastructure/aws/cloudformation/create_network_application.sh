@@ -23,22 +23,23 @@ fi
 
 IMAGE_ID=$(aws ec2 describe-images --owners self --query 'sort_by(Images, &CreationDate)[].ImageId' | jq -r '.[0]')
 
-S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')
+S3_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("csye6225")).Name')
+
+S3_BUCKET_CD=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("code-deploy")).Name')
 
 ./csye6225-aws-cf-create-stack.sh $1
 
 ./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3 $S3_BUCKET
 
-# curl -u c18fdd17d3cbb353f7231e5e8f76cbc5d2bebdc1 -d build_parameters[CIRCLE_JOB]=build https://circleci.com/api/v1.1/project/github/sreeragsreenath/csye6225-spring2019/tree/assignment5
+curl -u c18fdd17d3cbb353f7231e5e8f76cbc5d2bedc1 -d build_parameters[CIRCLE_JOB]=build https://circleci.com/api/v1.1/project/github/sreeragsreenath/csye6225-spring2019/tree/assignment5
 
-cd ../../../webapp
-zip -r --exclude=*djangoEnv* ../webapp.zip *
+# echo "Enter Token for Circle CI, followed by [ENTER]:"
+# read CI_Token
 
-cd ..
+# echo "Enter Username for Github, followed by [ENTER]:"
+# read USERNAME
 
-aws s3 cp webapp.zip s3://$S3_BUCKET
+# echo "Enter Branch for Github, followed by [ENTER]:"
+# read Branch
 
-aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "Deployment From creation" --s3-location bucket=$S3_BUCKET,bundleType=zip,key=webapp.zip
-
-rm webapp.zip
-cd infrastructure/aws/cloudformation
+# curl -u $CI_Token -d build_parameters[CIRCLE_JOB]=build https://circleci.com/api/v1.1/project/github/$USERNAME/csye6225-spring2019/tree/$Branch
