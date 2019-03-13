@@ -100,6 +100,15 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
 	print("Saving attachment to S3")
 	session = boto3.Session()
+	credentials = session.get_credentials()
+
+	# Credentials are refreshable, so accessing your access key / secret key
+	# separately can lead to a race condition. Use this to get an actual matched
+	# set.
+	credentials = credentials.get_frozen_credentials()
+	access_key = credentials.access_key
+	secret_key = credentials.secret_key
+	print(access_key,secret_key)
 	bucketName = settings.S3_BUCKETNAME
 	url = "dummy"
 	attachment = Attachment(url = url, note = note)
