@@ -200,34 +200,6 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
 
-  csye6225-webapp:
-    Type: AWS::CodeDeploy::Application
-    Properties: 
-      ComputePlatform : on-premises
-
-  DeploymentGroup:
-  Type: AWS::CodeDeploy::DeploymentGroup
-  Properties:
-    ApplicationName: !Ref: csye6225-webapp 
-    DeploymentGroupName: !Ref csye6225-webapp-deployment
-    Ec2TagFilters:
-      - 
-        Key: !Ref ec2TagFilter
-        Value: !Ref ec2TagFilter
-        Type: KEY_AND_VALUE
-    LoadBalancerInfo:
-      ElbInfoList:
-        - Name: !Ref myELB
-    DeploymentStyle:
-      DeploymentOption: In-place
-    ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
-    TriggerConfigurations:
-      - TriggerEvents:
-          - DeploymentSuccess
-          - DeploymentFailure
-        TriggerName: MyTarget
-        TriggerTargetArn: !Ref mySNSTopic
-
   iamRole:
     Type: AWS::IAM::Role
     Properties:
@@ -258,49 +230,51 @@ Resources:
                 Fn::Join:
                 - ''
                 - ['arn:aws:s3:::','*']
-                # - ['arn:aws:s3:::', {Ref: S3BucketName},'*/*']
-            # - 
-            #   Effect: "Allow"
-            #   Action:
-            #     - rds:*
-            #   Resource: !Ref MyRDSInstance
-    # DependsOn : MyRDSInstance
 
-  #connecting RDS to EC2 using IAM roles
-  # Role
-  # Type: AWS::IAM::Role
-  # Properties: 
-  #   AssumeRolePolicyDocument:
-  #     JSON object
-  #   ManagedPolicyArns:
-  #     - String
-  #   MaxSessionDuration: Integer
-  #   Path: String
-  #   PermissionsBoundary: String
-  #   Policies:
-  #     - Policies
-  #   RoleName: String
-      
+  CodeDeployServiceRole:
+  Type: AWS::IAM::Role
+  Properties:
+    Path: "/"
+    AssumeRolePolicyDocument: 
+      Version: "2012-10-17" 
+      Statement:
+         - 
+          Effect: "Allow" 
+          Principal:
+            Service: 
+              - "ec2.amazonaws.com" 
+          Action: 
+            - "sts:AssumeRole" 
+    ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole          
 
-#   RDSaccessRole: 
-#   Type: AWS::IAM::Role
-#   Properties: 
-#     AssumeRolePolicyDocument:
-#       Version: "2012-10-17"
-#       Statement: 
-#         -
-#           Effect: "Allow"
-#           Principal: 
-#             Service: 
-#               - "ec2.amazonaws.com" 
-#           Action: 
-#             - "rds:*"  #or - "sts:AssumeRole"
-#            Resource": ["arn:aws:rds:region::"]
-#         },
-#         {
-#             "Effect": "Allow",
-#             "Action": ["rds:Describe*"],
-#             "Resource": ["*"]
-#         }
-#     ]
-# }     
+  csye6225-webapp:
+    Type: AWS::CodeDeploy::Application
+    Properties: 
+      ComputePlatform : on-premises
+
+  DeploymentGroup:
+  Type: AWS::CodeDeploy::DeploymentGroup
+  Properties:
+    ApplicationName: !Ref: csye6225-webapp 
+    DeploymentGroupName: !Ref csye6225-webapp-deployment
+    Ec2TagFilters: 
+      Type: KEY_AND_VALUE
+      Key: ec2-type
+      Value: csye-6225
+    DeploymentStyle:
+      DeploymentOption: IN_PLACE
+    AutoRollbackConfiguration:
+      Enabled: true
+      Events: DEPLOYMENT_FAILURE
+    ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
+    TriggerConfigurations:
+      - TriggerEvents:
+          - DeploymentSuccess
+          - DeploymentFailure
+        TriggerName: MyTarget
+        TriggerTargetArn: !Ref mySNSTopic
+
+
+                
+  
