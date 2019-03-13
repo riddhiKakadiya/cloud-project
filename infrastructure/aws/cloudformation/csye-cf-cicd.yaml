@@ -1,98 +1,66 @@
-AWSTemplateFormatVersion": '2010-09-09'
-Description: Cloud Formation to build Continuos Integration and deployment stack
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cloud Formation to build Continuos Integration and deployment stack for Circle CI
 
 Parameters:
-  Deploymentgroupname:
-    Description: Deployment group name
+  AWSAccountId:
+    Description: AWSAccountId
     Type: String
-  codedeployapplicationname:
-    Description: Code deploy application name
+  CodeDeployApplicationName:
+    Description: CodeDeployApplicationName
     Type: String
-  aws_account_id:
-    Description: aws account id
-    Type: String  
-  TagKey:
-    Description: TagKey
+  AWSRegion:
+    Description: CodeDeployApplicationName
     Type: String
-  TagValue:
-    Description: TagValue
-    Type: String  
-
+  S3BucketName:
+    Description: S3BucketName
+    Type: String
 Resources:
-  
-  CodeDeploy-EC2-S3-Role:
-  Type: AWS::IAM::Role
-  Properties: 
-    AssumeRolePolicyDocument:
-      Version: "2012-10-17"
-      Statement: 
-        -
-          Action: 
-            - s3:Get*
-            - s3:List*
-          Effect: Allow
-          Resource: *
 
-  CircleCI-Upload-To-S3-Role:        
-  Type: AWS::IAM::Role
-  Properties: 
-    AssumeRolePolicyDocument:
-      Version: "2012-10-17"
-      Statement: 
-        -
-          Action: 
-            - s3:PutObject
-          Effect: Allow
-          Resource: *  
-
-  CirlceCI-Code-Deploy-Role:
-  Type: AWS::IAM::Role
-  Properties: 
-    AssumeRolePolicyDocument:
-      Version: "2012-10-17"
-      Statement: 
-        -
-          Effect: Allow
-          Resource: *    
-          Action: 
-            - s3:PutObject               
-        -
-          Effect: Allow
-          Resource: arn:aws:codedeploy:us-east-1:362989020786 :application:codedeployapplicationname
-          Action: 
-            - codedeploy:RegisterApplicationRevision
-            - codedeploy:GetApplicationRevision
-        -
-          Effect: Allow
-          Resource: *
-          Action: 
-            - codedeploy:RegisterApplicationRevision
-            - codedeploy:GetApplicationRevision
-        -
-          Effect: Allow
-          Resource:
-            - arn:aws:codedeploy:us-east-1:362989020786 :deploymentconfig:CodeDeployDefault.OneAtATime
-            - arn:aws:codedeploy:us-east-1:362989020786 :deploymentconfig:CodeDeployDefault.HalfAtATime
-            - arn:aws:codedeploy:us-east-1:362989020786 :deploymentconfig:CodeDeployDefault.AllAtOnce
-          Action: codedeploy:GetDeploymentConfig
-
-
-  # CircleCiUser: 
-  #   Type: AWS::IAM::User
-  #   Properties : 
-  #     -
-  #     Path: /
-  #     UserName: CircleCiUser
-
-  # codedeployapplication:
-  # Type: AWS::CodeDeploy::Application
-  # Properties: 
-  #   ApplicationName : {Ref: codedeployapplicationname}
-  #   ComputePlatform : Server
-
-
-
-  
-
-
-   
+  CircleCIUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: CircleCI1
+      Path: "/"
+      LoginProfile:
+        Password: Test@123
+      Policies:
+      - PolicyName: CodeDeployEC2S3
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement: 
+            Action: 
+              - "s3:Get*"
+              - "s3:List*"
+            Effect: Allow
+            Resource: !Join ["",["arn:aws:s3:::",!Ref S3BucketName,"/*"]]
+      - PolicyName: CircleCIUploadToS3
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement: 
+            Action: 
+              - "s3:PutObject"
+            Effect: Allow
+            Resource: !Join ["",["arn:aws:s3:::",!Ref S3BucketName,"/*"]]
+      - PolicyName: CirlceCICodeDeploy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement: 
+            - Effect: Allow
+              Action: 
+                - "codedeploy:RegisterApplicationRevision"
+                - "codedeploy:GetApplicationRevision"
+              Resource: 
+                - !Join ["",["arn:aws:codedeploy:",!Ref AWSRegion,":",!Ref AWSAccountId,":application:",!Ref CodeDeployApplicationName]]
+            - Effect: Allow
+              Action: 
+                - "codedeploy:CreateDeployment"
+                - "codedeploy:GetDeployment"
+              Resource: "*"
+            - Effect: Allow
+              Action: 
+                - "codedeploy:GetDeploymentConfig"
+              Resource: 
+                - !Join ["",["arn:aws:codedeploy:",!Ref AWSRegion,":",!Ref AWSAccountId,":deploymentconfig:CodeDeployDefault.OneAtATime"]]
+                - !Join ["",["arn:aws:codedeploy:",!Ref AWSRegion,":",!Ref AWSAccountId,":deploymentconfig:CodeDeployDefault.HalfAtATime"]]
+                - !Join ["",["arn:aws:codedeploy:",!Ref AWSRegion,":",!Ref AWSAccountId,":deploymentconfig:CodeDeployDefault.AllAtOnce"]]
