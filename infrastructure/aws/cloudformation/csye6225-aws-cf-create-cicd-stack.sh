@@ -1,5 +1,3 @@
-echo "Enter the stack name(cicd),Deployment group name, Code Deploy application name, aws account id, Tag Key & Tag value of the ec2 instance you want to connect to deployment group."
-
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
 AWS_REGION="us-east-1"
 CODE_DEPLOY_APPLICATION_NAME="csye6225-webapp"
