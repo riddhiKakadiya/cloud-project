@@ -1,3 +1,4 @@
+
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Cloud Formation to build Continuos Integration and deployment stack for Circle CI
 
@@ -15,6 +16,7 @@ Parameters:
     Description: S3BucketName
     Type: String
 Resources:
+
   CircleCIUser:
     Type: AWS::IAM::User
     Properties:

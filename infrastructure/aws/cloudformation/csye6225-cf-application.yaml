@@ -125,6 +125,17 @@ Resources:
       - MyRDSInstance
       - iamRole
 
+  # S3Bucket:
+  # Type: AWS::S3::Bucket
+  # Properties: 
+  #   AccessControl: Private
+  #   Bucketname: !Ref S3BucketName
+  #   Tags:
+  #     - Key: Name
+  #       Value:
+  #         Fn::Join:
+  #           - '-'
+  #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'S3']
 
   # MyDynamoDB: #creation of DynamoDB
   #   Type: AWS::DynamoDB::Table
@@ -278,9 +289,4 @@ Resources:
           - DEPLOYMENT_FAILURE
       ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
 
-
-
-                
-  
-
-                
+                 
