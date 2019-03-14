@@ -15,6 +15,7 @@ class NotesModel(models.Model):
 class Attachment(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	url = models.CharField(max_length=1000)
-	note = models.ForeignKey(NotesModel, on_delete=models.CASCADE)	
+	note = models.ForeignKey(NotesModel, on_delete=models.CASCADE)
+	metadata = models.CharField(max_length=5000, default = "")
 	def __str__(self):
 		return (str(self.id))

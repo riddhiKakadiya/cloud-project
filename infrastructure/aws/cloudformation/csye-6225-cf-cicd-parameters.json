@@ -1,0 +1,21 @@
+[
+  {
+    "ParameterKey": "AWSAccountId",
+    "ParameterValue": "00",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "CodeDeployApplicationName",
+    "ParameterValue": "codeDeployAppName",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "AWSRegion",
+    "ParameterValue": "us-east-1",
+    "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "S3BucketNameCD",
+    "ParameterValue": "cicdBucketName",
+    "UsePreviousValue": true
+  }]

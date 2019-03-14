@@ -28,5 +28,10 @@
     "ParameterKey": "KeyPair",
     "ParameterValue": "test1-sree",
     "UsePreviousValue": true
+  },
+  {
+    "ParameterKey": "S3BucketName",
+    "ParameterValue": "code-deploy.raik.me.csye6225.com",
+    "UsePreviousValue": true
   }
 ]
