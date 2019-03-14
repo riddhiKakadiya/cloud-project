@@ -244,48 +244,42 @@ Resources:
               Resource: 
                 Fn::Join:
                 - ''
-                - ['arn:aws:s3:::',!Ref S3BucketName_CD,'/*']
+                - ['arn:aws:s3:::',!Ref S3BucketNameCD,'/*']
 
   CodeDeployServiceRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
-      Path: "/"
-      AssumeRolePolicyDocument: 
-        Version: "2012-10-17" 
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
         Statement:
-           - 
-            Effect: "Allow" 
+          - Effect: Allow
             Principal:
-              Service: 
-                - "ec2.amazonaws.com" 
-            Action: 
-              - "sts:AssumeRole" 
+              Service:
+                - codedeploy.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole 
-      Path: "/"
-      RoleName: "CodeDeployServiceRole"           
-
+        - 'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole'
+      RoleName: CodeDeployServiceRole
   csye6225Webapp:
-    Type: AWS::CodeDeploy::Application
-    Properties: 
-      ComputePlatform : Server
-
-  DeploymentGroup:
-    Type: AWS::CodeDeploy::DeploymentGroup
+    Type: 'AWS::CodeDeploy::Application'
     Properties:
-      ApplicationName: !Ref csye6225Webapp 
+      ApplicationName: csye6225-webapp
+      ComputePlatform: Server
+  DeploymentGroup:
+    Type: 'AWS::CodeDeploy::DeploymentGroup'
+    Properties:
+      ApplicationName: !Ref csye6225Webapp
       DeploymentGroupName: csye6225-webapp-deployment
-      Ec2TagFilters: 
-      -
-        Type: KEY_AND_VALUE
-        Key: ec2-type
-        Value: csye-6225
-      DeploymentStyle:
-        DeploymentOption: IN_PLACE
-      DeploymentConfigName: CodeDeployDefault.AllAtOnce  
+      Ec2TagFilters:
+        - Type: KEY_AND_VALUE
+          Key: ec2-type
+          Value: csye-6225
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce
       AutoRollbackConfiguration:
         Enabled: true
-        Events: 
+        Events:
           - DEPLOYMENT_FAILURE
       ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
 
