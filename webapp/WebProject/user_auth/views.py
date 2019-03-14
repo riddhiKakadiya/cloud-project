@@ -52,10 +52,10 @@ def get_note_details(note):
 
 def update_attachment(file_to_upload,filename,note,attachment):
 	if (settings.PROFILE  == "dev"):
-		response = update_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note,attachment=attachment)
+		new_attachment = update_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note,attachment=attachment)
 	else:
-		response = update_attachment_to_local(file_to_upload,filename,note,attachment)
-	return response
+		new_attachment = update_attachment_to_local(file_to_upload,filename,note,attachment)
+	return new_attachment
 
 def delete_attachment(attachment):
 	if (settings.PROFILE  == "dev"):
@@ -95,8 +95,8 @@ def delete_attachment_from_local(attachment):
 
 def update_attachment_to_local(file_to_upload,filename,note,attachment):
 	delete_attachment_from_local(attachment)
-	save_attachment_to_local(file_to_upload,filename,note)	
-	return JsonResponse({'message': 'File Updated in local'}, status=200)
+	new_attachment = save_attachment_to_local(file_to_upload,filename,note)	
+	return new_attachment
 
 #--------------------------------------------------------------------------------
 # Function definitions for AWS S3 - dev profile
@@ -156,8 +156,8 @@ def delete_attachment_from_s3(attachment,acl):
 def update_attachment_to_s3(file_to_upload,filename,acl,note, attachment):
 #Get AWS keys from local aws_credentials file
 	delete_attachment(attachment)
-	save_attachments(file_to_upload,filename,note)
-	return JsonResponse({'message': 'File Updated in S3'}, status=200)
+	new_attachment = save_attachments(file_to_upload,filename,note)
+	return new_attachment
 
 #--------------------------------------------------------------------------------
 # Function definitions
@@ -508,10 +508,11 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 					if(note.user == user):
 						if(attachment.note == note):
 							file = request.FILES['attachment']
-							update_attachment(file_to_upload=file, filename= file._get_name(), note=note,attachment=attachment)
+							new_attachment = update_attachment(file_to_upload=file, filename= file._get_name(), note=note,attachment=attachment)
 							note.last_updated_on = datetime.datetime.now()
 							note.save()
-							return JsonResponse({'message': 'Attachment Updated'}, status=200)
+							message = get_attachment_details(new_attachment)
+							return JsonResponse(message, status=200)
 						else:
 							return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
 					else:
