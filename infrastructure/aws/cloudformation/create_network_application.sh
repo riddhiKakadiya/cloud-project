@@ -5,19 +5,19 @@ set -e
 ##Check if enough arguements are passed
 if [ $# -lt 1 ]; then
   echo "Please provide network stack name ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <CICD_STACK> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <KEY_PAIR>"
   exit 1
 fi
 
 if [ $# -lt 2 ]; then
   echo "Please provide application stack name ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <CICD_STACK> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <KEY_PAIR>"
   exit 1
 fi
 
 if [ $# -lt 3 ]; then
   echo "Please provide Key Pair ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <CICD_STACK> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <KEY_PAIR>"
   exit 1
 fi
 
