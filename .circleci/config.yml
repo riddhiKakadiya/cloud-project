@@ -58,4 +58,6 @@ workflows:
       - build:
           filters:
               branches:
-                only: assignment5
+                only: 
+                  - assignment5
+                  - master
