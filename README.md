@@ -78,11 +78,56 @@ cd csye6225-spring2019/webapp/WebProject/
 python3 manage.py createsuperuser
 ```
 
+
 ## Build Instructions
+Pre-requisites: You need to have "Postman" installed
+
+1. Clone the git repository.
+2. Traverse to the folder /csye6225-spring2019/webapp
+
+```bash
+curl -u c18fdd17d3cbb353f7231e5e8f76cbc5d2bebdc1 -d build_parameters[CIRCLE_JOB]=build https://circleci.com/api/v1.1/project/github/sreeragsreenath/csye6225-spring2019/tree/assignment5
+```
+
+
+## Instruction To run application
+1. Make Unauthenticated HTTP Request Execute following command on your bash shell
+
+```bash
+$ curl http://{EC2_hostname}
+```
+Message Response:
+
+{"message":"you are not logged in!!!"}
+
+
+2. Authenticate for HTTP Request Execute following command on your bash shell
+
+```bash
+$ curl -u user:password http://{EC2_hostname}
+```
+
+where user is the username and password is the password. Expected Response:
+
+{"message":"you are logged in. current time is Thu Mar 14 12:03:49 EDT 2019"}
+
+Execute following command on your bash shell
+
+```bash
+$ curl -u user:password http://{EC2_hostname}/user/register
+```
+
+where user is the username and password is the password. Expected Response:
+
+Registered successfully
 
 
 ## Deploy Instructions
 
+
+```bash
+aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=$S3_BUCKET,bundleType=zip,key=webapp.zip 
+```
 
 ## Running Tests
 
