@@ -69,11 +69,9 @@ Resources:
     Properties:
       Path: "/"
       Roles: 
-        # - CodeDeployEC2ServiceRole
-        - !Ref iamRole
+        - !Ref CodeDeployEC2ServiceRole
     DependsOn: 
-      # - MyRDSInstance
-      - iamRole
+      - CodeDeployEC2ServiceRole
   MyEC2Instance: #Creation of EC2
     Type: "AWS::EC2::Instance"
     Properties: 
@@ -97,7 +95,6 @@ Resources:
                 !Join ["",["S3_BUCKET=",!Ref S3BucketName]],
                 "EOF",
               ]
-      # IamInstanceProfile: {Ref: ListS3BucketsInstanceProfile} #reference to S3 bucket added
       BlockDeviceMappings: 
           - DeviceName: "/dev/sdm"
             Ebs: 
@@ -123,7 +120,7 @@ Resources:
         Value: csye-6225
     DependsOn: 
       - MyRDSInstance
-      - iamRole
+      - CodeDeployEC2ServiceRole
 
   # S3Bucket:
   # Type: AWS::S3::Bucket
@@ -137,27 +134,27 @@ Resources:
   #           - '-'
   #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'S3']
 
-  # MyDynamoDB: #creation of DynamoDB
-  #   Type: AWS::DynamoDB::Table
-  #   Properties:
-  #     AttributeDefinitions:
-  #       - 
-  #         AttributeName: "id"
-  #         AttributeType: "S"
-  #     KeySchema:
-  #       - 
-  #         AttributeName: "id"
-  #         KeyType: "HASH"
-  #     ProvisionedThroughput: 
-  #       ReadCapacityUnits: "5"
-  #       WriteCapacityUnits: "5"
-  #     TableName: "csye6225"
-  #     Tags:
-  #     - Key: Name
-  #       Value:
-  #         Fn::Join:
-  #           - '-'
-  #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
+  MyDynamoDB: #creation of DynamoDB
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - 
+          AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "csye6225"
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Join:
+            - '-'
+            - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
 
   MyRDSsubnetGroup: 
     Type: AWS::RDS::DBSubnetGroup
@@ -215,10 +212,11 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
 
-  iamRole:
+  CodeDeployEC2ServiceRole:
     Type: AWS::IAM::Role
     Properties:
       Path: "/"
+      RoleName: CodeDeployEC2ServiceRole
       AssumeRolePolicyDocument: 
         Version: "2012-10-17" 
         Statement:
@@ -240,47 +238,25 @@ Resources:
             - 
               Effect: "Allow"
               Action:
-                - s3:*
+                - "s3:Get*"
+                - "s3:List*"
               Resource: 
                 Fn::Join:
                 - ''
-                - ['arn:aws:s3:::*/','*']
+                - ['arn:aws:s3:::',!Ref S3BucketNameCD,'/*']
+        -
+          PolicyName: "Attachment-EC2-S3"
+          PolicyDocument:
+           Version: "2012-10-17"
+           Statement:            
+            - 
+              Effect: "Allow"
+              Action:
+                - "s3:*"
+              Resource: 
+                Fn::Join:
+                - ''
+                - ['arn:aws:s3:::',!Ref S3BucketName,'/*']
 
-  CodeDeployServiceRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      Path: /
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - codedeploy.amazonaws.com
-            Action:
-              - 'sts:AssumeRole'
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole'
-      RoleName: CodeDeployServiceRole
-  csye6225Webapp:
-    Type: 'AWS::CodeDeploy::Application'
-    Properties:
-      ApplicationName: csye6225-webapp
-      ComputePlatform: Server
-  DeploymentGroup:
-    Type: 'AWS::CodeDeploy::DeploymentGroup'
-    Properties:
-      ApplicationName: !Ref csye6225Webapp
-      DeploymentGroupName: csye6225-webapp-deployment
-      Ec2TagFilters:
-        - Type: KEY_AND_VALUE
-          Key: ec2-type
-          Value: csye-6225
-      DeploymentConfigName: CodeDeployDefault.AllAtOnce
-      AutoRollbackConfiguration:
-        Enabled: true
-        Events:
-          - DEPLOYMENT_FAILURE
-      ServiceRoleArn: !GetAtt CodeDeployServiceRole.Arn
 
                  
