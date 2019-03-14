@@ -56,13 +56,6 @@ press Ctrl+c
 deactivate
 ```
 
-## To run test
-
-```bash
-cd csye6225-spring2019/webapp/WebProject/
-python3 manage.py test
-```
-
 #### Other common commands
 1. To make database migrations, navigate to csye6225-spring2019/webapp/WebProject/
 
@@ -131,12 +124,18 @@ Registered successfully
 
 
 ```bash
-aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=$S3_BUCKET,bundleType=zip,key=webapp.zip 
+aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=$S3_BUCKET,bundleType=zip,key=webapp.zip 
 ```
 
 ## Running Tests
 
+```bash
+cd csye6225-spring2019/webapp/WebProject/
+python3 manage.py test
+```
+
 
 ## CI/CD
+Any changes made to master branch will trigger a new build
 
 

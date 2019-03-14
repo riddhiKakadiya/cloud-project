@@ -58,13 +58,25 @@ cd csye6225-spring2019/infrastructure/aws/cloudformation/
 
 The example code will setup a stack named 'MyAppStack'. The paramaters required for the script can be configured in 'csye-6225-cf-application-parameters.json'.
 
+#### To create network and application stack using one script
+
+```bash
+cd csye6225-spring2019/infrastructure/aws/cloudformation/
+./csye6225-aws-cf-create-stack
+```
+#### To create CICD stack
+
+```bash
+cd csye6225-spring2019/infrastructure/aws/cloudformation/
+./csye6225-aws-cf-create-cicd-stack
+```
+
 #### To Terminate a Application Stack
 
 ```bash
 cd csye6225-spring2019/infrastructure/aws/cloudformation/
 ./csye6225-aws-cf-terminate-application-stack.sh
 ```
-
 
 The above code will list available stacks and ask for the STACK_NAME to be deleted.
 
