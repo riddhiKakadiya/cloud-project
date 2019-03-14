@@ -1,4 +1,4 @@
-echo "Enter the stack name(cicd),Deployment group name, Code Deploy application name, aws account id, Tag Key & Tag value of the ec2 instance you want to connect to deployment group."
+#!/bin/bash
 
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
 AWS_REGION="us-east-1"
@@ -22,11 +22,3 @@ else
 fi
 echo "Bucket Name : "
 echo $S3_BUCKET
-
-echo "Input Circle CI Token: "
-read TOKEN
-
-echo "Input Circle CI URL: "
-read URL
-
-curl -u $TOKEN -d build_parameters[CIRCLE_JOB]=build $URL
