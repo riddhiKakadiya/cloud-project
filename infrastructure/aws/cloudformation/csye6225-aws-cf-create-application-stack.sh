@@ -13,7 +13,7 @@ fi
 
 if [ $# -lt 2 ]; then
 	echo "Creating Stack $1"
-	response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-application.yaml --parameters file://csye-6225-cf-application-parameters.json)
+	response=$(aws cloudformation create-stack --stack-name "$1" --capabilities CAPABILITY_IAM --template-body file://csye6225-cf-application.yaml --parameters file://csye-6225-cf-application-parameters.json)
   	echo "Waiting for Stack $1 to be created"
 	echo "$response"
 	aws cloudformation wait stack-create-complete --stack-name $1
@@ -60,7 +60,8 @@ SUBNET_ID3=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "S
 
 echo $VPC_ID $SUBNET_ID1
 
-response=$(aws cloudformation create-stack --stack-name $1 --template-body file://csye6225-cf-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=EC2Subnet,ParameterValue=$SUBNET_ID1 ParameterKey=RDSSubnet1,ParameterValue=$SUBNET_ID2 ParameterKey=RDSSubnet2,ParameterValue=$SUBNET_ID3 ParameterKey=KeyPair,ParameterValue=$4)
+response=$(aws cloudformation create-stack --stack-name $1 --capabilities CAPABILITY_NAMED_IAM --template-body file://csye6225-cf-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=EC2Subnet,ParameterValue=$SUBNET_ID1 ParameterKey=RDSSubnet1,ParameterValue=$SUBNET_ID2 ParameterKey=RDSSubnet2,ParameterValue=$SUBNET_ID3 ParameterKey=KeyPair,ParameterValue=$4 ParameterKey=S3BucketName,ParameterValue=$5 ParameterKey=S3BucketNameCD,ParameterValue=$6)
+
 
 echo "Waiting for Stack $1 to be created"
 echo "$response"
