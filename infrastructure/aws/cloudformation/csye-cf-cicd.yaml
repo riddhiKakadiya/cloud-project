@@ -10,7 +10,7 @@ Parameters:
     Description: CodeDeployApplicationName
     Type: String
   AWSRegion:
-    Description: CodeDeployApplicationName
+    Description: AWS Region
     Type: String
   S3BucketName:
     Description: S3BucketName
