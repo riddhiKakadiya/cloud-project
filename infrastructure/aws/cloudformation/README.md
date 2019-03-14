@@ -33,7 +33,7 @@ cd csye6225-spring2019/infrastructure/aws/cloudformation/
 
 The example code will setup a stack named 'MyStack'. The paramaters required for the script can be configured in 'csye-6225-cf-networking-parameters.json'.
 
-#### To Terminate a Stack
+#### To Terminate a Network Stack
 
 ```bash
 cd csye6225-spring2019/infrastructure/aws/cloudformation/
@@ -58,7 +58,7 @@ cd csye6225-spring2019/infrastructure/aws/cloudformation/
 
 The example code will setup a stack named 'MyAppStack'. The paramaters required for the script can be configured in 'csye-6225-cf-application-parameters.json'.
 
-#### To Terminate a Stack
+#### To Terminate a Application Stack
 
 ```bash
 cd csye6225-spring2019/infrastructure/aws/cloudformation/
