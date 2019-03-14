@@ -61,8 +61,6 @@ Resources:
     Properties:
       UserName: circleci
       Path: "/"
-      LoginProfile:
-        Password: Test@123
       Policies:
       - PolicyName: CircleCIUploadToS3
         PolicyDocument:
