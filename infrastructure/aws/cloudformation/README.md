@@ -93,5 +93,17 @@ cd csye6225-spring2019/infrastructure/aws/cloudformation/
 ./csye6225-aws-cf-terminate-cicd.sh
 ```
 
+#### To trigger a build in CircleCI
+
+Requires : 
+CircleCI API Token, 
+URL of repository
+
+```bash
+cd csye6225-spring2019/infrastructure/aws/cloudformation/
+./trigger_build.sh
+```
+
+
 The above code will list available stacks and ask for the STACK_NAME to be deleted.
 
