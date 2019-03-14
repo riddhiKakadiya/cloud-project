@@ -28,6 +28,7 @@ EOF
 
 sudo apt-get update
 sudo apt-get install python3 virtualenv python3-pip mysql-server python3-dev libmysqlclient-dev -y
+cd WebProject
 virtualenv -p python3 djangoEnv
 
 sudo mysql <<EOF
@@ -44,10 +45,7 @@ EOF
 sudo rm -rf djangoEnv
 virtualenv -p python3 djangoEnv
 source djangoEnv/bin/activate
-#For CentOS
-#cat requirements.txt | xargs -n 1 pip install
-pip install -r requirements.txt
-cd WebProject
+pip3 install -r requirements.txt
 python3 manage.py makemigrations
 python3 manage.py migrate
 python3 manage.py runserver

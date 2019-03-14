@@ -26,6 +26,15 @@ Parameters:
     Default: "test1-sree"
     Description: Key Pair parameter (eg test1-sree)
     Type: String
+  S3BucketName:
+    Default: "code-deploy.raik.me.csye6225.com"
+    Description: S3 Bucket parameter (eg test1-sree)
+    Type: String
+  S3BucketNameCD:
+    Default: "code-deploy.raik.me.csye6225.com"
+    Description: S3 Bucket parameter (eg test1-sree)
+    Type: String
+
 
 Resources:
 
@@ -48,10 +57,6 @@ Resources:
         FromPort: 443
         ToPort: 443
         CidrIp: 0.0.0.0/0
-      # - IpProtocol: tcp
-      #   FromPort: 8000
-      #   ToPort: 8000
-      #   CidrIp: 0.0.0.0/0
       Tags:
       - Key: Name
         Value:
@@ -59,12 +64,38 @@ Resources:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'sg']
 
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles: 
+        - !Ref CodeDeployEC2ServiceRole
+    DependsOn: 
+      - CodeDeployEC2ServiceRole
   MyEC2Instance: #Creation of EC2
     Type: "AWS::EC2::Instance"
     Properties: 
+      IamInstanceProfile : {Ref : InstanceProfile}
       ImageId: {Ref: ImageIdparam} #Refrence to the custom AMI
       InstanceType: t2.micro
       KeyName: {Ref : "KeyPair"}
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - "\n"
+            - [ "#!/bin/bash -xe",
+                "sudo bash",
+                "export DJANGO_SETTINGS_MODULE=WebProject.settings_dev",
+                "cd /home/centos",
+                "cat > my.cnf << EOF",
+                "[Config]",
+                !Join ["",["RDS_HOST=",!GetAtt MyRDSInstance.Endpoint.Address]],
+                "RDS_UN=csye6225master",
+                "RDS_PASSWORD=csye6225password",
+                "RDS_DB=csye6225",
+                !Join ["",["S3_BUCKET=",!Ref S3BucketName]],
+                "EOF",
+              ]
       BlockDeviceMappings: 
           - DeviceName: "/dev/sdm"
             Ebs: 
@@ -86,29 +117,33 @@ Resources:
           Fn::Join:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'EC2']
+      - Key: ec2-type
+        Value: csye-6225
+    DependsOn: 
+      - MyRDSInstance
+      - CodeDeployEC2ServiceRole
 
-
-  MyDynamoDB: #creation of DynamoDB
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - 
-          AttributeName: "id"
-          AttributeType: "S"
-      KeySchema:
-        - 
-          AttributeName: "id"
-          KeyType: "HASH"
-      ProvisionedThroughput: 
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
-      TableName: "csye6225"
-      Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-            - '-'
-            - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
+  # MyDynamoDB: #creation of DynamoDB
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     AttributeDefinitions:
+  #       - 
+  #         AttributeName: "id"
+  #         AttributeType: "S"
+  #     KeySchema:
+  #       - 
+  #         AttributeName: "id"
+  #         KeyType: "HASH"
+  #     ProvisionedThroughput: 
+  #       ReadCapacityUnits: "5"
+  #       WriteCapacityUnits: "5"
+  #     TableName: "csye6225"
+  #     Tags:
+  #     - Key: Name
+  #       Value:
+  #         Fn::Join:
+  #           - '-'
+  #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
 
   MyRDSsubnetGroup: 
     Type: AWS::RDS::DBSubnetGroup
@@ -135,7 +170,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 3306
         ToPort: 3306
-        CidrIp: 0.0.0.0/0
+        SourceSecurityGroupId: !Ref InstanceSecurityGroup
       Tags:
       - Key: Name
         Value:
@@ -165,3 +200,52 @@ Resources:
           Fn::Join:
             - '-'
             - [{Ref: 'AWS::StackName'}, 'csye6225', 'rds']
+
+  CodeDeployEC2ServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      RoleName: CodeDeployEC2ServiceRole
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17" 
+        Statement:
+           - 
+            Effect: "Allow" 
+            Principal:
+              Service: 
+                - "ec2.amazonaws.com" 
+            Action: 
+              - "sts:AssumeRole" 
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole         
+      Policies:
+        - 
+         PolicyName: "EC2-S3-Access"
+         PolicyDocument:
+           Version: "2012-10-17"
+           Statement:            
+            - 
+              Effect: "Allow"
+              Action:
+                - "s3:Get*"
+                - "s3:List*"
+              Resource: 
+                Fn::Join:
+                - ''
+                - ['arn:aws:s3:::',!Ref S3BucketNameCD,'/*']
+        -
+          PolicyName: "Attachment-EC2-S3"
+          PolicyDocument:
+           Version: "2012-10-17"
+           Statement:            
+            - 
+              Effect: "Allow"
+              Action:
+                - "s3:*"
+              Resource: 
+                Fn::Join:
+                - ''
+                - ['arn:aws:s3:::',!Ref S3BucketName,'/*']
+
+
+                 

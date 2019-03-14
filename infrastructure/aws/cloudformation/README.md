@@ -19,6 +19,7 @@ The architecture contains networking resources such as Virtual Private Cloud (VP
 ### Executing the scripts
 #### To Create a Network Stack
 
+
 ```bash
 cd csye6225-spring2019/infrastructure/aws/cloudformation/
 ./csye6225-aws-cf-create-stack.sh <STACK_NAME>
@@ -63,6 +64,7 @@ The example code will setup a stack named 'MyAppStack'. The paramaters required 
 cd csye6225-spring2019/infrastructure/aws/cloudformation/
 ./csye6225-aws-cf-terminate-application-stack.sh
 ```
+
 
 The above code will list available stacks and ask for the STACK_NAME to be deleted.
 

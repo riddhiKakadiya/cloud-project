@@ -1,0 +1,61 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/webapp/WebProject
+    docker:
+      - image: circleci/python:3.5-jessie
+    steps:
+      - checkout
+      - run:
+          name: List directory
+          command: cd webapp/WebProject && ls
+      - run:
+          name: Update packages
+          command: sudo apt-get update && sudo apt-get install wget zip unzip -y
+      - run:
+          name: Install packages for project
+          command: sudo apt-get install python3 virtualenv python3-pip mysql-server python3-dev libmysqlclient-dev -y
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
+      - run:
+          name: Create Virtualenv
+          command: cd webapp/WebProject && virtualenv -p python3 djangoEnv
+      - run:
+          name: Enter Virtual env
+          command: cd webapp/WebProject && source djangoEnv/bin/activate
+      - run:
+          name: Install Requirements
+          command:  cd webapp/WebProject && source djangoEnv/bin/activate && pip3 install -r requirements.txt
+      - run:
+          name: Make Migrations
+          command: cd webapp/WebProject && source djangoEnv/bin/activate && python3 manage.py makemigrations --settings=WebProject.settings_test
+      - run:
+          name: Migrate
+          command: cd webapp/WebProject && source djangoEnv/bin/activate && python3 manage.py migrate --settings=WebProject.settings_test
+      - run:
+          name: Running Tests for webapp 
+          command: cd webapp/WebProject && source djangoEnv/bin/activate  &&  python3 manage.py test --settings=WebProject.settings_test
+      - run:
+          name: Remove djangoEnv
+          command: cd webapp/WebProject && rm -rf djangoEnv
+      - run:
+          name: Zip Project 
+          command: cd webapp && zip -r ~/webapp.zip * 
+      - run:
+          name: List directory
+          command: cd ~/ && ls
+      - run:
+          name: Send WebApp to S3
+          command: aws s3 cp ~/webapp.zip s3://$S3_BUCKET
+      - run: 
+          name: Deploy to AWS EC2
+          command: aws configure set region us-east-1 && aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --description "My demo deployment" --s3-location bucket=$S3_BUCKET,bundleType=zip,key=webapp.zip 
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build:
+          filters:
+              branches:
+                only: assignment5
