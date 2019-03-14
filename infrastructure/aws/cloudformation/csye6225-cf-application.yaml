@@ -244,7 +244,7 @@ Resources:
               Resource: 
                 Fn::Join:
                 - ''
-                - ['arn:aws:s3:::',!Ref S3BucketNameCD,'/*']
+                - ['arn:aws:s3:::',!Ref S3BucketName,'/*']
 
   CodeDeployServiceRole:
     Type: 'AWS::IAM::Role'
