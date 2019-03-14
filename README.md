@@ -80,7 +80,12 @@ python3 manage.py createsuperuser
 
 
 ## Build Instructions
-Pre-requisites: You need to have "Postman" installed
+Pre-requisites: 
+- You need to have "Postman" installed
+- User need to have two S3 buckets:
+  e.g. for webapp: yourdomain.tld 
+       for code deploy: code-deploy.yourdomain.tld  
+  where yourdomain.tld should be replaced with your domain name
 
 1. Clone the git repository.
 2. Traverse to the folder /csye6225-spring2019/webapp
