@@ -85,6 +85,7 @@ Resources:
             - "\n"
             - [ "#!/bin/bash -xe",
                 "sudo bash",
+                "export DJANGO_SETTINGS_MODULE=WebProject.settings_dev",
                 "cd /home/centos",
                 "cat > my.cnf << EOF",
                 "[Config]",
@@ -122,39 +123,27 @@ Resources:
       - MyRDSInstance
       - CodeDeployEC2ServiceRole
 
-  # S3Bucket:
-  # Type: AWS::S3::Bucket
-  # Properties: 
-  #   AccessControl: Private
-  #   Bucketname: !Ref S3BucketName
-  #   Tags:
+  # MyDynamoDB: #creation of DynamoDB
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     AttributeDefinitions:
+  #       - 
+  #         AttributeName: "id"
+  #         AttributeType: "S"
+  #     KeySchema:
+  #       - 
+  #         AttributeName: "id"
+  #         KeyType: "HASH"
+  #     ProvisionedThroughput: 
+  #       ReadCapacityUnits: "5"
+  #       WriteCapacityUnits: "5"
+  #     TableName: "csye6225"
+  #     Tags:
   #     - Key: Name
   #       Value:
   #         Fn::Join:
   #           - '-'
-  #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'S3']
-
-  MyDynamoDB: #creation of DynamoDB
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - 
-          AttributeName: "id"
-          AttributeType: "S"
-      KeySchema:
-        - 
-          AttributeName: "id"
-          KeyType: "HASH"
-      ProvisionedThroughput: 
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
-      TableName: "csye6225"
-      Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-            - '-'
-            - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
+  #           - [{Ref: 'AWS::StackName'}, 'csye6225', 'DynamoDB']
 
   MyRDSsubnetGroup: 
     Type: AWS::RDS::DBSubnetGroup

@@ -15,7 +15,7 @@ echo "Stack $1 created successfully"
 
 if [ $? = "0" ]
 then
-	aws iam create-access-key --user-name CircleCI1
+	aws iam create-access-key --user-name circleci
 else
 	echo "Error : Creating user"
 	exit
