@@ -12,10 +12,10 @@ else
 	do
 	  echo "Available stacks :"
 	  echo $StackList
-	  echo "Enter Stack name to be deleted else enter exit to cancel"
+	  echo "Enter Stack name to be deleted else enter exit"
 	  read StackName
 	#fi
-	  if [ "$StackName" = "exit" ]
+	  if [ \("$StackName" = "exit"\) -o \($StackList -eq 0\) ]
 		  then
 		  	exit
 	  else
