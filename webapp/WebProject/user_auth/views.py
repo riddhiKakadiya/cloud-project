@@ -353,11 +353,14 @@ def noteFromId(request, note_id=""):
 		user = validateSignin(request.META)
 		if (is_valid_uuid(note_id)):
 			if (user):
-				note = NotesModel.objects.get(pk=note_id)
-				if (note.user==user):
-					message = get_note_details(note)
-					return JsonResponse(message, status=200)
-				else:
+				try:
+					note = NotesModel.objects.get(pk=note_id)
+					if (note.user==user):
+						message = get_note_details(note)
+						return JsonResponse(message, status=200)
+					else:
+						return JsonResponse({'message': 'Error : Note not found'}, status=404)
+				except:
 					return JsonResponse({'message': 'Error : Note not found'}, status=404)
 			else:
 				return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
@@ -369,27 +372,30 @@ def noteFromId(request, note_id=""):
 			user = validateSignin(request.META)
 			if (is_valid_uuid(note_id)):
 				if(user):
-					note = NotesModel.objects.get(pk=note_id)
-					if(note.user==user):
-						try:
-							note.title = request.PUT.get('title')
-							note.content = request.PUT.get('content')
-							note.last_updated_on = datetime.datetime.now()	
-							note.save()
-						except:
-							return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
-						#If attachment is sent as PUT method while updating note
-						try:
-							if (request.FILES):
-								file = request.FILES['attachment']
-								save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
-							else:
-								print("No Attachment added")
-						except:
-							return JsonResponse({'message': 'Error : Invalid attachment'}, status=400)
-						message = get_note_details(note)
-						return JsonResponse(message, status=204)
-					else:
+					try:
+						note = NotesModel.objects.get(pk=note_id)
+						if(note.user==user):
+							try:
+								note.title = request.PUT.get('title')
+								note.content = request.PUT.get('content')
+								note.last_updated_on = datetime.datetime.now()	
+								note.save()
+							except:
+								return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
+							#If attachment is sent as PUT method while updating note
+							try:
+								if (request.FILES):
+									file = request.FILES['attachment']
+									save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+								else:
+									print("No Attachment added")
+							except:
+								return JsonResponse({'message': 'Error : Invalid attachment'}, status=400)
+							message = get_note_details(note)
+							return JsonResponse(message, status=204)
+						else:
+							return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
+					except:
 						return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
 				else:	
 					return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
