@@ -140,8 +140,6 @@ def delete_attachment_from_s3(attachment,acl):
 	attachment_url=attachment.url
 	extension=os.path.splitext(attachment_url)[1]
 	filename=str(attachment.id)+extension
-	AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
-	AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
 	session = boto3.Session()
 	bucketName = settings.S3_BUCKETNAME
 	try:
