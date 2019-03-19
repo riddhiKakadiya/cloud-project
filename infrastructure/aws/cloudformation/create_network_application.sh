@@ -5,25 +5,19 @@ set -e
 ##Check if enough arguements are passed
 if [ $# -lt 1 ]; then
   echo "Please provide network stack name ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <CICD_STACK> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <KEY_PAIR>"
   exit 1
 fi
 
 if [ $# -lt 2 ]; then
   echo "Please provide application stack name ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <CICD_STACK> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <KEY_PAIR>"
   exit 1
 fi
 
 if [ $# -lt 3 ]; then
-  echo "Please provide CICD stack name ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <CICD_STACK> <KEY_PAIR>"
-  exit 1
-fi
-
-if [ $# -lt 4 ]; then
   echo "Please provide Key Pair ! Try Again."
-  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <CICD_STACK> <KEY_PAIR>"
+  echo "e.g. ./csye6225-aws-cf-create-stack.sh <NETWORK_STACK> <STACK_NAME> <KEY_PAIR>"
   exit 1
 fi
 
@@ -35,6 +29,6 @@ S3_BUCKET_CD=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | start
 
 ./csye6225-aws-cf-create-stack.sh $1
 
-./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $4 $S3_BUCKET $S3_BUCKET_CD
+./csye6225-aws-cf-create-application-stack.sh $2 $1 $IMAGE_ID $3 $S3_BUCKET $S3_BUCKET_CD
 
 # ./csye6225-aws-cf-create-cicd-stack.sh $3

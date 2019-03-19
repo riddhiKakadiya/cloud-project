@@ -1,3 +1,5 @@
+#!/bin/bash
+
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq -r '.Account')
 AWS_REGION="us-east-1"
 CODE_DEPLOY_APPLICATION_NAME="csye6225-webapp"
@@ -20,11 +22,3 @@ else
 fi
 echo "Bucket Name : "
 echo $S3_BUCKET
-
-echo "Input Circle CI Token: "
-read TOKEN
-
-echo "Input Circle CI URL: "
-read URL
-
-curl -u $TOKEN -d build_parameters[CIRCLE_JOB]=build $URL
