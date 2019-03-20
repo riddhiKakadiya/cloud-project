@@ -218,7 +218,9 @@ Resources:
             Action: 
               - "sts:AssumeRole" 
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole         
+        - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
+        - arn:aws:iam::aws:policy/service-role/CloudWatchAgentAdminPolicy  
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM     
       Policies:
         - 
          PolicyName: "EC2-S3-Access"
