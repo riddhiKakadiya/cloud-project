@@ -59,9 +59,13 @@ S3_BUCKETNAME = config['Config']['S3_BUCKET']
 
 # Application definition
 
+STATSD_HOST = 'localhost'
+STATSD_PORT = 8125
+STATSD_PREFIX = None
+STATSD_MAXUDPSIZE = 512
+
 INSTALLED_APPS = [
     'user_auth',
-    'django_statsd',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,7 +76,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django_statsd.middleware.StatsdMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,7 +85,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'user_auth.middleware.PutParsingMiddleware',
     'user_auth.middleware.JSONParsingMiddleware',
-    'django_statsd.middleware.StatsdMiddlewareTimer',
 ]
 
 ROOT_URLCONF = 'WebProject.urls'
