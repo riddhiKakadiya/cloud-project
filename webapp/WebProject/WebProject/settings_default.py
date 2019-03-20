@@ -58,6 +58,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -203,3 +205,14 @@ logging.config.dictConfig({
         }
     }
 })
+
+STATSD_CLIENT = 'django_statsd.clients.log'
+
+STATSD_HOST = 'localhost'
+
+STATSD_PORT = 8125
+
+STATSD_PATCHES = [
+    'django_statsd.patches.db',
+    'django_statsd.patches.cache',
+]

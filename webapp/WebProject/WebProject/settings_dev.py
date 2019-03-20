@@ -199,3 +199,14 @@ logging.config.dictConfig({
         }
     }
 })
+
+STATSD_CLIENT = 'django_statsd.clients.normal'
+
+MIDDLEWARE = [
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
+] + MIDDLEWARE
+
+# STATSD_HOST = 'localhost'
+
+STATSD_PORT = 8125
