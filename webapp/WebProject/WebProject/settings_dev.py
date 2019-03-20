@@ -157,7 +157,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'EST'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -184,9 +184,15 @@ logging.config.dictConfig({
             'style': '{',
         },
     },
+    'filters': {
+        'require_debug_true': {
+             '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
     'handlers': {
         'default': {
-            'level': 'INFO',
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
             'class': 'logging.handlers.RotatingFileHandler',
             'filename' : 'logs/mylog.log',
             'formatter': 'standard'
@@ -202,11 +208,11 @@ logging.config.dictConfig({
 
 STATSD_CLIENT = 'django_statsd.clients.normal'
 
-MIDDLEWARE = [
-    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
-    'django_statsd.middleware.GraphiteMiddleware',
-] + MIDDLEWARE
-
-# STATSD_HOST = 'localhost'
+STATSD_HOST = 'localhost'
 
 STATSD_PORT = 8125
+
+STATSD_PATCHES = [
+    'django_statsd.patches.db',
+    'django_statsd.patches.cache',
+]
