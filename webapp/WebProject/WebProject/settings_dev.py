@@ -200,7 +200,6 @@ logging.config.dictConfig({
     'handlers': {
         'default': {
             'level': 'DEBUG',
-            'filters': ['require_debug_true'],
             'class': 'logging.handlers.RotatingFileHandler',
             'filename' : '/opt/django/logs/csye6225.log',
             'formatter': 'standard'
