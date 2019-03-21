@@ -213,8 +213,3 @@ logging.config.dictConfig({
         }
     }
 })
-
-STATSD_HOST = 'localhost'
-STATSD_PORT = 8125
-STATSD_PREFIX = None
-STATSD_MAXUDPSIZE = 512

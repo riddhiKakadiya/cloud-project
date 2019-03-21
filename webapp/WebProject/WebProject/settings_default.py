@@ -209,7 +209,3 @@ logging.config.dictConfig({
         }
     }
 })
-
-STATSD_HOST = 'localhost'
-STATSD_PORT = 8125
-
