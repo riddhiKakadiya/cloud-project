@@ -1,4 +1,4 @@
-#!/home/sreeragsreenath/cloud/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
+#!/home/jai/jai_csye6225/dev/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
 
 # $Id: rst2odt_prepstyles.py 5839 2009-01-07 19:09:28Z dkuhlman $
 # Author: Dave Kuhlman <dkuhlman@rexx.com>

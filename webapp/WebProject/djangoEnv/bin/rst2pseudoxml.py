@@ -1,4 +1,4 @@
-#!/home/sreeragsreenath/cloud/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
+#!/home/jai/jai_csye6225/dev/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
 
 # $Id: rst2pseudoxml.py 4564 2006-05-21 20:44:42Z wiemann $
 # Author: David Goodger <goodger@python.org>
