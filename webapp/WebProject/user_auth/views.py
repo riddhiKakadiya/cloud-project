@@ -18,9 +18,7 @@ from .models import *
 import sys
 import boto3
 from django.conf import settings
-# from statsd.defaults.django import statsd
 
-# statsd.incr('test')
 #--------------------------------------------------------------------------------
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
@@ -289,6 +287,7 @@ def registerPage(request):
 @csrf_exempt
 def signin(request):
 	# statsd.incr('test2')
+
 	# check if method is get
 	if request.method == 'GET':
 		if 'HTTP_AUTHORIZATION' in request.META:
