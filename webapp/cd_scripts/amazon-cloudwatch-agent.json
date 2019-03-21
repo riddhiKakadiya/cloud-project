@@ -120,15 +120,15 @@
             "timezone": "UTC"
           },
           {
-            "file_path": "/opt/aws/amazon-cloudwatch-agent/logs/test.log",
-            "log_group_name": "test.log",
-            "log_stream_name": "test.log",
+            "file_path": "/opt/django/logs/csye6225.log",
+            "log_group_name": "csye6225_spring2019",
+            "log_stream_name": "csye6225-webapp",
             "timezone": "Local"
           }
         ]
       }
     },
-    "log_stream_name": "my_log_stream_name",
+    "log_stream_name": "cloudwatch_log_stream",
     "force_flush_interval" : 15
   }
 }
