@@ -635,6 +635,9 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 				else:
 					logger.debug("Incorrect user details")
 					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
+			else:
+				logger.debug("Incorrect user details")
+				return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 		logger.debug(" Request method should be PUT or DELETE")
 		return JsonResponse({'message': 'Error : Request method should be PUT or DELETE'}, status=400)
 	except Exception as e:
