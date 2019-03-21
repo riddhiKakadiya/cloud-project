@@ -18,11 +18,10 @@ from .models import *
 import sys
 import boto3
 from django.conf import settings
-
 import logging
-# from django_statsd.clients import statsd
+from django_statsd.clients import statsd
 #
-# statsd.incr('response.200')
+statsd.incr('response.200')
 #--------------------------------------------------------------------------------
 # Define Logger
 # --------------------------------------------------------------------------------
