@@ -35,6 +35,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*' ]
 
+STATSD_HOST = 'localhost'
+STATSD_PORT = 8125
+STATSD_PREFIX = None
+STATSD_MAXUDPSIZE = 512
+
 # Define whether to run in dev environment or default(local) environment
 PROFILE = 'default'
 
@@ -42,6 +47,7 @@ PROFILE = 'default'
 
 INSTALLED_APPS = [
     'user_auth',
+    'django_statsd',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,7 +57,14 @@ INSTALLED_APPS = [
     'django_truncate',
 ]
 
+STATSD_PATCHES = [
+        'django_statsd.patches.db',
+        'django_statsd.patches.cache',
+]
+
 MIDDLEWARE = [
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
