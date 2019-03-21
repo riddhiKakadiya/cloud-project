@@ -36,7 +36,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/sreeragsreenath/cloud/csye6225-spring2019/webapp/WebProject/djangoEnv"
+set -gx VIRTUAL_ENV "/home/jai/jai_csye6225/dev/csye6225-spring2019/webapp/WebProject/djangoEnv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

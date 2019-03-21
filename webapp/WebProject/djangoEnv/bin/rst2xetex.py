@@ -1,4 +1,4 @@
-#!/home/sreeragsreenath/cloud/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
+#!/home/jai/jai_csye6225/dev/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
 
 # $Id: rst2xetex.py 7847 2015-03-17 17:30:47Z milde $
 # Author: Guenter Milde

@@ -1,4 +1,4 @@
-#!/home/sreeragsreenath/cloud/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
+#!/home/jai/jai_csye6225/dev/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
 
 # Author: 
 # Contact: grubert@users.sf.net

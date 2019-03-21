@@ -19,11 +19,24 @@ import sys
 import boto3
 from django.conf import settings
 
+import logging
+# from django_statsd.clients import statsd
+#
+# statsd.incr('response.200')
+#--------------------------------------------------------------------------------
+# Define Logger
+# --------------------------------------------------------------------------------
+
+logger = logging.getLogger(__name__)
+if settings.DEBUG == True:
+	logger.setLevel("DEBUG")
+else:
+	logger.setLevel("INFO")
 #--------------------------------------------------------------------------------
 # Function definitions for reading, saving, updating and deleting
 # --------------------------------------------------------------------------------
 def save_attachments(file_to_upload,filename,	note):
-	print("settings.PROFILE :", settings.PROFILE)
+	logger.debug("settings.PROFILE : %s", settings.PROFILE)
 	if (settings.PROFILE  == "dev"):
 		attachment = save_attachment_to_s3(file_to_upload=file_to_upload,filename=filename,acl="public-read",note=note)
 	else:
@@ -80,6 +93,7 @@ def save_attachment_to_local(file_to_upload,filename,note):
 	attachment.save()
 	filename, file_extension = os.path.splitext(filename)
 	filename = str(attachment.id) + file_extension
+	logger.info("Saving attachment to local : %s", filename)
 	attachment.url = settings.MEDIA_URL+filename
 	attachment.save()
 	path = default_storage.save(filename, ContentFile(file_to_upload.read()))
@@ -89,12 +103,14 @@ def save_attachment_to_local(file_to_upload,filename,note):
 def delete_attachment_from_local(attachment): 
 	attachment_url = attachment.url
 	filename=attachment_url[13:]
+	logger.info("Deleting attachment from local : %s", filename)
 	path = os.path.join(settings.MEDIA_ROOT, filename)
 	default_storage.delete(path) 
 	attachment.delete()
 	return JsonResponse({'message': 'Attachment deleted from Local'}, status=200)
 
 def update_attachment_to_local(file_to_upload,filename,note,attachment):
+	logger.info("Updating attachment in local : %s", filename)
 	delete_attachment_from_local(attachment)
 	new_attachment = save_attachment_to_local(file_to_upload,filename,note)	
 	return new_attachment
@@ -105,7 +121,7 @@ def update_attachment_to_local(file_to_upload,filename,note,attachment):
 
 def save_attachment_to_s3(file_to_upload,filename,acl,note):
 #Get AWS keys from local aws_credentials file
-	print("Saving attachment to S3")
+	logger.info("Saving attachment to S3")
 	session = boto3.Session()
 	bucketName = settings.S3_BUCKETNAME
 	url = "dummy"
@@ -133,8 +149,10 @@ def save_attachment_to_s3(file_to_upload,filename,acl,note):
 		)
 	except Exception as e:
 		# This is a catch all exception, edit this part to fit your needs.
-		print("Something Happened: ", e)
+		logger.error("Something Happened: %s", e)
 		return e
+
+	logger.info("s3 attachment deleted : %s", filename)
 	return attachment
 
 def delete_attachment_from_s3(attachment,acl):
@@ -148,14 +166,15 @@ def delete_attachment_from_s3(attachment,acl):
 		object=s3.Bucket(bucketName).Object(filename)
 		object.delete()
 		attachment.delete()
-		print("s3 attachment deleted")
+		logger.info("s3 attachment deleted : %s",filename)
 		return JsonResponse({'message':'Note updated!'}, status=204)
 	except Exception as e:
-		print("Something Happened: ", e)
+		logger.error("Something Happened: %s", e)
 		return e
 
 def update_attachment_to_s3(file_to_upload,filename,acl,note, attachment):
-#Get AWS keys from local aws_credentials file
+	#Get AWS keys from local aws_credentials file
+	logger.info("Updating attachment in local : %s", filename)
 	delete_attachment(attachment)
 	new_attachment = save_attachments(file_to_upload,filename,note)
 	return new_attachment
@@ -255,6 +274,7 @@ def registerPage(request):
 			username = request.POST.get('username')
 			password = request.POST.get('password')
 			if (username == "" or password == "" or username == None or password == None):
+				logger.debug("Username or password is empty")
 				return JsonResponse({'message': 'Username or password cant be empty'})
 			username_status = validateUserName(username)
 			password_status = validatePassword(password)
@@ -264,22 +284,25 @@ def registerPage(request):
 					user = User.objects.create_user(username, email, password)
 					user.is_staff = True
 					user.save()
-
+					logger.info("User created")
 					return JsonResponse({"message": " : User created"})
 				else:
+					logger.info("User already exists")
 					return JsonResponse({'Error': "User already exists"})
 
 			else:
 				if (password_status == True):
+					logger.debug("Registration Error: %s",username_status)
 					return JsonResponse({"message": username_status})
 				elif (username_status == True):
+					logger.debug("Registration Error: %s", password_status)
 					return JsonResponse({"message": password_status})
 				else:
+					logger.debug("Registration Error: %s %s", username_status, password_status)
 					return JsonResponse({'message': username_status + " " + password_status})
-		except:
-
-			JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
-
+		except Exception as e:
+			logger.error("Something Happened: %s", e)
+			return JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
 	# If all the cases fail then return error message
 	return JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
 
@@ -309,69 +332,88 @@ def signin(request):
 
 @csrf_exempt
 def createOrGetNotes(request):
-	# Post method to create new notes for authorized user
-	if request.method == 'POST':
-		if (request.POST):
-			try:
-				title = request.POST.get('title')
-				content = request.POST.get('content')
-				time_now = datetime.datetime.now()
-				user = validateSignin(request.META)
-				if (user):
-					note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
-									  user=user)
-					note.save()
-					#If attachment is sent as POST method while creating note
-					if (request.FILES):
-						file = request.FILES['attachment']
-						save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+	try:
+		logger.debug("Request Method : %s /note", request.method)
+		# Post method to create new notes for authorized user
+		if request.method == 'POST':
+			if (request.POST):
+				try:
+					title = request.POST.get('title')
+					content = request.POST.get('content')
+					time_now = datetime.datetime.now()
+					user = validateSignin(request.META)
+					if (user):
+						note = NotesModel(title=title, content=content, created_on=time_now, last_updated_on=time_now,
+										  user=user)
+						note.save()
+						#If attachment is sent as POST method while creating note
+						if (request.FILES):
+							logger.info("Attachments added")
+							file = request.FILES['attachment']
+							save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
+						else:
+							logger.info("No Attachment added")
+						message = get_note_details(note)
+						logger.info("Note Saved")
+						return JsonResponse(message, status=200)
 					else:
-						print("No Attachment added")
-					message = get_note_details(note)
-					return JsonResponse(message, status=200)
+						logger.debug("Incorrect user details")
+						return JsonResponse({'message': 'Error : User not authorized'}, status=401)
+				except:
+					logger.debug("Incorrect request")
+					return JsonResponse({'message': 'Error : provide title(req), content(req) and attachment(optional) in form-data'}, status=400)
+		# Get method to retrive all notes for authorized user
+		elif request.method == 'GET':
+			user = validateSignin(request.META)
+			if (user):
+				notes = NotesModel.objects.filter(user=user)
+				if (notes.exists()):
+					message_list = []
+					for note in notes:
+						attachment_list = []
+						message = get_note_details(note)
+						message_list.append(message)
+					logger.info("Notes displayed")
+					return JsonResponse(message_list, status=200, safe=False)
 				else:
-					return JsonResponse({'message': 'Error : User not authorized'}, status=401)
-			except: 
-				return JsonResponse({'message': 'Error : provide title(req), content(req) and attachment(optional) in form-data'}, status=400)
-	# Get method to retrive all notes for authorized user
-	elif request.method == 'GET':
-		user = validateSignin(request.META)
-		if (user):
-			notes = NotesModel.objects.filter(user=user)
-			if (notes.exists()):
-				message_list = []
-				for note in notes:
-					attachment_list = []
-					message = get_note_details(note)
-					message_list.append(message)
-				return JsonResponse(message_list, status=200, safe=False)
-			else:
-				return JsonResponse({'message': 'Error : Note List Empty'}, status=204)
-		return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
-	return JsonResponse({'message': 'Error : Incorrect Request'}, status=400)
+					logger.info("Notes Empty")
+					return JsonResponse({'message': 'Error : Note List Empty'}, status=204)
+			logger.debug("Incorrect user details")
+			return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+		logger.debug("Incorrect request")
+		return JsonResponse({'message': 'Error : Incorrect Request'}, status=400)
+	except Exception as e:
+		logger.error("Something Happened: %s", e)
+		return JsonResponse({'Error': 'Bad Request'}, status=400)
 
 @csrf_exempt
 def noteFromId(request, note_id=""):
-	if request.method == 'GET':
-		user = validateSignin(request.META)
-		if (is_valid_uuid(note_id)):
-			if (user):
-				try:
-					note = NotesModel.objects.get(pk=note_id)
-					if (note.user==user):
-						message = get_note_details(note)
-						return JsonResponse(message, status=200)
-					else:
+	try:
+		logger.debug("Request Method : %s /note/<note_id>",request.method)
+		if request.method == 'GET':
+			user = validateSignin(request.META)
+			if (is_valid_uuid(note_id)):
+				if (user):
+					try:
+						note = NotesModel.objects.get(pk=note_id)
+						if (note.user==user):
+							message = get_note_details(note)
+							logger.info("Notes displayed")
+							return JsonResponse(message, status=200)
+						else:
+							logger.debug("Notes not found")
+							return JsonResponse({'message': 'Error : Note not found'}, status=404)
+					except:
+						logger.debug("Note not found")
 						return JsonResponse({'message': 'Error : Note not found'}, status=404)
-				except:
-					return JsonResponse({'message': 'Error : Note not found'}, status=404)
+				else:
+					logger.debug("Incorrect user details")
+					return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
 			else:
-				return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
-		else:
-			return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
-	#update
-	elif request.method=='PUT':
-		try:
+				logger.debug("Invalid Note ID")
+				return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
+		#update
+		elif request.method=='PUT':
 			user = validateSignin(request.META)
 			if (is_valid_uuid(note_id)):
 				if(user):
@@ -384,6 +426,7 @@ def noteFromId(request, note_id=""):
 								note.last_updated_on = datetime.datetime.now()	
 								note.save()
 							except:
+								logger.debug("Invalid note id")
 								return JsonResponse({'message': 'Error : Invalid note id'}, status=400)		
 							#If attachment is sent as PUT method while updating note
 							try:
@@ -391,31 +434,34 @@ def noteFromId(request, note_id=""):
 									file = request.FILES['attachment']
 									save_attachments(file_to_upload=file, filename= file._get_name(), note=note)
 								else:
-									print("No Attachment added")
+									logger.info("No Attachment added")
 							except:
+								logger.debug("Invalid attachment")
 								return JsonResponse({'message': 'Error : Invalid attachment'}, status=400)
+							logger.info("Note updated")
 							message = get_note_details(note)
 							return JsonResponse(message, status=204)
 						else:
+							logger.debug("Invalid note id")
 							return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
 					except:
+						logger.debug("Invalid note id")
 						return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
-				else:	
+				else:
+					logger.debug("Incorrect user details")
 					return JsonResponse({'message': 'Error : Incorrect user details'}, status=400)
 			else:
-				return JsonResponse({'message': 'Error : Invalid note id'}, status=400)
-		except:
-			return JsonResponse({'message': 'Error : Bad Request, provide title(req), content(req) and attachment(optional) in form-data'}, status=400)
-
-	#delete			
-	elif request.method == 'DELETE':
-		try: 
-			user = validateSignin(request.META)		
+				logger.debug("Invalid note id")
+				return JsonResponse({'message': 'Error : Invalid note id'}, status=401)
+		#delete
+		elif request.method == 'DELETE':
+			user = validateSignin(request.META)
 			if (user):
 				try:
 					note = NotesModel.objects.get(pk=note_id)
 				except:
-					return JsonResponse({'Error': 'Invalid note ID'}, status=400)		
+					logger.debug("Invalid note id")
+					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 				if(note):
 					if(user == note.user):
 						##delete attachments if any
@@ -424,27 +470,35 @@ def noteFromId(request, note_id=""):
 							for attachment in attachments:
 								delete_attachment(attachment)
 						note.delete()
-						return JsonResponse({'message':'Note Deleted!'}, status=204) 
+						logger.info("Note Deleted")
+						return JsonResponse({'message':'Note Deleted!'}, status=204)
 					else:
+						logger.debug("Invalid note id")
 						return JsonResponse({'message': 'Error : Invalid Note ID'}, status=400)
-		except:
-			return JsonResponse({'message': 'Bad Request'}, status=400)
-	return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+			else:
+				logger.debug("Incorrect user details")
+				return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+	except Exception as e:
+		logger.error("Something Happened: %s", e)
+		return JsonResponse({'Error': 'Bad Request'}, status=400)
 
 @csrf_exempt
 def addAttachmentToNotes(request,note_id=""):
-	# Post method to create new notes for authorized user
-	if request.method == 'POST':
-		try:
+	try:
+		logger.debug("Request Method : %s /note/<note_id>/attachments", request.method)
+		# Post method to create new notes for authorized user
+		if request.method == 'POST':
 			if (request.FILES):
 				user = validateSignin(request.META)
 				if(user):
-					if(is_valid_uuid(note_id)):                    
+					if(is_valid_uuid(note_id)):
 						try:
 							note = NotesModel.objects.get(pk=note_id)
 						except:
+							logger.debug("Invalid note id")
 							return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 					else:
+						logger.debug("Invalid note id")
 						return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 					if(note.user==user):
 						file = request.FILES['attachment']
@@ -454,48 +508,58 @@ def addAttachmentToNotes(request,note_id=""):
 						message = get_attachment_details(attachment)
 						return JsonResponse(message, status=200)
 					else:
+						logger.debug("Incorrect user details")
 						return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 				else:
+					logger.debug("Incorrect user details")
 					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 			else:
+				logger.debug("No Files Attached")
 				return JsonResponse({'message': 'Error : Files not selected'}, status=400)
-		except Exception as e:
-			return JsonResponse({'Error': 'Bad Request'}, status=400)
 
-	# GET method to create new notes for authorized user
-	if request.method == 'GET':
-		user = validateSignin(request.META)
-		if(user):
-			if(is_valid_uuid(note_id)):                    
-				try:
-					note = NotesModel.objects.get(pk=note_id)
-				except:
-					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
-			else:
-				return JsonResponse({'Error': 'Invalid note ID'}, status=400)
-			if(note.user==user):
-				message = {}
-				attachment_list = []
-				attachments = Attachment.objects.filter(note=note.id)
-				if (attachments.exists()):
-					for attachment in attachments:
-						attachment_list.append(get_attachment_details(attachment))
-					message['attachments'] = attachment_list
+		# GET method to create new notes for authorized user
+		if request.method == 'GET':
+			user = validateSignin(request.META)
+			if(user):
+				if(is_valid_uuid(note_id)):
+					try:
+						note = NotesModel.objects.get(pk=note_id)
+					except:
+						logger.debug("Invalid note id")
+						return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 				else:
-					return JsonResponse({'message': 'No Attachments added to note'}, status=200)	
-				return JsonResponse(message, status=200)
+					logger.debug("Invalid note id")
+					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+				if(note.user==user):
+					message = {}
+					attachment_list = []
+					attachments = Attachment.objects.filter(note=note.id)
+					if (attachments.exists()):
+						for attachment in attachments:
+							attachment_list.append(get_attachment_details(attachment))
+						message['attachments'] = attachment_list
+						logger.info("Attachments added")
+						return JsonResponse(message, status=200)
+					else:
+						logger.debug("No attachments added to note")
+						return JsonResponse({'message': 'No Attachments added to note'}, status=200)
+				else:
+					logger.debug("Incorrect user details")
+					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 			else:
+				logger.debug("Incorrect user details")
 				return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
-		else:
-			return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
-	return JsonResponse({'message': 'Error : Request method should be GET or POST'}, status=400)
-
+		logger.debug("Request method should be GET or POST")
+		return JsonResponse({'message': 'Error : Request method should be GET or POST'}, status=400)
+	except Exception as e:
+		logger.error("Something Happened: %s", e)
+		return JsonResponse({'Error': 'Bad Request'}, status=400)
 @csrf_exempt
 def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 	# Update method to update attachments for authorized user
 	try:
+		logger.debug("Request Method : %s /note/<note_id>/attachments/<attachment_id>", request.method)
 		if request.method == 'PUT':
-			print(request)
 			if(request.FILES):
 				user = validateSignin(request.META)
 				if(user):
@@ -503,15 +567,19 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 						try:
 							note = NotesModel.objects.get(pk=note_id)
 						except:
+							logger.debug("Invalid note id")
 							return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 					else:
+						logger.debug("Invalid note id")
 						return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 					if(is_valid_uuid(attachment_id)):
 						try:
 							attachment = Attachment.objects.get(pk=attachment_id)
 						except:
+							logger.debug("Invalid attachment id")
 							return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
 					else:
+						logger.debug("Invalid attachment id")
 						return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
 					
 					if(note.user == user):
@@ -521,43 +589,59 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 							note.last_updated_on = datetime.datetime.now()
 							note.save()
 							message = get_attachment_details(new_attachment)
+							logger.info("Attachment updated")
 							return JsonResponse(message, status=200)
 						else:
+							logger.debug("Invalid attachment id")
 							return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
 					else:
+						logger.debug("Incorrect user details")
 						return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
 			else:
+				logger.debug("Files not selected")
 				return JsonResponse({'message': 'Error : Files not selected'}, status=400)
-	except:
-		return JsonResponse({'Error': 'Bad Request'}, status=400)
-	# Delete method to delete attachments for authorized user	
-	if request.method == 'DELETE':
-		user = validateSignin(request.META)
-		if(user):
-			if(is_valid_uuid(note_id)):                    
-				try:
-					note = NotesModel.objects.get(pk=note_id)
-				except:
-					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
-			else:
-				return JsonResponse({'Error': 'Invalid note ID'}, status=400)
-			if(is_valid_uuid(attachment_id)):
-				try:
-					attachment = Attachment.objects.get(pk=attachment_id)
-				except:
-					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
-			else:
-				return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
-			if(note.user == user):
-				if(attachment.note.id == note.id):
-					#Primary Logic for deleting attachments
-					delete_attachment(attachment)
-					note.last_updated_on = datetime.datetime.now()
-					note.save()
-					return JsonResponse({'message': 'Attachment Deleted'}, status=200)
+		# Delete method to delete attachments for authorized user
+		if request.method == 'DELETE':
+			user = validateSignin(request.META)
+			if(user):
+				if(is_valid_uuid(note_id)):
+					try:
+						note = NotesModel.objects.get(pk=note_id)
+					except:
+						logger.debug("Invalid note id")
+						return JsonResponse({'Error': 'Invalid note ID'}, status=400)
 				else:
+					logger.debug("Invalid note id")
+					return JsonResponse({'Error': 'Invalid note ID'}, status=400)
+				if(is_valid_uuid(attachment_id)):
+					try:
+						attachment = Attachment.objects.get(pk=attachment_id)
+					except:
+						logger.debug("Invalid attachment id")
+						return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+				else:
+					logger.debug("Invalid attachment id")
 					return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
-			else:
-				return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
-	return JsonResponse({'message': 'Error : Request method should be PUT or DELETE'}, status=400)
+				if(note.user == user):
+					if(attachment.note.id == note.id):
+						#Primary Logic for deleting attachments
+						delete_attachment(attachment)
+						note.last_updated_on = datetime.datetime.now()
+						note.save()
+						logger.info("Attachment Deleted")
+						return JsonResponse({'message': 'Attachment Deleted'}, status=200)
+					else:
+						logger.debug("Invalid attachment id")
+						return JsonResponse({'Error': 'Invalid attachment ID'}, status=400)
+				else:
+					logger.debug("Incorrect user details")
+					return JsonResponse({'message': 'Error : Invalid User Credentials'}, status=401)
+		logger.debug(" Request method should be PUT or DELETE")
+		return JsonResponse({'message': 'Error : Request method should be PUT or DELETE'}, status=400)
+	except Exception as e:
+		logger.error("Something Happened: %s", e)
+		return JsonResponse({'Error': 'Bad Request'}, status=400)
 
+@csrf_exempt
+def get404(request):
+	return JsonResponse({'Error': 'Page not found'}, status=404)
