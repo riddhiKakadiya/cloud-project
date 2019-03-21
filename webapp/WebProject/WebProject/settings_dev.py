@@ -206,13 +206,13 @@ logging.config.dictConfig({
     }
 })
 
-# STATSD_CLIENT = 'django_statsd.clients.normal'
-#
-# STATSD_HOST = 'localhost'
-#
-# STATSD_PORT = 8125
-#
-# STATSD_PATCHES = [
-#     'django_statsd.patches.db',
-#     'django_statsd.patches.cache',
-# ]
+STATSD_CLIENT = 'django_statsd.clients.normal'
+
+STATSD_HOST = 'localhost'
+
+STATSD_PORT = 8125
+
+STATSD_PATCHES = [
+    'django_statsd.patches.db',
+    'django_statsd.patches.cache',
+]
