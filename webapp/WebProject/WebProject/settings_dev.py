@@ -61,7 +61,7 @@ S3_BUCKETNAME = config['Config']['S3_BUCKET']
 
 STATSD_HOST = 'localhost'
 STATSD_PORT = 8125
-STATSD_PREFIX = None
+STATSD_PREFIX = 'statsd'
 STATSD_MAXUDPSIZE = 512
 
 INSTALLED_APPS = [
@@ -76,8 +76,14 @@ INSTALLED_APPS = [
     'django_truncate',
 ]
 
+STATSD_PATCHES = [
+        'django_statsd.patches.db',
+        'django_statsd.patches.cache',
+]
+
 MIDDLEWARE = [
-    'django_statsd.middleware.StatsdMiddleware',
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -200,9 +206,8 @@ logging.config.dictConfig({
     'handlers': {
         'default': {
             'level': 'DEBUG',
-            'filters': ['require_debug_true'],
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename' : '/opt/django/logs/csye6225.log',
+            'filename' : '/opt/aws/amazon-cloudwatch-agent/logs/csye6225.log',
             'formatter': 'standard'
         },
     },
