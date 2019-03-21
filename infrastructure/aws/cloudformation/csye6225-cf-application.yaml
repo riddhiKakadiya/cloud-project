@@ -249,6 +249,3 @@ Resources:
                 Fn::Join:
                 - ''
                 - ['arn:aws:s3:::',!Ref S3BucketName,'/*']
-
-
-                 
