@@ -5,4 +5,6 @@ sudo cp -rf /home/centos/webapp/cd_scripts/amazon-cloudwatch-agent.json /opt/aws
 sudo cp -rf /home/centos/my.cnf /home/centos/webapp/WebProject/WebProject/config/my.cnf
 sudo mkdir --parents /etc/systemd/system/nginx.service.d/; sudo mv /home/centos/webapp/cd_scripts/override.conf $_
 sudo yum install jq -y
+sudo touch /opt/aws/amazon-cloudwatch-agent/logs/csye6225.log
+sudo chmod 777 /opt/aws/amazon-cloudwatch-agent/logs/csye6225.log
 
