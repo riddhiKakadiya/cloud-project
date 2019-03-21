@@ -194,7 +194,7 @@ logging.config.dictConfig({
             'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename' : 'logs/mylog.log',
+            'filename' : 'logs/csye6225.log',
             'formatter': 'standard'
         },
     },
