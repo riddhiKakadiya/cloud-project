@@ -32,6 +32,8 @@ Resources:
               - 'sts:AssumeRole'
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole'
+        - 'arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy'
+        - 'arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy'
       RoleName: CodeDeployServiceRole
 
   csye6225Webapp:
