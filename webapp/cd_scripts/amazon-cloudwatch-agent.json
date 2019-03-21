@@ -117,13 +117,13 @@
             "file_path": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
             "log_group_name": "amazon-cloudwatch-agent.log",
             "log_stream_name": "amazon-cloudwatch-agent.log",
-            "timezone": "UTC"
+            "timezone": "EST"
           },
           {
             "file_path": "/opt/django/logs/csye6225.log",
             "log_group_name": "csye6225_spring2019",
             "log_stream_name": "csye6225-webapp",
-            "timezone": "Local"
+            "timezone": "EST"
           }
         ]
       }
