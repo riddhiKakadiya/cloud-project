@@ -8,7 +8,7 @@
      "statsd":{
           "service_address":":8125",
           "metrics_collection_interval":10,
-          "metrics_aggregation_interval":300
+          "metrics_aggregation_interval":30
        },
       "cpu": {
         "resources": [
@@ -117,13 +117,13 @@
             "file_path": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
             "log_group_name": "amazon-cloudwatch-agent.log",
             "log_stream_name": "amazon-cloudwatch-agent.log",
-            "timezone": "EST"
+            "timezone": "UTC"
           },
           {
             "file_path": "/opt/aws/amazon-cloudwatch-agent/logs/csye6225.log",
             "log_group_name": "csye6225_spring2019",
             "log_stream_name": "csye6225-webapp",
-            "timezone": "EST"
+            "timezone": "UTC"
           }
         ]
       }
