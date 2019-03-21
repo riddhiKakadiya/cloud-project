@@ -6,6 +6,7 @@ sudo scl enable rh-python36 "source /home/centos/webapp/WebProject/djangoEnv/bin
 sudo scl enable rh-python36 "source /home/centos/webapp/WebProject/djangoEnv/bin/activate && python3 /home/centos/webapp/WebProject/manage.py migrate --settings=WebProject.settings_dev"
 cd /home/centos/webapp/WebProject
 #Import must read !!
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
 sudo systemctl daemon-reload
 sudo systemctl start gunicorn
 sudo systemctl restart gunicorn

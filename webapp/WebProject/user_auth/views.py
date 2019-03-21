@@ -18,8 +18,11 @@ from .models import *
 import sys
 import boto3
 from django.conf import settings
-import logging
 
+import logging
+# from django_statsd.clients import statsd
+#
+# statsd.incr('response.200')
 #--------------------------------------------------------------------------------
 # Define Logger
 # --------------------------------------------------------------------------------
@@ -306,6 +309,8 @@ def registerPage(request):
 
 @csrf_exempt
 def signin(request):
+	# statsd.incr('test2')
+
 	# check if method is get
 	if request.method == 'GET':
 		if 'HTTP_AUTHORIZATION' in request.META:

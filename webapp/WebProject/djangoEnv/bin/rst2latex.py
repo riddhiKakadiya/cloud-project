@@ -1,4 +1,4 @@
-#!/home/sreeragsreenath/cloud/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
+#!/home/jai/jai_csye6225/dev/csye6225-spring2019/webapp/WebProject/djangoEnv/bin/python3
 
 # $Id: rst2latex.py 5905 2009-04-16 12:04:49Z milde $
 # Author: David Goodger <goodger@python.org>

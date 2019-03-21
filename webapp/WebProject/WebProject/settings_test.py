@@ -35,6 +35,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*' ]
 
+STATSD_HOST = 'localhost'
+STATSD_PORT = 8125
+STATSD_PREFIX = None
+STATSD_MAXUDPSIZE = 512
+
 # Define whether to run in dev environment or default(local) environment
 PROFILE = 'default'
 

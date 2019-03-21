@@ -60,4 +60,5 @@ workflows:
               branches:
                 only: 
                   - assignment5
+                  - assignment6
                   - master
