@@ -25,7 +25,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 STATSD_HOST = 'localhost'
 STATSD_PORT = 8125
-
+STATSD_PREFIX = 'statsd'
+STATSD_MAXUDPSIZE = 512
 #Get configuration from my.cnf
 #Open and parse the file
 config = configparser.ConfigParser()
@@ -49,6 +50,11 @@ PROFILE = 'default'
 
 # Application definition
 
+STATSD_PATCHES = [
+        'django_statsd.patches.db',
+        'django_statsd.patches.cache',
+]
+
 INSTALLED_APPS = [
     'user_auth',
     'django_statsd',
@@ -62,7 +68,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django_statsd.middleware.StatsdMiddleware',
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,7 +79,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'user_auth.middleware.PutParsingMiddleware',
     'user_auth.middleware.JSONParsingMiddleware',
-    'django_statsd.middleware.StatsdMiddlewareTimer'
 ]
 
 ROOT_URLCONF = 'WebProject.urls'
@@ -181,7 +187,7 @@ MEDIA_URL = '/attachments/'
 LOGGING_CONFIG = None
 logging.config.dictConfig({
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'formatters': {
         'standard': {
             'format': '{asctime} {levelname} {module} {process:d} {thread:d} {message}',
@@ -198,7 +204,7 @@ logging.config.dictConfig({
             'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename' : '/opt/django/logs/csye6225.log',
+            'filename' : 'csye6225.log',
             'formatter': 'standard'
         },
     },
