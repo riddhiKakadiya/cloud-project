@@ -220,7 +220,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole 
         - arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy        
-        - arn:aws:iam::aws:policy/aws-service-role/AmazonSSMServiceRolePolicy        
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM     
       Policies:
         - 
          PolicyName: "EC2-S3-Access"
