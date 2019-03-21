@@ -116,3 +116,4 @@ venv.bak/
 /webapp/WebProject/user_auth/attachments/
 /infrastructure/aws/cloudformation/csye-6225-cf-networking-parameters.json
 /infrastructure/aws/cloudformation/csye-6225-cf-application-parameters.json
+/webapp/WebProject/logs/
