@@ -76,8 +76,14 @@ INSTALLED_APPS = [
     'django_truncate',
 ]
 
+STATSD_PATCHES = [
+        'django_statsd.patches.db',
+        'django_statsd.patches.cache',
+]
+
 MIDDLEWARE = [
-    'django_statsd.middleware.StatsdMiddleware',
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
