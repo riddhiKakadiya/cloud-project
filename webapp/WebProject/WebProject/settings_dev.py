@@ -194,7 +194,7 @@ logging.config.dictConfig({
             'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename' : 'logs/mylog.log',
+            'filename' : '/opt/django/logs/csye6225.log',
             'formatter': 'standard'
         },
     },
@@ -206,13 +206,13 @@ logging.config.dictConfig({
     }
 })
 
-STATSD_CLIENT = 'django_statsd.clients.normal'
-
-STATSD_HOST = 'localhost'
-
-STATSD_PORT = 8125
-
-STATSD_PATCHES = [
-    'django_statsd.patches.db',
-    'django_statsd.patches.cache',
-]
+# STATSD_CLIENT = 'django_statsd.clients.normal'
+#
+# STATSD_HOST = 'localhost'
+#
+# STATSD_PORT = 8125
+#
+# STATSD_PATCHES = [
+#     'django_statsd.patches.db',
+#     'django_statsd.patches.cache',
+# ]
