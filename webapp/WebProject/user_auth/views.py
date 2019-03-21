@@ -641,7 +641,7 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 	except Exception as e:
 		logger.error("Something Happened: %s", e)
 		return JsonResponse({'Error': 'Bad Request'}, status=400)
-#
-# @csrf_exempt
-# def get404(request):
-# 	return JsonResponse({'Error': 'Page not found'}, status=404)
+
+@csrf_exempt
+def get404(request):
+	return JsonResponse({'Error': 'Page not found'}, status=404)

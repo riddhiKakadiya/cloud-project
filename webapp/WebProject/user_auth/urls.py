@@ -12,7 +12,7 @@ try:
         re_path(r'^note/(?P<note_id>[0-9a-z-]+)$', views.noteFromId, name='noteFromId'),
         re_path(r'^note/(?P<note_id>[0-9a-z-]+)/attachments$', views.addAttachmentToNotes, name='addAttachmentToNotes'),
         re_path(r'^note/(?P<note_id>[0-9a-z-]+)/attachments/(?P<attachment_id>[0-9a-z-]+)$', views.updateOrDeleteAttachments, name='updateOrDeleteAttachments'),
-        # re_path(r'^.*/$', views.get404, name='get404')
+        re_path(r'^.*/$', views.get404, name='get404')
             ]
 except Exception as e:
     logger.debug("Something happened :\n %s", e)
