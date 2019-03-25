@@ -1,3 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CSYE 6225 - serverless stack
+
+Parameters:
+  SNSTOPICARN:
+    Default: "arn:aws:sns:us-east-1:<account_id>:SNSTopicResetPassword"
+    Description: SNS topic ARN for reset password
+    Type: String
+  LAMBDABUCKET:
+    Default: "lambda.csye6225-spring2019-sonij.me"
+    Description: S3 Bucket name for lambda func
+    Type: String
+
 Resources:
   SNSTopic:
     Type: AWS::SNS::Topic
@@ -40,7 +53,7 @@ Resources:
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      Handler: LogEvent::handleRequest
+      Handler: lambda-func.lambda_handler
       Role:
         Fn::GetAtt:
         - LambdaExecRole
@@ -49,12 +62,7 @@ Resources:
         S3Bucket:
           Ref: LAMBDABUCKET
         S3Key: lambda-test.zip
-      Runtime: java8
+      Runtime: python3.6
       FunctionName: csye6225-spring2019-lambda
-      MemorySize: 180
+      MemorySize: 128
       Timeout: 180
-Parameters:
-  LAMBDABUCKET:
-    Type: String
-  SNSTOPICARN:
-    Type: String
