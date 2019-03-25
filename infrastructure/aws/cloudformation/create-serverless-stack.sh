@@ -1,13 +1,7 @@
 #!/bin/bash
-# echo "Fetching domain name from Route 53"
-# DOMAIN_NAME=$(aws route53 list-hosted-zones --query HostedZones[0].Name --output text)
-# DOMAIN_NAME="${DOMAIN_NAME%?}"
-# echo "$DOMAIN_NAME"
 
 LAMBDA_BUCKET=$(aws s3api list-buckets | jq -r '.Buckets[] | select(.Name | startswith("lambda")).Name')
 echo "LAMBDA_BUCKET: $LAMBDA_BUCKET"
-# LAMBDABUCKET="lambda.$DOMAIN_NAME"
-# echo "LAMBDA_BUCKET:- $LAMBDABUCKET"
 
 AccountId=$(aws iam get-user|python -c "import json as j,sys;o=j.load(sys.stdin);print o['User']['Arn'].split(':')[4]")
 echo "AccountId: $AccountId"
