@@ -21,5 +21,8 @@ else
 	echo "Error : Creating user"
 	exit
 fi
-echo "Bucket Name : "
+echo "Webapp Bucket Name : "
 echo $S3_BUCKET
+
+echo "Lambda Bucket Name : "
+echo $LAMBDA_BUCKET
