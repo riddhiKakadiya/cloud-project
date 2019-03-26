@@ -661,6 +661,7 @@ def passwordReset(request):
 				if username_status == True:
 					if not User.objects.filter(username=username).exists():
 						# DO Nothing
+						logger.info("Email not present on Database")
 						return JsonResponse({"message" : "If user exists, a password reset email wll be sent to the email provided"}, status=200)
 					else:
 						# Username exists, proceed to reset pasword
