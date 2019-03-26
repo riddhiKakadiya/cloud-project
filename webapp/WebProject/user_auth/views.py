@@ -647,3 +647,39 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 @csrf_exempt
 def get404(request):
 	return JsonResponse({'Error': 'Page not found'}, status=404)
+
+@csrf_exempt
+def passwordReset(request):
+	try:
+		if request.method == "POST":
+			if(request.body):
+				received_json_data = json.loads(request.body.decode("utf-8"))
+				username = received_json_data['email']
+				if (username=="" or username==None):
+					return JsonResponse({'message':'Username cant be empty'})
+				username_status = validateUserName(username)
+				if username_status == True:
+					if not User.objects.filter(username=username).exists():
+						# DO Nothing
+						return JsonResponse({"message" : "If user exists, a password reset email wll be sent to the email provided"}, status=200)
+					else:
+						# Username exists, proceed to reset pasword
+						logger.info("Sending notfcation to SNS")
+						message = {"email": username}
+						client = boto3.client('sns',region_name='us-east-1')
+						response = client.publish(
+							TargetArn=settings.S3_BUCKETNAME,
+							Message=json.dumps({'default': json.dumps(message)}),
+							MessageStructure='json'
+						)
+						return JsonResponse({"message" : "If user exists, a password reset email wll be sent to the email provided"}, status=200)
+				else:
+					return JsonResponse({"message" : username_status})
+		else:
+			return JsonResponse({'Error': 'Please use a POST method to reset password'}, status=400)
+
+
+
+	except Exception as e:
+		logger.error("Something Happened: %s", e)
+		return JsonResponse({'Error': 'Bad Request'}, status=400)
