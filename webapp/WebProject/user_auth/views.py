@@ -20,7 +20,7 @@ import boto3
 from django.conf import settings
 import logging
 from django_statsd.clients import statsd
-#
+from boto3.dynamodb.conditions import Key, Attr
 
 # #--------------------------------------------------------------------------------
 # Define Logger
@@ -725,18 +725,35 @@ def get404(request):
 def passwordReset(request):
 	statsd.incr('api.passwordReset')
 	try:
-		email = request.POST.get('email')
-		#Get email and verify/authenticate it, verify if email exists in db
+		#user = validateSignin(request.META)
+		email=request.POST.get('email')
+		print(email)
+		#Get email and verify if email exists in db
 		#trigger lamda
 		if (email == ""):
 			logger.debug("email is empty")
-			return JsonResponse({'message': 'Username or password cant be empty'})
-		email = validateUserName(email)
-		return JsonResponse({"message": " : you will receive password reset link"})
-						
+			return JsonResponse({'message': 'Email cant be empty'}, status=400)
+		email_status = validateUserName(email)
+		if email_status== True:
+			if User.objects.filter(username=email).exists():
+				# logger.info("Sending notfcation to SNS")
+				message = {"email": email}
+				# client = boto3.client('sns',region_name='us-east-1')
+				# response = client.publish(
+				# 	TargetArn=settings.SNSTOPICARN,
+				# 	Message=json.dumps({'default': json.dumps(message)}),
+				# 	MessageStructure='json'
+				# )
+				statsd.incr('api.passwordReset.POST.200')
+				return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
+			else:
+				statsd.incr('api.passwordReset.POST.400')
+				return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
+		else:
+			statsd.incr('api.passwordReset.POST.400')
+			return JsonResponse(email_status, status=400)		
 	except Exception as e:
 		logger.error("Something Happened: %s", e)
-		return JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
+		statsd.incr('api.passwordReset.')
+		return JsonResponse({'Error': 'Please use a post method with parameter email'})
 
-# If all the cases fail then return error message
-	return JsonResponse({'Error': 'Please use a post method with parameter email'})
