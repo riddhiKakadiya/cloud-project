@@ -720,3 +720,23 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 def get404(request):
 	statsd.incr('api.404')
 	return JsonResponse({'Error': 'Page not found'}, status=404)
+
+@csrf_exempt
+def passwordReset(request):
+	statsd.incr('api.passwordReset')
+	try:
+		email = request.POST.get('email')
+		#Get email and verify/authenticate it, verify if email exists in db
+		#trigger lamda
+		if (email == ""):
+			logger.debug("email is empty")
+			return JsonResponse({'message': 'Username or password cant be empty'})
+		email = validateUserName(email)
+		return JsonResponse({"message": " : you will receive password reset link"})
+						
+	except Exception as e:
+		logger.error("Something Happened: %s", e)
+		return JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
+
+# If all the cases fail then return error message
+	return JsonResponse({'Error': 'Please use a post method with parameter email'})
