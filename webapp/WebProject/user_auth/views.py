@@ -730,7 +730,7 @@ def passwordReset(request):
 				received_json_data = json.loads(request.body.decode("utf-8"))
 				username = received_json_data['email']
 				if (username=="" or username==None):
-					return JsonResponse({'message':'Username cant be empty'},, status=400)
+					return JsonResponse({'message':'Username cant be empty'}, status=400)
 				username_status = validateUserName(username)
 				if username_status == True:
 					if not User.objects.filter(username=username).exists():
