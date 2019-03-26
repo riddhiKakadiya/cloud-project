@@ -724,8 +724,8 @@ def get404(request):
 @csrf_exempt
 def passwordReset(request):
 	try:
-		statsd.incr('api.password_reset.POST')
 		if request.method == "POST":
+			statsd.incr('api.password_reset.POST')
 			if(request.body):
 				received_json_data = json.loads(request.body.decode("utf-8"))
 				username = received_json_data['email']
@@ -736,6 +736,7 @@ def passwordReset(request):
 					if not User.objects.filter(username=username).exists():
 						# DO Nothing
 						logger.info("Email not present on Database")
+						print("SNS notification not sent")
 						return JsonResponse({"message" : "If user exists, a password reset email wll be sent to the email provided"}, status=200)
 					else:
 						# Username exists, proceed to reset pasword
@@ -747,9 +748,12 @@ def passwordReset(request):
 							Message=json.dumps({'default': json.dumps(message)}),
 							MessageStructure='json'
 						)
+						print("SNS notificaton sent")
 						return JsonResponse({"message" : "If user exists, a password reset email wll be sent to the email provided"}, status=200)
 				else:
-					return JsonResponse({"message" : username_status})
+					return JsonResponse({"message" : username_status},status=400)
+			else:
+				return JsonResponse({"message" : "Please send an email in the request body" },status=400)
 		else:
 			return JsonResponse({'Error': 'Please use a POST method to reset password'}, status=400)
 	except Exception as e:
