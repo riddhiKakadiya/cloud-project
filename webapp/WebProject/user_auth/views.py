@@ -725,19 +725,18 @@ def get404(request):
 def passwordReset(request):
 	statsd.incr('api.passwordReset')
 	try:
-		#user = validateSignin(request.META)
 		email=request.POST.get('email')
 		print(email)
+		print(type(email))
 		#Get email and verify if email exists in db
-		#trigger lamda
 		if (email == ""):
 			logger.debug("email is empty")
 			return JsonResponse({'message': 'Email cant be empty'}, status=400)
 		email_status = validateUserName(email)
 		if email_status== True:
 			if User.objects.filter(username=email).exists():
-				# logger.info("Sending notfcation to SNS")
 				message = {"email": email}
+				# logger.info("Sending notfcation to SNS")
 				# client = boto3.client('sns',region_name='us-east-1')
 				# response = client.publish(
 				# 	TargetArn=settings.SNSTOPICARN,
