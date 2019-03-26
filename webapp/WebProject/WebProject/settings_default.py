@@ -33,6 +33,7 @@ config = configparser.ConfigParser()
 pathToConfig = os.path.join(BASE_DIR, 'WebProject/config/my.cnf')
 config.read(pathToConfig)
 #Get variable
+# SNSTOPICARN= config['Config']['SNSTOPICARN']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
