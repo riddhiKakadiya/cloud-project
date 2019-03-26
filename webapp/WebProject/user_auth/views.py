@@ -20,7 +20,7 @@ import boto3
 from django.conf import settings
 import logging
 from django_statsd.clients import statsd
-#
+from boto3.dynamodb.conditions import Key, Attr
 
 # #--------------------------------------------------------------------------------
 # Define Logger
@@ -723,37 +723,36 @@ def get404(request):
 
 @csrf_exempt
 def passwordReset(request):
+	statsd.incr('api.passwordReset')
 	try:
-		if request.method == "POST":
-			statsd.incr('api.password_reset.POST')
-			if(request.body):
-				received_json_data = json.loads(request.body.decode("utf-8"))
-				username = received_json_data['email']
-				if (username=="" or username==None):
-					return JsonResponse({'message':'Username cant be empty'}, status=400)
-				username_status = validateUserName(username)
-				if username_status == True:
-					if not User.objects.filter(username=username).exists():
-						# DO Nothing
-						logger.info("Email not present on Database")
-						return JsonResponse({"message" : "If user exists, a password reset email wll be sent to the email provided"}, status=200)
-					else:
-						# Username exists, proceed to reset pasword
-						logger.info("Sending notfcation to SNS")
-						message = {"email": username}
-						client = boto3.client('sns',region_name='us-east-1')
-						response = client.publish(
-							TargetArn=settings.SNSTOPICARN,
-							Message=json.dumps({'default': json.dumps(message)}),
-							MessageStructure='json'
-						)
-						return JsonResponse({"message" : "If user exists, a password reset email wll be sent to the email provided"}, status=200)
-				else:
-					return JsonResponse({"message" : username_status},status=400)
+		email=request.POST.get('email')
+		print(email)
+		print(type(email))
+		#Get email and verify if email exists in db
+		if (email == ""):
+			logger.debug("email is empty")
+			return JsonResponse({'message': 'Email cant be empty'}, status=400)
+		email_status = validateUserName(email)
+		if email_status== True:
+			if User.objects.filter(username=email).exists():
+				message = {"email": email}
+				# logger.info("Sending notfcation to SNS")
+				# client = boto3.client('sns',region_name='us-east-1')
+				# response = client.publish(
+				# 	TargetArn=settings.SNSTOPICARN,
+				# 	Message=json.dumps({'default': json.dumps(message)}),
+				# 	MessageStructure='json'
+				# )
+				statsd.incr('api.passwordReset.POST.200')
+				return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
 			else:
-				return JsonResponse({"message" : "Please send an email in the request body" },status=400)
+				statsd.incr('api.passwordReset.POST.400')
+				return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
 		else:
-			return JsonResponse({'Error': 'Please use a POST method to reset password'}, status=400)
+			statsd.incr('api.passwordReset.POST.400')
+			return JsonResponse(email_status, status=400)		
 	except Exception as e:
 		logger.error("Something Happened: %s", e)
-		return JsonResponse({'Error': 'Bad Request'}, status=400)
+		statsd.incr('api.passwordReset.')
+		return JsonResponse({'Error': 'Please use a post method with parameter email'})
+
