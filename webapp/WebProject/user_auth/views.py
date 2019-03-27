@@ -739,15 +739,16 @@ def passwordReset(request):
 			client = boto3.client('sns',region_name='us-east-1')
 			response = client.publish(
 				TargetArn=settings.SNSTOPICARN,
-				MessageStructure='json',
+				MessageStructure='String',
+				Message="Reset Email",
 				MessageAttributes={
-					'URL': {
-							'Type': 'string',
-							'Value': domain_name
+					"URL": {
+							"DataType": "String",
+							"StringValue": str(domain_name)
 						},
-					'email': {
-							'Type': 'string',
-							'Value': email
+					"email": {
+							"DataType" : "String",
+							"StringValue" : str(email)
 						}
 					}
 				)
