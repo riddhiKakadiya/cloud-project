@@ -742,13 +742,13 @@ def passwordReset(request):
 				MessageStructure='json',
 				Message="",
 				MessageAttributes={
-					'URL': {
-							'DataType': 'string',
-							'StringValue': domain_name
+					"URL": {
+							"DataType": "String",
+							"StringValue": str(domain_name)
 						},
-					'email': {
-							'DataType': 'string',
-							'StringValue': email
+					"email": {
+							"DataType" : "String",
+							"StringValue" : str(email)
 						}
 					}
 				)
