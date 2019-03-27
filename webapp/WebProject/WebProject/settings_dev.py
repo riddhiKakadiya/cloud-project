@@ -57,6 +57,7 @@ PROFILE = 'dev'
 
 S3_BUCKETNAME = config['Config']['S3_BUCKET']
 SNSTOPICARN= config['Config']['SNSTOPICARN']
+DOMAIN_NAME= config['Config']['DOMAIN_NAME']
 
 # Application definition
 
