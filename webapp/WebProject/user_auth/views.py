@@ -740,7 +740,7 @@ def passwordReset(request):
 			response = client.publish(
 				TargetArn=settings.SNSTOPICARN,
 				MessageStructure='json',
-				Message="",
+				Message="Reset Email",
 				MessageAttributes={
 					"URL": {
 							"DataType": "String",
