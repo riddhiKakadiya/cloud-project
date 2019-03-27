@@ -45,6 +45,7 @@ SECRET_KEY = 'l_k3zyn7$2j*vsvk&m3t5&*bp++r*=v*$c9gmoiy9z0xk5u_6m'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+SNSTOPICARN= config['Config']['SNSTOPICARN']
 
 # Define whether to run in dev environment or default(local) environment
 PROFILE = 'default'
