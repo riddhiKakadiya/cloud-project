@@ -724,7 +724,6 @@ def get404(request):
 @csrf_exempt
 def passwordReset(request):
 	statsd.incr('api.passwordReset')
-	# try:
 	email=request.POST.get('email')
 	print(email)
 	print(type(email))
@@ -733,7 +732,7 @@ def passwordReset(request):
 		logger.debug("email is empty")
 		return JsonResponse({'message': 'Email cant be empty'}, status=400)
 	email_status = validateUserName(email)
-	domain_name="csye6225-spring2019-kamleshr.me"
+	domain_name = settings.DOMAIN_NAME
 	if email_status== True:
 		if User.objects.filter(username=email).exists():
 			logger.info("Sending notification to SNS")
@@ -759,9 +758,6 @@ def passwordReset(request):
 			return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
 	else:
 		statsd.incr('api.passwordReset.POST.400')
-		return JsonResponse(email_status, status=400)		
-	# except Exception as e:
-	# 	logger.error("Something Happened: %s", e)
-	# 	statsd.incr('api.passwordReset.')
-	# 	return JsonResponse({'Error': 'Please use a post method with parameter email'})
+		return JsonResponse(email_status, status=400)
+
 

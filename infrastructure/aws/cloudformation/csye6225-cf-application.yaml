@@ -38,6 +38,10 @@ Parameters:
     Default: "arn:aws:sns:us-east-1:<account_id>:SNSTopicResetPassword"
     Description: SNS topic ARN for reset password
     Type: String
+  DomainName:
+    Default: "csye6225-s19-mandakathils.me."
+    Description: Domain Name for the server
+    Type: String
 
 Resources:
 
@@ -96,6 +100,7 @@ Resources:
                 "RDS_UN=csye6225master",
                 "RDS_PASSWORD=csye6225password",
                 "RDS_DB=csye6225",
+                !Join ["",["DOMAIN_NAME=",!Ref DomainName]],
                 !Join ["",["S3_BUCKET=",!Ref S3BucketName]],
                 !Join ["",["SNSTOPICARN=",!Ref SNSTOPICARN]],
                 "EOF",
