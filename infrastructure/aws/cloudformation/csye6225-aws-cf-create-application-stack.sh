@@ -60,7 +60,7 @@ SUBNET_ID3=$(echo $NETWORK_STACK  | jq -c '.[] | select(.LogicalResourceId == "S
 
 echo $VPC_ID $SUBNET_ID1
 
-AccountId=$(aws iam get-user|python -c "import json as j,sys;o=j.load(sys.stdin);print o['User']['Arn'].split(':')[4]")
+AccountId=$(aws sts get-caller-identity | jq -r '.Account')
 echo "AccountId: $AccountId"
 
 SNSTOPIC_ARN="arn:aws:sns:us-east-1:$AccountId:SNSTopicResetPassword"
