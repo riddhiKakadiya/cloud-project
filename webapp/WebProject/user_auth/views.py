@@ -740,7 +740,7 @@ def passwordReset(request):
 			client = boto3.client('sns',region_name='us-east-1')
 			response = client.publish(
 				TargetArn=settings.SNSTOPICARN,
-				MessageStructure='json'
+				MessageStructure='json',
 				MessageAttributes={
 					'URL': {
 							'Type': 'string',
@@ -751,8 +751,7 @@ def passwordReset(request):
 							'Value': email
 						}
 					}
-			)
-
+				)
 			statsd.incr('api.passwordReset.POST.200')
 			return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
 		else:
