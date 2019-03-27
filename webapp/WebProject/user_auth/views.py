@@ -732,7 +732,7 @@ def passwordReset(request):
 		logger.debug("email is empty")
 		return JsonResponse({'message': 'Email cant be empty'}, status=400)
 	email_status = validateUserName(email)
-	domain_name = settings.DOMAIN_NAME
+	domain_name = settings.DOMAIN_NAME[:-1]
 	if email_status== True:
 		if User.objects.filter(username=email).exists():
 			logger.info("Sending notification to SNS")
