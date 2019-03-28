@@ -228,7 +228,8 @@ def validatePassword(password):
 
 # Validing username
 def validateUserName(username):
-	valid = re.search(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$', username)
+	valid = re.search(r'\w+[.|\w]\w+@\w+[.]\w+[.|\w+]\w+', username)
+	# valid = re.search(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$', username)
 	if valid:
 		return True
 	return "* please enter valid email ID *"
