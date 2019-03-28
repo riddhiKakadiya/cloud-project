@@ -61,5 +61,5 @@ workflows:
                 only: 
                   - assignment5
                   - assignment6
-                  - assignment7_test
+                  - assignment7
                   - master

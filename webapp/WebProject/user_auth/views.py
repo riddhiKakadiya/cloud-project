@@ -228,7 +228,8 @@ def validatePassword(password):
 
 # Validing username
 def validateUserName(username):
-	valid = re.search(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$', username)
+	valid = re.search(r'\w+[.|\w]\w+@\w+[.]\w+[.|\w+]\w+', username)
+	# valid = re.search(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$', username)
 	if valid:
 		return True
 	return "* please enter valid email ID *"
@@ -724,7 +725,6 @@ def get404(request):
 @csrf_exempt
 def passwordReset(request):
 	statsd.incr('api.passwordReset')
-	# try:
 	email=request.POST.get('email')
 	print(email)
 	print(type(email))
@@ -733,22 +733,23 @@ def passwordReset(request):
 		logger.debug("email is empty")
 		return JsonResponse({'message': 'Email cant be empty'}, status=400)
 	email_status = validateUserName(email)
-	domain_name="csye6225-spring2019-kamleshr.me"
+	domain_name = settings.DOMAIN_NAME
 	if email_status== True:
 		if User.objects.filter(username=email).exists():
 			logger.info("Sending notification to SNS")
 			client = boto3.client('sns',region_name='us-east-1')
 			response = client.publish(
 				TargetArn=settings.SNSTOPICARN,
-				MessageStructure='json',
+				MessageStructure='String',
+				Message="Reset Email",
 				MessageAttributes={
-					'URL': {
-							'Type': 'string',
-							'Value': domain_name
+					"URL": {
+							"DataType": "String",
+							"StringValue": str(domain_name)
 						},
-					'email': {
-							'Type': 'string',
-							'Value': email
+					"email": {
+							"DataType" : "String",
+							"StringValue" : str(email)
 						}
 					}
 				)
@@ -759,9 +760,6 @@ def passwordReset(request):
 			return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
 	else:
 		statsd.incr('api.passwordReset.POST.400')
-		return JsonResponse(email_status, status=400)		
-	# except Exception as e:
-	# 	logger.error("Something Happened: %s", e)
-	# 	statsd.incr('api.passwordReset.')
-	# 	return JsonResponse({'Error': 'Please use a post method with parameter email'})
+		return JsonResponse(email_status, status=400)
+
 
