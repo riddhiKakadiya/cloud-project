@@ -46,6 +46,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 SNSTOPICARN= config['Config']['SNSTOPICARN']
+DOMAIN_NAME= config['Config']['DOMAIN_NAME']
 
 # Define whether to run in dev environment or default(local) environment
 PROFILE = 'default'
