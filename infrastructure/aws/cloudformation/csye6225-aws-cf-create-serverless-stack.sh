@@ -13,5 +13,5 @@ aws cloudformation create-stack --stack-name "serverless" --capabilities "CAPABI
 aws cloudformation wait stack-create-complete --stack-name "serverless"
 STACKDETAILS=$(aws cloudformation describe-stacks --stack-name "serverless" --query Stacks[0].StackId --output text)
 
-# echo "Stack serverless created successfully"
+echo "Stack serverless created successfully"
 exit 0
