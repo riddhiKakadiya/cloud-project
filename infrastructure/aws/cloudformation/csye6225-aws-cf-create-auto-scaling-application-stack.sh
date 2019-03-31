@@ -67,6 +67,7 @@ SNSTOPIC_ARN="arn:aws:sns:us-east-1:$AccountId:SNSTopicResetPassword"
 echo "SNSTOPIC_ARN: $SNSTOPIC_ARN"
 
 DOMAIN=$(aws route53 list-hosted-zones | jq -r '.HostedZones[] | select(.Name | startswith("csye")).Name')
+DOMAIN=${DOMAIN%?}
 
 response=$(aws cloudformation create-stack --stack-name $1 --capabilities CAPABILITY_NAMED_IAM --template-body file://csye6225-cf-auto-scaling-application.yaml --parameters ParameterKey=ImageIdparam,ParameterValue=$3 ParameterKey=myVPC,ParameterValue=$VPC_ID ParameterKey=EC2Subnet,ParameterValue=$SUBNET_ID1 ParameterKey=RDSSubnet1,ParameterValue=$SUBNET_ID2 ParameterKey=RDSSubnet2,ParameterValue=$SUBNET_ID3 ParameterKey=KeyPair,ParameterValue=$4 ParameterKey=S3BucketName,ParameterValue=$5 ParameterKey=S3BucketNameCD,ParameterValue=$6 ParameterKey=SNSTOPICARN,ParameterValue=$SNSTOPIC_ARN ParameterKey=DomainName,ParameterValue=$DOMAIN)
 
