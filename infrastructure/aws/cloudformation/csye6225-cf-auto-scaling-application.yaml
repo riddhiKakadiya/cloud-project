@@ -164,9 +164,9 @@ Resources:
     Properties:
       HealthCheckIntervalSeconds: 40
       HealthCheckTimeoutSeconds: 30
-      HealthCheckPort: 8080
+      HealthCheckPort: 80
       HealthCheckProtocol: HTTP
-      Port: 8080
+      Port: 80
       TargetGroupAttributes:
       - Key: "deregistration_delay.timeout_seconds"
         Value: 20
@@ -190,8 +190,8 @@ Resources:
         CidrIp: "0.0.0.0/0"
       SecurityGroupEgress:
       - IpProtocol: "tcp"
-        FromPort: 8080
-        ToPort: 8080
+        FromPort: 80
+        ToPort: 80
         DestinationSecurityGroupId: !GetAtt InstanceSecurityGroup.GroupId
 
 
