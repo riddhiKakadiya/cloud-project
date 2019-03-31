@@ -192,7 +192,6 @@ Resources:
       - IpProtocol: "tcp"
         FromPort: 80
         ToPort: 80
-        DestinationSecurityGroupId: !GetAtt InstanceSecurityGroup.GroupId
 
 
   LoadBalancer:
@@ -226,17 +225,19 @@ Resources:
       GroupDescription: Allow http, SSH and SSL to client host
       VpcId:
         Ref: myVPC
-      SecurityGroupIngress:
+      SecurityGroupIngress: 
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
+        SourceSecurityGroupId: !GetAtt LoadBalancerSecurityGroup.GroupId
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
-        CidrIp: 0.0.0.0/0
+        CidrIp: "0.0.0.0/0"
       - IpProtocol: tcp
         FromPort: 443
         ToPort: 443
+        SourceSecurityGroupId: !GetAtt LoadBalancerSecurityGroup.GroupId
       Tags:
       - Key: Name
         Value:
@@ -314,6 +315,8 @@ Resources:
       MinSize: "3"
       MaxSize: "10"
       DesiredCapacity: "3"
+      TargetGroupARNs: 
+      - !Ref "TargetGroup"
       Tags:
       - Key: Name
         PropagateAtLaunch: "true"
