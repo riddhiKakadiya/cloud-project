@@ -309,7 +309,7 @@ Resources:
         - Type: KEY_AND_VALUE
           Key: ec2-type
           Value: csye-6225
-      DeploymentConfigName: CodeDeployDefault.AllAtOncep
+      DeploymentConfigName: CodeDeployDefault.OneAtATime
       DeploymentStyle:
         DeploymentType: "IN_PLACE"
         DeploymentOption: "WITHOUT_TRAFFIC_CONTROL"
