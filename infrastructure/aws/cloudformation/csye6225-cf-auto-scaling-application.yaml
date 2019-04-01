@@ -462,7 +462,7 @@ Resources:
       - !Ref WebServerGroup
       DeploymentStyle:
         DeploymentType: "IN_PLACE"
-        DeploymentOption: "WITHOUT_TRAFFIC_CONTROL"
+        DeploymentOption: "WITH_TRAFFIC_CONTROL"
       AutoRollbackConfiguration:
         Enabled: true
         Events:
