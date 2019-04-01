@@ -15,6 +15,8 @@ try:
         re_path(r'^reset/?$', views.passwordReset, name='passwordReset'),
         re_path(r'^.*/$', views.get404, name='get404')
             ]
+        re_path(r'^pingTest$', views.pingTest, name='pingTest'),
+            
 except Exception as e:
     logger.debug("Something happened :\n %s", e)
 
