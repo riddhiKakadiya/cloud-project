@@ -335,7 +335,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Ref WebServerGroup
       AdjustmentType: "ChangeInCapacity"
-      Cooldown: "60"
+      Cooldown: "30"
       ScalingAdjustment: "1"
 
 
@@ -344,7 +344,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Ref WebServerGroup
       AdjustmentType: "ChangeInCapacity"
-      Cooldown: "60"
+      Cooldown: "30"
       ScalingAdjustment: "-1"
 
   CPUAlarmHigh:
@@ -454,7 +454,7 @@ Resources:
         - Type: KEY_AND_VALUE
           Key: ec2-type
           Value: csye-6225
-      DeploymentConfigName: CodeDeployDefault.OneAtATime
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce
       LoadBalancerInfo:
         TargetGroupInfoList:
         - Name: !GetAtt TargetGroup.TargetGroupName
@@ -462,7 +462,7 @@ Resources:
       - !Ref WebServerGroup
       DeploymentStyle:
         DeploymentType: "IN_PLACE"
-        DeploymentOption: "WITH_TRAFFIC_CONTROL"
+        DeploymentOption: "WITHOUT_TRAFFIC_CONTROL"
       AutoRollbackConfiguration:
         Enabled: true
         Events:
