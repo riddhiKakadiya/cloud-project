@@ -764,4 +764,4 @@ def passwordReset(request):
 
 @csrf_exempt
 def pingTest(request):
-	return JsonResponse("message": " : Ping Test Successful", status=200)
+	return JsonResponse({"message": " : Ping Test Successful"}, status=200)
