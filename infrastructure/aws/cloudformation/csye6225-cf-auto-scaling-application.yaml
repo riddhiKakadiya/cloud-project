@@ -307,7 +307,7 @@ Resources:
   WebServerGroup: 
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties: 
-      Cooldown: "60"
+      Cooldown: "10"
       VPCZoneIdentifier:
       - !Ref "RDSSubnet1"
       - !Ref "RDSSubnet2"
@@ -349,14 +349,14 @@ Resources:
   CPUAlarmHigh:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
-      AlarmDescription: "Scale-up if CPU > 10% for 1 minutes"
+      AlarmDescription: "Scale-up if CPU > 8% for 1 minutes"
       MetricName: "CPUUtilization"
       Namespace: "AWS/EC2"
       Statistic: "Average"
       Period: "60"
       EvaluationPeriods: "1"
       DatapointsToAlarm: "1"
-      Threshold: "10"
+      Threshold: "8"
       AlarmActions:
       - !Ref WebServerScaleUpPolicy
       Dimensions:
