@@ -162,8 +162,8 @@ Resources:
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      HealthCheckIntervalSeconds: 40
-      HealthCheckTimeoutSeconds: 30
+      HealthCheckIntervalSeconds: 5
+      HealthCheckTimeoutSeconds: 2
       HealthCheckPort: 80
       HealthCheckProtocol: HTTP
       HealthCheckPath: "/pingTest"
@@ -310,8 +310,7 @@ Resources:
       Cooldown: "60"
       VPCZoneIdentifier:
       - !Ref "RDSSubnet1"
-      - !Ref "RDSSubnet1"
-      - !Ref "EC2Subnet"
+      - !Ref "RDSSubnet2"
       LaunchConfigurationName: 
         Ref: "ASGLaunchConfig"
       MinSize: "3"
@@ -356,7 +355,8 @@ Resources:
       Statistic: "Average"
       Period: "60"
       EvaluationPeriods: "1"
-      Threshold: "4"
+      DatapointsToAlarm: "1"
+      Threshold: "10"
       AlarmActions:
       - !Ref WebServerScaleUpPolicy
       Dimensions:
@@ -373,7 +373,8 @@ Resources:
       Statistic: "Average"
       Period: "60"
       EvaluationPeriods: "1"
-      Threshold: "2"
+      DatapointsToAlarm: "1"
+      Threshold: "5"
       AlarmActions:
       - !Ref WebServerScaleDownPolicy
       Dimensions:
