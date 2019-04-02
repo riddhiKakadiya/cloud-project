@@ -762,4 +762,6 @@ def passwordReset(request):
 		statsd.incr('api.passwordReset.POST.400')
 		return JsonResponse(email_status, status=400)
 
-
+@csrf_exempt
+def pingTest(request):
+	return JsonResponse({"message": " : Ping Test Successful"}, status=200)

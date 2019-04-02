@@ -166,6 +166,7 @@ Resources:
       HealthCheckTimeoutSeconds: 30
       HealthCheckPort: 80
       HealthCheckProtocol: HTTP
+      HealthCheckPath: "/pingTest"
       Port: 80
       TargetGroupAttributes:
       - Key: "deregistration_delay.timeout_seconds"
@@ -192,7 +193,7 @@ Resources:
       - IpProtocol: "tcp"
         FromPort: 80
         ToPort: 80
-        CidrIp: "0.0.0.0/0"
+        DestinationSecurityGroupId: !GetAtt InstanceSecurityGroup.GroupId
 
 
   LoadBalancer:
@@ -230,7 +231,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
-        SourceSecurityGroupId: !GetAtt LoadBalancerSecurityGroup.GroupId
+        CidrIp: "0.0.0.0/0"
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
@@ -238,7 +239,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: 443
         ToPort: 443
-        SourceSecurityGroupId: !GetAtt LoadBalancerSecurityGroup.GroupId
+        CidrIp: "0.0.0.0/0"
       Tags:
       - Key: Name
         Value:
@@ -334,7 +335,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Ref WebServerGroup
       AdjustmentType: "ChangeInCapacity"
-      Cooldown: "60"
+      Cooldown: "30"
       ScalingAdjustment: "1"
 
 
@@ -343,7 +344,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Ref WebServerGroup
       AdjustmentType: "ChangeInCapacity"
-      Cooldown: "60"
+      Cooldown: "30"
       ScalingAdjustment: "-1"
 
   CPUAlarmHigh:
@@ -454,9 +455,9 @@ Resources:
           Key: ec2-type
           Value: csye-6225
       DeploymentConfigName: CodeDeployDefault.AllAtOnce
-      # LoadBalancerInfo:
-      #   TargetGroupInfoList:
-      #   - Name: !GetAtt TargetGroup.TargetGroupName
+      LoadBalancerInfo:
+        TargetGroupInfoList:
+        - Name: !GetAtt TargetGroup.TargetGroupName
       AutoScalingGroups: 
       - !Ref WebServerGroup
       DeploymentStyle:
