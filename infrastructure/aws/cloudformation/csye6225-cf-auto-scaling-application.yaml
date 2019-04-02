@@ -355,8 +355,8 @@ Resources:
       Namespace: "AWS/EC2"
       Statistic: "Average"
       Period: "60"
-      EvaluationPeriods: "2"
-      Threshold: "10"
+      EvaluationPeriods: "1"
+      Threshold: "4"
       AlarmActions:
       - !Ref WebServerScaleUpPolicy
       Dimensions:
@@ -372,8 +372,8 @@ Resources:
       Namespace: "AWS/EC2"
       Statistic: "Average"
       Period: "60"
-      EvaluationPeriods: "2"
-      Threshold: "5"
+      EvaluationPeriods: "1"
+      Threshold: "2"
       AlarmActions:
       - !Ref WebServerScaleDownPolicy
       Dimensions:
