@@ -307,7 +307,7 @@
           <boolProp name="CookieManager.clearEachIteration">false</boolProp>
         </CookieManager>
         <hashTree/>
-        <AuthManager guiclass="AuthPanel" testclass="AuthManager" testname="HTTP Authorization Manager" enabled="false">
+        <AuthManager guiclass="AuthPanel" testclass="AuthManager" testname="HTTP Authorization Manager" enabled="true">
           <collectionProp name="AuthManager.auth_list">
             <elementProp name="" elementType="Authorization">
               <stringProp name="Authorization.url">https://csye6225-spring2019-kamleshr.me.</stringProp>
@@ -317,6 +317,7 @@
               <stringProp name="Authorization.realm"></stringProp>
             </elementProp>
           </collectionProp>
+          <boolProp name="AuthManager.clearEachIteration">true</boolProp>
         </AuthManager>
         <hashTree/>
       </hashTree>
