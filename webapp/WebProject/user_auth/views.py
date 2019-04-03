@@ -266,7 +266,7 @@ def is_valid_uuid(uuid_to_test, version=4):
 # --------------------------------------------------------------------------------
 
 
-@csrf_exempt
+
 def registerPage(request):
 	statsd.incr('api.registerPage')
 	# check if method is post
@@ -308,7 +308,7 @@ def registerPage(request):
 	return JsonResponse({'Error': 'Please use a post method with parameters username and password to create user'})
 
 
-@csrf_exempt
+
 def signin(request):
 	statsd.incr('api.signin')
 	# statsd.incr('test2')
@@ -332,7 +332,7 @@ def signin(request):
 	else:
 		return JsonResponse({'Error': 'Please use a get method with user credentials'})
 
-@csrf_exempt
+
 def createOrGetNotes(request):
 	statsd.incr('api.note')
 	try:
@@ -399,7 +399,7 @@ def createOrGetNotes(request):
 		statsd.incr('api.note.GET.400')
 		return JsonResponse({'Error': 'Bad Request'}, status=400)
 
-@csrf_exempt
+
 def noteFromId(request, note_id=""):
 	statsd.incr('api.note_id')
 	try:
@@ -517,7 +517,7 @@ def noteFromId(request, note_id=""):
 		statsd.incr('api.note_id.DELETE.400')
 		return JsonResponse({'Error': 'Bad Request'}, status=400)
 
-@csrf_exempt
+
 def addAttachmentToNotes(request,note_id=""):
 	statsd.incr('api.note_attachment')
 	try:
@@ -605,7 +605,7 @@ def addAttachmentToNotes(request,note_id=""):
 		logger.error("Something Happened: %s", e)
 		statsd.incr('api.note_attachment.GET.400')
 		return JsonResponse({'Error': 'Bad Request'}, status=400)
-@csrf_exempt
+
 def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 	statsd.incr('api.note_attachment_id')
 	# Update method to update attachments for authorized user
@@ -717,12 +717,12 @@ def updateOrDeleteAttachments(request,note_id="",attachment_id=""):
 		statsd.incr('api.note_attachment_id.DELETE.400')
 		return JsonResponse({'Error': 'Bad Request'}, status=400)
 
-@csrf_exempt
+
 def get404(request):
 	statsd.incr('api.404')
 	return JsonResponse({'Error': 'Page not found'}, status=404)
 
-@csrf_exempt
+
 def passwordReset(request):
 	try:
 		if request.method == 'POST':
@@ -769,6 +769,6 @@ def passwordReset(request):
 			logger.error("Something Happened: %s", e)
 			statsd.incr('api.password_reset.POST.400')
 			return JsonResponse({'Error': 'Bad Request'}, status=400)
-@csrf_exempt
+
 def pingTest(request):
 	return JsonResponse({"message": " : Ping Test Successful"}, status=200)
