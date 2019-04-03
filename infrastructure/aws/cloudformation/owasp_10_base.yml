@@ -830,7 +830,7 @@ Resources:
         - FieldToMatch:
             Type: METHOD
           PositionalConstraint: EXACTLY
-          TargetString: trace
+          TargetString: post
           TextTransformation: LOWERCASE
   wafgCSRFMethodStringSet:
     Type: AWS::WAF::ByteMatchSet
@@ -841,7 +841,7 @@ Resources:
         - FieldToMatch:
             Type: METHOD
           PositionalConstraint: EXACTLY
-          TargetString: trace
+          TargetString: post
           TextTransformation: LOWERCASE
   wafrCSRFTokenSizeConstraint:
     Type: AWS::WAFRegional::SizeConstraintSet
