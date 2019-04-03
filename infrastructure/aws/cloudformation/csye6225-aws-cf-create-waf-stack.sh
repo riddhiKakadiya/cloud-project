@@ -2,10 +2,13 @@
 
 #Exit immediately if a command exits with a non-zero exit status.
 set -e
+##Get Load balacer ARN
+LOADBALANCER=$(aws elbv2 describe-load-balancers --query LoadBalancers[0].LoadBalancerArn --output text)
 
+echo "ELBResourceARN: $LOADBALANCER"
 ##Creating Stack
 echo "Creating Stack waf"
-response=$(aws cloudformation create-stack --stack-name "waf" --template-body file://owasp_10_base.yml) 
+response=$(aws cloudformation create-stack --stack-name "waf" --template-body file://owasp_10_base.yml --parameters ParameterKey=LOADBALANCER,ParameterValue=$LOADBALANCER) 
 #response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-networking.yaml)
 echo "Waiting for Stack waf to be created"
 echo "$response"
