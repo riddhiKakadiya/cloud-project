@@ -228,7 +228,7 @@ def validatePassword(password):
 
 # Validing username
 def validateUserName(username):
-	valid = re.search(r'\w+[.|\w]\w+@\w+[.]\w+[.|\w+]\w+', username)
+	valid = re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}', username)
 	# valid = re.search(r'^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$', username)
 	if valid:
 		return True
@@ -756,13 +756,13 @@ def passwordReset(request):
 							}
 						)
 					statsd.incr('api.passwordReset.POST.200')
-					return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
+					return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"}, safe=False)
 				else:
 					statsd.incr('api.passwordReset.POST.400')
-					return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"})
+					return JsonResponse({"message": " : you will receive password reset link if the email address exists in our system"}, safe=False)
 			else:
 				statsd.incr('api.passwordReset.POST.400')
-				return JsonResponse(email_status, status=400)
+				return JsonResponse({"message":email_status}, status=400, safe=False)
 		else:
 			return JsonResponse({'message': 'Error : Request method should be POST'}, status=400)
 	except Exception as e:
