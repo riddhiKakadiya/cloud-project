@@ -142,6 +142,8 @@ python3 manage.py test
 ## CI/CD
 Any changes made to master branch will trigger a new build
 
+## LAMDA function 
+Prerequsites: User need to have a verified domain name
 
 ## Checking UDP port for statsd streaming
 
