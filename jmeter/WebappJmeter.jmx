@@ -27,21 +27,25 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1000</stringProp>
+          <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">200</stringProp>
+        <stringProp name="ThreadGroup.num_threads">1000</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1000</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
-        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
       </ThreadGroup>
       <hashTree>
         <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
           <collectionProp name="Arguments.arguments">
             <elementProp name="domainName" elementType="Argument">
               <stringProp name="Argument.name">domainName</stringProp>
-              <stringProp name="Argument.value">csye6225-spring2019-kamleshr.me</stringProp>
+              <stringProp name="Argument.value">csye6225-s19-mandakathils.me</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="attachment_path" elementType="Argument">
+              <stringProp name="Argument.name">attachment_path</stringProp>
+              <stringProp name="Argument.value">C:\Users\sreer\Desktop\scrapy.txt</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
           </collectionProp>
@@ -105,7 +109,7 @@
         <AuthManager guiclass="AuthPanel" testclass="AuthManager" testname="HTTP Authorization Manager" enabled="true">
           <collectionProp name="AuthManager.auth_list">
             <elementProp name="" elementType="Authorization">
-              <stringProp name="Authorization.url">https://csye6225-spring2019-kamleshr.me</stringProp>
+              <stringProp name="Authorization.url">https://${domainName}</stringProp>
               <stringProp name="Authorization.username">srjk${rand_var}@gmail.com</stringProp>
               <stringProp name="Authorization.password">SRjk_${rand_var}</stringProp>
               <stringProp name="Authorization.domain"></stringProp>
@@ -197,8 +201,8 @@
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="AttachmentUpload" enabled="true">
           <elementProp name="HTTPsampler.Files" elementType="HTTPFileArgs">
             <collectionProp name="HTTPFileArgs.files">
-              <elementProp name="/home/riddhikakadiya/Downloads/chicken.jpeg" elementType="HTTPFileArg">
-                <stringProp name="File.path">/home/riddhikakadiya/Downloads/chicken.jpeg</stringProp>
+              <elementProp name="${attachment_path}" elementType="HTTPFileArg">
+                <stringProp name="File.path">${attachment_path}</stringProp>
                 <stringProp name="File.paramname">attachment</stringProp>
                 <stringProp name="File.mimetype">jpeg</stringProp>
               </elementProp>
@@ -230,7 +234,7 @@
           <stringProp name="HTTPSampler.port"></stringProp>
           <stringProp name="HTTPSampler.protocol">https</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/</stringProp>
+          <stringProp name="HTTPSampler.path">/note</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
