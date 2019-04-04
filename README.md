@@ -2,8 +2,8 @@
 
 ## Team Information
 
-| Name | NEU ID | Email Address |
-| --- | --- | --- |
+| Name | NEU ID | Email Address | Domain |
+| --- | --- | --- | --- |
 | Jai Soni| 001822913|soni.j@husky.neu.edu | csye6225-spring2019-sonij.me |
 | Krapali Rai| 001813750 | rai.k@husky.neu.edu | csye6225-spring2019-raik.me. |
 | Riddhi Kakadiya| 001811354 | kamlesh.r@husky.neu.edu | csye6225-spring2019-kamleshr.me |
