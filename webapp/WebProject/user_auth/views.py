@@ -512,6 +512,10 @@ def noteFromId(request, note_id=""):
 				logger.debug("Incorrect user details")
 				statsd.incr('api.note_id.DELETE.401')
 				return JsonResponse({'message': 'Error : Incorrect user details'}, status=401)
+		else:
+			logger.debug("wrong request method")
+			statsd.incr('api.note_id.401')
+			return JsonResponse({'message': 'Please use GET, PUT or DELETE'}, status=401)
 	except Exception as e:
 		logger.error("Something Happened: %s", e)
 		statsd.incr('api.note_id.DELETE.400')
