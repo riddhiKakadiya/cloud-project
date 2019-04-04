@@ -126,8 +126,8 @@ $ curl http://{EC2_hostname}/reset
 
 ## Web End-points
 __________________________________________________________________________________________________
-num | request  | path                 | required variables 		              | sample request   |
-____|____type__|______________________|_______________________________________|__________________|
+num | request  | path                 | required variables 		            |Authorization type   |
+____|____type__|______________________|_____________________________________|_____________________|
 
  1  |  GET     | /                    |           NA                        | No auth required
  2  |  POST    | /user/register       | username:"", Password: ""           | No auth required
