@@ -4,10 +4,10 @@
 
 | Name | NEU ID | Email Address |
 | --- | --- | --- |
-| Jai Soni| 001822913|soni.j@husky.neu.edu | csye6225-spring2019-sonij.me
-| Krapali Rai| 001813750 | rai.k@husky.neu.edu | csye6225-spring2019-raik.me.
-| Riddhi Kakadiya| 001811354 | kamlesh.r@husky.neu.edu | csye6225-spring2019-kamleshr.me
-| Sreerag Mandakathil Sreenath| 001838559| mandakathil.s@husky.neu.edu| csye6225-s19-mandakathils.me
+| Jai Soni| 001822913|soni.j@husky.neu.edu | csye6225-spring2019-sonij.me |
+| Krapali Rai| 001813750 | rai.k@husky.neu.edu | csye6225-spring2019-raik.me. |
+| Riddhi Kakadiya| 001811354 | kamlesh.r@husky.neu.edu | csye6225-spring2019-kamleshr.me |
+| Sreerag Mandakathil Sreenath| 001838559| mandakathil.s@husky.neu.edu| csye6225-s19-mandakathils.me |
 
 
 ## Technology Stack
