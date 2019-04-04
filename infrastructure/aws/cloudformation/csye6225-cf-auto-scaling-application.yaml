@@ -214,13 +214,13 @@ Resources:
     Properties:
       DefaultActions:
       - Type: forward
-        RedirectConfig:
-            Host: "#{host}"
-            Path: "/#{path}"
-            Port: 443
-            Protocol: "HTTPS"
-            Query: "#{query}"
-            StatusCode: "HTTP_301"
+        # RedirectConfig:
+        #     Host: "#{host}"
+        #     Path: "/#{path}"
+        #     Port: 443
+        #     Protocol: "HTTPS"
+        #     Query: "#{query}"
+        #     StatusCode: "HTTP_301"
         TargetGroupArn: !Ref TargetGroup
       LoadBalancerArn: !Ref LoadBalancer
       Port: 443
