@@ -214,6 +214,13 @@ Resources:
     Properties:
       DefaultActions:
       - Type: forward
+        # RedirectConfig:
+        #     Host: "#{host}"
+        #     Path: "/#{path}"
+        #     Port: 443
+        #     Protocol: "HTTPS"
+        #     Query: "#{query}"
+        #     StatusCode: "HTTP_301"
         TargetGroupArn: !Ref TargetGroup
       LoadBalancerArn: !Ref LoadBalancer
       Port: 443
@@ -349,14 +356,14 @@ Resources:
   CPUAlarmHigh:
     Type: "AWS::CloudWatch::Alarm"
     Properties:
-      AlarmDescription: "Scale-up if CPU > 8% for 1 minutes"
+      AlarmDescription: "Scale-up if CPU > 10% for 1 minutes"
       MetricName: "CPUUtilization"
       Namespace: "AWS/EC2"
       Statistic: "Average"
       Period: "60"
       EvaluationPeriods: "1"
       DatapointsToAlarm: "1"
-      Threshold: "8"
+      Threshold: "10"
       AlarmActions:
       - !Ref WebServerScaleUpPolicy
       Dimensions:
