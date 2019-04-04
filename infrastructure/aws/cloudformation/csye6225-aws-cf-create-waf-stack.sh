@@ -8,7 +8,7 @@ LOADBALANCER=$(aws elbv2 describe-load-balancers --query LoadBalancers[0].LoadBa
 echo "ELBResourceARN: $LOADBALANCER"
 ##Creating Stack
 echo "Creating Stack waf"
-response=$(aws cloudformation create-stack --stack-name "waf" --template-body file://owasp_10_base.yml --parameters ParameterKey=LOADBALANCER,ParameterValue=$LOADBALANCER) 
+response=$(aws cloudformation create-stack --stack-name "waf" --template-body file://csye6225-cf-owasp.yaml --parameters ParameterKey=LOADBALANCER,ParameterValue=$LOADBALANCER) 
 #response=$(aws cloudformation create-stack --stack-name "$1" --template-body file://csye6225-cf-networking.yaml)
 echo "Waiting for Stack waf to be created"
 echo "$response"

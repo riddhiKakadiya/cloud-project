@@ -42,6 +42,10 @@ Parameters:
     Default: "csye6225-s19-mandakathils.me."
     Description: Domain Name for the server
     Type: String
+  DomainCert:
+    Default: "arn:aws:acm:us-east-1:165960615265:certificate/bcb8fa5c-f3df-4c5e-b948-d2c40d5c68e9"
+    Description: Domain Cert
+    Type: String
 
 Resources:
 
@@ -150,14 +154,14 @@ Resources:
                 - ''
                 - ['arn:aws:s3:::',!Ref S3BucketName,'/*']
 
-  DomainCert:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      DomainName: !Ref "DomainName"
-      ValidationMethod: "DNS"
-      DomainValidationOptions:
-      - DomainName: !Ref "DomainName"
-        ValidationDomain: !Ref "DomainName"
+  # DomainCert:
+  #   Type: AWS::CertificateManager::Certificate
+  #   Properties:
+  #     DomainName: !Ref "DomainName"
+  #     ValidationMethod: "DNS"
+  #     DomainValidationOptions:
+  #     - DomainName: !Ref "DomainName"
+  #       ValidationDomain: !Ref "DomainName"
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -189,6 +193,10 @@ Resources:
         FromPort: 443
         ToPort: 443
         CidrIp: "0.0.0.0/0"
+      - IpProtocol: "tcp"
+        FromPort: 80
+        ToPort: 80
+        CidrIp: "0.0.0.0/0"
       SecurityGroupEgress:
       - IpProtocol: "tcp"
         FromPort: 80
@@ -209,24 +217,33 @@ Resources:
       SecurityGroups: 
       - !GetAtt LoadBalancerSecurityGroup.GroupId
 
-  Listener:
+  ListenerDefault:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
       - Type: forward
-        # RedirectConfig:
-        #     Host: "#{host}"
-        #     Path: "/#{path}"
-        #     Port: 443
-        #     Protocol: "HTTPS"
-        #     Query: "#{query}"
-        #     StatusCode: "HTTP_301"
         TargetGroupArn: !Ref TargetGroup
       LoadBalancerArn: !Ref LoadBalancer
       Port: 443
       Protocol: HTTPS
       Certificates : 
       - CertificateArn: !Ref DomainCert
+
+  ListenerRedirect:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+      - Type: redirect
+        RedirectConfig:
+            Host: "#{host}"
+            Path: "/#{path}"
+            Port: 443
+            Protocol: "HTTPS"
+            Query: "#{query}"
+            StatusCode: "HTTP_301"
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
 
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
