@@ -42,7 +42,10 @@ Parameters:
     Default: "csye6225-s19-mandakathils.me."
     Description: Domain Name for the server
     Type: String
-
+  DomainCert:
+    Default: "arn:aws:acm:us-east-1:165960615265:certificate/bcb8fa5c-f3df-4c5e-b948-d2c40d5c68e9"
+    Description: Domain Cert
+    Type: String
     #WAF PARAMETERS
   stackPrefix:
     Type: String
@@ -281,14 +284,14 @@ Resources:
                 - ''
                 - ['arn:aws:s3:::',!Ref S3BucketName,'/*']
 
-  DomainCert:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      DomainName: !Ref "DomainName"
-      ValidationMethod: "DNS"
-      DomainValidationOptions:
-      - DomainName: !Ref "DomainName"
-        ValidationDomain: !Ref "DomainName"
+  # DomainCert:
+  #   Type: AWS::CertificateManager::Certificate
+  #   Properties:
+  #     DomainName: !Ref "DomainName"
+  #     ValidationMethod: "DNS"
+  #     DomainValidationOptions:
+  #     - DomainName: !Ref "DomainName"
+  #       ValidationDomain: !Ref "DomainName"
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -695,10 +698,6 @@ Resources:
           DataId: !Ref wafgSQLiSet
 
 ## 2.
-## OWASP Top 10 A2
-## Blacklist bad/hijacked JWT tokens or session IDs
-## Matches the specific values in the cookie or Authorization header
-## for JWT it is sufficient to check the signature
   wafrAuthTokenStringSet:
     Type: AWS::WAFRegional::ByteMatchSet
     Condition: isRegional
@@ -758,9 +757,6 @@ Resources:
 
 
 ## 3.
-## OWASP Top 10 A3
-## Mitigate Cross Site Scripting Attacks
-## Matches attempted XSS patterns in the URI, QUERY_STRING, BODY, COOKIES
   wafrXSSSet:
     Type: AWS::WAFRegional::XssMatchSet
     Condition: isRegional
@@ -847,10 +843,6 @@ Resources:
           DataId: !Ref wafgXSSSet
 
 ## 4.
-## OWASP Top 10 A4
-## Path Traversal, LFI, RFI
-## Matches request patterns designed to traverse filesystem paths, and include
-## local or remote files
   wafrPathsStringSet:
     Type: AWS::WAFRegional::ByteMatchSet
     Condition: isRegional
@@ -965,10 +957,6 @@ Resources:
           DataId: !Ref wafgPathsStringSet
 
 ## 5.
-## OWASP Top 10 A4
-## Privileged Module Access Restrictions
-## Restrict access to the admin interface to known source IPs only
-## Matches the URI prefix, when the remote IP isn't in the whitelist
   wafrAdminUrlStringSet:
     Type: AWS::WAFRegional::ByteMatchSet
     Condition: isRegional
@@ -1035,9 +1023,6 @@ Resources:
           DataId: !Ref wafgAdminRemoteAddrIpSet
 
 ## 6.
-## OWASP Top 10 A5
-## PHP Specific Security Misconfigurations
-## Matches request patterns designed to exploit insecure PHP/CGI configuration
   wafrPHPInsecureQSStringSet:
     Type: AWS::WAFRegional::ByteMatchSet
     Condition: isRegional
@@ -1190,9 +1175,6 @@ Resources:
           DataId: !Ref wafgPHPInsecureURIStringSet
 
 ## 7.
-## OWASP Top 10 A7
-## Mitigate abnormal requests via size restrictions
-## Enforce consistent request hygene, limit size of key elements
   wafrSizeRestrictionSet:
     Type: AWS::WAFRegional::SizeConstraintSet
     Condition: isRegional
@@ -1269,9 +1251,6 @@ Resources:
           DataId: !Ref wafgSizeRestrictionSet
 
 ## 8.
-## OWASP Top 10 A8
-## CSRF token enforcement example
-## Enforce the presence of CSRF token in request header
   wafrCSRFMethodStringSet:
     Type: AWS::WAFRegional::ByteMatchSet
     Condition: isRegional
@@ -1346,9 +1325,6 @@ Resources:
           DataId: !Ref wafgCSRFTokenSizeConstraint
 
 ## 9.
-## OWASP Top 10 A9
-## Server-side includes & libraries in webroot
-## Matches request patterns for webroot objects that shouldn't be directly accessible
   wafrServerSideIncludeStringSet:
     Type: AWS::WAFRegional::ByteMatchSet
     Condition: isRegional
@@ -1463,9 +1439,6 @@ Resources:
           DataId: !Ref wafgServerSideIncludeStringSet
 
 ## 10.
-## Generic
-## IP Blacklist
-## Matches IP addresses that should not be allowed to access content
   wafrBlacklistIpSet:
     Type: AWS::WAFRegional::IPSet
     Condition: isRegional
@@ -1624,59 +1597,5 @@ Resources:
     Properties:
       ResourceArn: !Ref LoadBalancer
       WebACLId: !Ref wafrOwaspACL
-
-## ::OUTPUTS::
-## Outputs useful in other templates
-Outputs:
-  wafWebACL:
-    Value: !If [ isRegional, !Ref wafrOwaspACL, !Ref wafgOwaspACL ]
-  wafWebACLMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'owaspacl']]
-  wafSQLiRule:
-    Value: !If [ isRegional, !Ref wafrSQLiRule, !Ref wafgSQLiRule ]
-  wafSQLiRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'mitigatesqli']]
-  wafAuthTokenRule:
-    Value: !If [ isRegional, !Ref wafrAuthTokenRule, !Ref wafgAuthTokenRule ]
-  wafAuthTokenRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'badauthtokens']]
-  wafXSSRule:
-    Value: !If [ isRegional, !Ref wafrXSSRule, !Ref wafgXSSRule ]
-  wafXSSRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'mitigatexss']]
-  wafPathsRule:
-    Value: !If [ isRegional, !Ref wafrPathsRule, !Ref wafgPathsRule ]
-  wafPathsRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'detectrfilfi']]
-  wafPHPMisconfigRule:
-    Value: !If [ isRegional, !Ref wafrPHPInsecureRule, !Ref wafgPHPInsecureRule ]
-  wafPHPMisconfigRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'detectphpinsecure']]
-  wafAdminAccessRule:
-    Value: !If [ isRegional, !Ref wafrAdminAccessRule, !Ref wafgAdminAccessRule ]
-  wafAdminAccessRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'detectadminaccess']]
-  wafCSRFRule:
-    Value: !If [ isRegional, !Ref wafrCSRFRule, !Ref wafgCSRFRule ]
-  wafCSRFRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'enforcecsrf']]
-  wafSSIRule:
-    Value: !If [ isRegional, !Ref wafrServerSideIncludeRule, !Ref wafgServerSideIncludeRule ]
-  wafSSIRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'detectssi']]
-  wafBlacklistIpRule:
-    Value: !If [ isRegional, !Ref wafrBlacklistIpRule, !Ref wafgBlacklistIpRule ]
-  wafBlacklistIpRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'blacklistedips']]
-  wafSizeRestrictionRule:
-    Value: !If [ isRegional, !Ref wafrSizeRestrictionRule, !Ref wafgSizeRestrictionRule ]
-  wafSizeRestrictionRuleMetric:
-    Value: !Join ['', [!Ref stackPrefix, 'restrictsizes']]
-  wafAuthTokenBlacklist:
-    Value: !If [ isRegional, !Ref wafrAuthTokenStringSet, !Ref wafgAuthTokenStringSet ]
-  wafAdminAccessWhitelist:
-    Value: !If [ isRegional, !Ref wafrAdminRemoteAddrIpSet, !Ref wafgAdminRemoteAddrIpSet ]
-  wafIpBlacklist:
-    Value: !If [ isRegional, !Ref wafrBlacklistIpSet, !Ref wafgBlacklistIpSet ]
 
 #END WAF RESOURCES
