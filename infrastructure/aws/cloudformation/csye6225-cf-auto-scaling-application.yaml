@@ -42,10 +42,10 @@ Parameters:
     Default: "csye6225-s19-mandakathils.me."
     Description: Domain Name for the server
     Type: String
-  DomainCert:
-    Default: "arn:aws:acm:us-east-1:165960615265:certificate/bcb8fa5c-f3df-4c5e-b948-d2c40d5c68e9"
-    Description: Domain Cert
-    Type: String
+  # DomainCert:
+  #   Default: "arn:aws:acm:us-east-1:165960615265:certificate/bcb8fa5c-f3df-4c5e-b948-d2c40d5c68e9"
+  #   Description: Domain Cert
+  #   Type: String
     #WAF PARAMETERS
   stackPrefix:
     Type: String
@@ -284,14 +284,14 @@ Resources:
                 - ''
                 - ['arn:aws:s3:::',!Ref S3BucketName,'/*']
 
-  # DomainCert:
-  #   Type: AWS::CertificateManager::Certificate
-  #   Properties:
-  #     DomainName: !Ref "DomainName"
-  #     ValidationMethod: "DNS"
-  #     DomainValidationOptions:
-  #     - DomainName: !Ref "DomainName"
-  #       ValidationDomain: !Ref "DomainName"
+  DomainCert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref "DomainName"
+      ValidationMethod: "DNS"
+      DomainValidationOptions:
+      - DomainName: !Ref "DomainName"
+        ValidationDomain: !Ref "DomainName"
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
