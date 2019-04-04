@@ -125,21 +125,21 @@ $ curl http://{EC2_hostname}/reset
 ```
 
 ## Web End-points
-__________________________________________________________________________________________________
-num | request  | path                 | required variables 		            |Authorization type   |
-____|____type__|______________________|_____________________________________|_____________________|
 
- 1  |  GET     | /                    |           NA                        | No auth required
- 2  |  POST    | /user/register       | username:"", Password: ""           | No auth required
- 3  |  POST    | /note                | title:"", content: ""               | Basic auth required
- 4  |  GET     | /note                | NA                                  | Basic auth required
- 5  |  GET     | /note/id             | NA                                  | Basic auth required
- 6  |  DELETE  | /note/id             | NA                                  | Basic auth required
- 7  |  PUT     | /note/id             | title:"", content: ""               | Basic auth required
- 8  |  POST    | /note/attachments    | attachment: ("attach-file")         | Basic auth required
- 9  |  PUT     | /note/attachments/id | attachment: ("attach-new file")     | Basic auth required
- 10 |  GET     | /note/attachments/id | NA                                  | Basic auth required
- 11 | DELETE   | /note/attachments/id | NA                                  | Basic auth required
+num | request type | path | required variables |Authorization type |
+| --- | --- | --- | --- | --- |
+
+| 1 | GET | / | NA | No auth required |
+| 2 | POST | /user/register | username:"", Password: "" | No auth required |
+| 3 | POST | /note | title:"", content: "" | Basic auth required |
+| 4 | GET | /note | NA | Basic auth required |
+| 5 | GET | /note/id | NA | Basic auth required |
+| 6 | DELETE | /note/id | NA | Basic auth required |
+| 7 | PUT | /note/id | title:"", content: "" | Basic auth required |
+| 8 | POST | /note/attachments | attachment: ("attach-file") | Basic auth required |
+| 9 | PUT | /note/attachments/id | attachment: ("attach-new file") | Basic auth required
+| 10 | GET | /note/attachments/id | NA | Basic auth required
+| 11 | DELETE | /note/attachments/id | NA | Basic auth required
  ________________________________________________________________________________________________
 
 
