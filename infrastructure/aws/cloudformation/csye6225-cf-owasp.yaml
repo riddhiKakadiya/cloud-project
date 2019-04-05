@@ -238,16 +238,23 @@ Resources:
       ByteMatchTuples:
         - FieldToMatch:
             Type: HEADER
-            Data: cookie
-          PositionalConstraint: CONTAINS
-          TargetString: example-session-id
-          TextTransformation: URL_DECODE
-        - FieldToMatch:
-            Type: HEADER
             Data: authorization
-          PositionalConstraint: ENDS_WITH
-          TargetString: .TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-          TextTransformation: URL_DECODE
+          PositionalConstraint: STARTS_WITH
+          TargetString: Basic
+          TextTransformation: NONE
+
+  noteAPIStringSet:
+    Type: AWS::WAFRegional::ByteMatchSet
+    Condition: isRegional
+    Properties:
+      Name: !Join ['-', [!Ref stackPrefix, 'match-note-api']]
+      ByteMatchTuples:
+        - FieldToMatch:
+            Type: URI
+          PositionalConstraint: CONTAINS
+          TargetString: note
+          TextTransformation: NONE
+
   wafgAuthTokenStringSet:
     Type: AWS::WAF::ByteMatchSet
     Condition: isGlobal
@@ -263,9 +270,10 @@ Resources:
         - FieldToMatch:
             Type: HEADER
             Data: authorization
-          PositionalConstraint: ENDS_WITH
-          TargetString: .TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-          TextTransformation: URL_DECODE
+          PositionalConstraint: STARTS_WITH
+          TargetString: Basic
+          TextTransformation: NONE
+
   wafrAuthTokenRule:
     Type: AWS::WAFRegional::Rule
     Condition: isRegional
@@ -274,8 +282,12 @@ Resources:
       Name: !Join ['-', [!Ref stackPrefix, 'detect-bad-auth-tokens']]
       Predicates:
         - Type: ByteMatch
-          Negated: false
+          Negated: true
           DataId: !Ref wafrAuthTokenStringSet
+        - Type: ByteMatch
+          Negated: false
+          DataId: !Ref noteAPIStringSet
+
   wafgAuthTokenRule:
     Type: AWS::WAF::Rule
     Condition: isGlobal
