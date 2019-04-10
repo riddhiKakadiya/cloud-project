@@ -182,7 +182,7 @@ Resources:
       - Key: Name
         Value: csye6225-TargetGroup
 
-  TargetGroup2:
+  TargetGroupNoWaf:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       HealthCheckIntervalSeconds: 5
@@ -265,10 +265,10 @@ Resources:
       Protocol: HTTP
 
 
-  LoadBalancer2:
+  LoadBalancerNoWaf:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: "csye6225LoadBalancer2"
+      Name: "csye6225LoadBalancerNoWaf"
       Scheme: "internet-facing"
       IpAddressType: "ipv4"
       Subnets:
@@ -278,19 +278,19 @@ Resources:
       SecurityGroups: 
       - !GetAtt LoadBalancerSecurityGroup.GroupId
 
-  ListenerDefault2:
+  ListenerDefaultNoWaf:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref TargetGroup2
-      LoadBalancerArn: !Ref LoadBalancer2
+        TargetGroupArn: !Ref TargetGroupNoWaf
+      LoadBalancerArn: !Ref LoadBalancerNoWaf
       Port: 443
       Protocol: HTTPS
       Certificates : 
       - CertificateArn: !Ref DomainCert
 
-  ListenerRedirect2:
+  ListenerRedirectNoWaf:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
@@ -302,7 +302,7 @@ Resources:
             Protocol: "HTTPS"
             Query: "#{query}"
             StatusCode: "HTTP_301"
-      LoadBalancerArn: !Ref LoadBalancer2
+      LoadBalancerArn: !Ref LoadBalancerNoWaf
       Port: 80
       Protocol: HTTP
 
@@ -336,13 +336,13 @@ Resources:
       Name: !Join ["",[!Ref DomainName,"."]]
       Type: "A"
 
-  Route53RecordSetA2:
+  Route53RecordSetANoWaf:
     Type: AWS::Route53::RecordSet
     Properties: 
       AliasTarget:
-        DNSName: !GetAtt LoadBalancer2.DNSName
+        DNSName: !GetAtt LoadBalancerNoWaf.DNSName
         EvaluateTargetHealth: "true"
-        HostedZoneId: !GetAtt LoadBalancer2.CanonicalHostedZoneID
+        HostedZoneId: !GetAtt LoadBalancerNoWaf.CanonicalHostedZoneID
       HostedZoneName: !Join ["",[!Ref DomainName,"."]]
       Comment: "User Domain Name"
       Name: !Join ["",["nowaf.",!Ref DomainName,"."]]
@@ -407,7 +407,7 @@ Resources:
       DesiredCapacity: "3"
       TargetGroupARNs: 
       - !Ref "TargetGroup"
-      - !Ref "TargetGroup2"
+      - !Ref "TargetGroupNoWaf"
       Tags:
       - Key: Name
         PropagateAtLaunch: "true"
