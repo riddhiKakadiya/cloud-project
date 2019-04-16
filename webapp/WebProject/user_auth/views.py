@@ -327,7 +327,7 @@ def signin(request):
 					if user is not None:
 						d = {}
 						current_time = datetime.datetime.now().date()
-						return JsonResponse({"current time": current_time})
+						return JsonResponse({"current time": json.dumps(current_time)})
 		# otherwise ask for authentification
 		return JsonResponse({'message': 'Error : Incorrect user details entered'}, status=401)
 	else:
