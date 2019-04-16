@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test import Client
 import base64
-import time
+import datetime
 
 from .views import validateUserName , validatePassword
 
@@ -20,28 +20,12 @@ class BasicAuthTest(TestCase):
 		up = self.username+':'+self.password
 		auth_headers = {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode(up.encode('utf-8')).decode('utf-8'),}
 		c = Client()
-		response = c.get('/', **auth_headers)
-		response = c.get('', **auth_headers)
+		response = c.get('/timestamp', **auth_headers)
+		# response = c.get('', **auth_headers)
 		self.assertEqual(response.status_code, 200)
 
 
-	def testUserAuthentication(self):
-		up = self.username + ':' + self.password
-		auth_headers = {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode(up.encode('utf-8')).decode('utf-8'), }
-		c = Client()
-		response = c.get('', **auth_headers)
-		test_time = response.json()
-		test_time=test_time['current time']
-		test_time = time.strptime(test_time)
-		test_time = time.mktime(test_time)
-
-		cur_time = time.ctime()
-		cur_time = time.strptime(cur_time)
-		cur_time = time.mktime(cur_time)
-		elapsed= (cur_time - test_time)/60
-
-		self.assertTrue(elapsed<=60)
-
+	
 
 	#deleting user
 	def tearDown(self):
