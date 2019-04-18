@@ -40,12 +40,12 @@
           <collectionProp name="Arguments.arguments">
             <elementProp name="domainName" elementType="Argument">
               <stringProp name="Argument.name">domainName</stringProp>
-              <stringProp name="Argument.value">csye6225-s19-mandakathils.me</stringProp>
+              <stringProp name="Argument.value">csye6225-spring2019-kamleshr.me</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
             <elementProp name="attachment_path" elementType="Argument">
               <stringProp name="Argument.name">attachment_path</stringProp>
-              <stringProp name="Argument.value">C:\Users\sreer\Desktop\scrapy.txt</stringProp>
+              <stringProp name="Argument.value">/home/riddhikakadiya/Desktop/sample.txt</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
           </collectionProp>
@@ -209,7 +209,14 @@
             </collectionProp>
           </elementProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-            <collectionProp name="Arguments.arguments"/>
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
           </elementProp>
           <stringProp name="HTTPSampler.domain">${domainName}</stringProp>
           <stringProp name="HTTPSampler.port">443</stringProp>
